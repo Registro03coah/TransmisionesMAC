@@ -65,7 +65,7 @@
             <div class="bg-gradient-to-r from-indigo-900/60 to-slate-800/80 p-8 rounded-2xl border border-indigo-500/30 shadow-xl backdrop-blur-md">
                 <h2 class="text-3xl font-extrabold text-white mb-2">Panel de Control General</h2>
                 <p class="text-slate-300 max-w-2xl">
-                    Sistema integral con calendario sincronizado de días festivos y adicionales laborables, autocalculando días de transmisión e impactos.
+                    Sistema integral con calendario sincronizado, formato DD/MM/AAAA e indicador dinámico de videos vigentes.
                 </p>
             </div>
 
@@ -99,7 +99,7 @@
                         <span class="text-xs bg-amber-500/10 text-amber-400 px-2.5 py-1 rounded-full font-semibold">Configuración</span>
                     </div>
                     <h3 class="text-xl font-bold text-white mb-1">Calendario & Festivos</h3>
-                    <p class="text-sm text-slate-400">Gestión de días inhábiles y adicionales laborados con cálculo automático de día.</p>
+                    <p class="text-sm text-slate-400">Gestión de días inhábiles y adicionales laborados con formato DD/MM/AAAA.</p>
                 </div>
             </div>
         </section>
@@ -113,7 +113,13 @@
                     </h2>
                     <p class="text-xs text-slate-400">Registros ordenados cronológicamente por su fecha de inicio de transmisión.</p>
                 </div>
-                <div class="flex gap-2">
+                <div class="flex flex-wrap items-center gap-3">
+                    <!-- INSIGNIA DE VIDEOS VIGENTES -->
+                    <div class="bg-orange-600/20 border border-orange-500/40 text-orange-300 px-4 py-2 rounded-xl text-sm font-bold shadow flex items-center space-x-2">
+                        <i class="fa-solid fa-video text-orange-400"></i>
+                        <span>Videos Vigentes: <span id="badge-vigentes" class="text-white bg-orange-600 px-2 py-0.5 rounded-md ml-1">0</span></span>
+                    </div>
+
                     <button onclick="recargarDatosForzado()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg text-sm font-semibold transition flex items-center shadow">
                         <i class="fa-solid fa-rotate mr-2"></i> Sincronizar / Cargar Todos
                     </button>
@@ -192,7 +198,7 @@
                         <h2 class="text-xl font-bold text-white flex items-center">
                             <i class="fa-solid fa-calendar-days text-amber-400 mr-2"></i> Módulo Independiente: Días Festivos y Laborales
                         </h2>
-                        <p class="text-xs text-slate-400">Días inhábiles y adicionales laborados con cálculo automático de día de la semana.</p>
+                        <p class="text-xs text-slate-400">Días inhábiles y adicionales laborados con formato DD/MM/AAAA.</p>
                     </div>
                     <button onclick="abrirModalCalendario()" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center shadow">
                         <i class="fa-solid fa-plus mr-2"></i> Agregar Día Especial
@@ -278,7 +284,7 @@
 
     <!-- PIE DE PÁGINA -->
     <footer class="bg-slate-800 border-t border-slate-700 py-4 mt-auto text-center text-xs text-slate-400">
-        Contador de Impactos Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.17
+        Contador de Impactos Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.18
     </footer>
 
     <!-- MODAL NUEVO / EDITAR VIDEO -->
@@ -380,10 +386,22 @@
         window.dbCalendario = [];
         window.FECHA_ACTUAL = new Date().toISOString().split('T')[0];
 
+        // Función para formatear YYYY-MM-DD a DD/MM/AAAA
+        window.formatearFechaDDMMYYYY = function(fechaStr) {
+            if (!fechaStr) return "";
+            if (fechaStr.includes('/')) return fechaStr; // Ya está formateada
+            const partes = fechaStr.split('-');
+            if (partes.length === 3) {
+                return `${partes[2]}/${partes[1]}/${partes[0]}`;
+            }
+            return fechaStr;
+        };
+
         // Función para obtener el día de la semana en español automáticamente a partir de una fecha YYYY-MM-DD
         window.obtenerDiaSemana = function(fechaStr) {
             if (!fechaStr) return "";
-            const [y, m, d] = fechaStr.split('-').map(Number);
+            const limpio = fechaStr.includes('/') ? fechaStr.split('/').reverse().join('-') : fechaStr;
+            const [y, m, d] = limpio.split('-').map(Number);
             const fecha = new Date(y, m - 1, d);
             const dias = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
             return dias[fecha.getDay()];
@@ -685,25 +703,16 @@
                 window.dbCalendario = [];
                 calSnap.forEach(d => window.dbCalendario.push({ idDoc: d.id, ...d.data() }));
 
-                // Precarga de listas exactas de la imagen (Festivos y Adicionales Laborados)
                 if (window.dbCalendario.length === 0) {
                     const festivosOficiales = [
-                        { fecha: "2025-01-01", desc: "Año Nuevo" },
-                        { fecha: "2025-03-17", desc: "Natalicio Benito Juárez" },
-                        { fecha: "2025-02-02", desc: "Día Festivo" },
-                        { fecha: "2025-04-17", desc: "Jueves Santo" },
-                        { fecha: "2025-04-18", desc: "Viernes Santo" },
-                        { fecha: "2025-04-19", desc: "Sábado de Gloria" },
-                        { fecha: "2025-04-24", desc: "Día Festivo" },
-                        { fecha: "2025-04-26", desc: "Día Festivo" },
-                        { fecha: "2025-05-01", desc: "Día del Trabajo" },
-                        { fecha: "2025-05-05", desc: "Batalla de Puebla" },
-                        { fecha: "2025-09-16", desc: "Independencia de México" },
-                        { fecha: "2025-11-17", desc: "Revolución Mexicana" },
-                        { fecha: "2025-11-18", desc: "Día Festivo" },
-                        { fecha: "2025-12-24", desc: "Nochebuena" },
-                        { fecha: "2025-12-25", desc: "Navidad" },
-                        { fecha: "2026-12-31", desc: "Fin de Año" },
+                        { fecha: "2025-01-01", desc: "Año Nuevo" }, { fecha: "2025-03-17", desc: "Natalicio Benito Juárez" },
+                        { fecha: "2025-02-02", desc: "Día Festivo" }, { fecha: "2025-04-17", desc: "Jueves Santo" },
+                        { fecha: "2025-04-18", desc: "Viernes Santo" }, { fecha: "2025-04-19", desc: "Sábado de Gloria" },
+                        { fecha: "2025-04-24", desc: "Día Festivo" }, { fecha: "2025-04-26", desc: "Día Festivo" },
+                        { fecha: "2025-05-01", desc: "Día del Trabajo" }, { fecha: "2025-05-05", desc: "Batalla de Puebla" },
+                        { fecha: "2025-09-16", desc: "Independencia de México" }, { fecha: "2025-11-17", desc: "Revolución Mexicana" },
+                        { fecha: "2025-11-18", desc: "Día Festivo" }, { fecha: "2025-12-24", desc: "Nochebuena" },
+                        { fecha: "2025-12-25", desc: "Navidad" }, { fecha: "2026-12-31", desc: "Fin de Año" },
                         { fecha: "2026-01-01", desc: "Año Nuevo" }
                     ];
 
@@ -770,6 +779,11 @@
         window.renderizarTodo = function() {
             window.procesarCalculosAutomaticos();
             document.getElementById('contador-videos').innerText = window.dbVideos.length;
+
+            // Actualizar contador de videos vigentes en la insignia naranja
+            const vigentesCount = window.dbVideos.filter(v => v.vigente === 'VIGENTE').length;
+            document.getElementById('badge-vigentes').innerText = vigentesCount;
+
             window.renderBDVideos();
             window.renderReporteVersion();
             window.renderCalendario();
@@ -788,8 +802,8 @@
                         <td class="p-3">${v.version || ''}</td>
                         <td class="p-3 text-slate-400">${v.tematica || ''}</td>
                         <td class="p-3 font-mono">${v.duracion || ''}</td>
-                        <td class="p-3">${v.inicio_transmision || ''}</td>
-                        <td class="p-3">${v.cierre_transmision || ''}</td>
+                        <td class="p-3 font-mono">${window.formatearFechaDDMMYYYY(v.inicio_transmision) || ''}</td>
+                        <td class="p-3 font-mono">${window.formatearFechaDDMMYYYY(v.cierre_transmision) || ''}</td>
                         <td class="p-3 text-center">${v.festivos || 0}</td>
                         <td class="p-3 text-center">${v.dias_transmision || 0}</td>
                         <td class="p-3 text-center font-bold text-emerald-400">${Math.round(v.repeticiones || 0)}</td>
@@ -833,10 +847,11 @@
             tAdicionales.innerHTML = '';
             window.dbCalendario.forEach(c => {
                 const diaSemana = window.obtenerDiaSemana(c.fecha);
+                const fechaFormateada = window.formatearFechaDDMMYYYY(c.fecha);
                 if (c.tipo === 'festivo') {
-                    tFestivos.innerHTML += `<tr class="hover:bg-slate-750"><td class="p-2.5 font-mono text-amber-300">${c.fecha}</td><td class="p-2.5 capitalize text-slate-300">${diaSemana}</td><td class="p-2.5">${c.descripcion || 'Festivo'}</td><td class="p-2.5 text-center"><button onclick="eliminarDia('${c.idDoc}')" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                    tFestivos.innerHTML += `<tr class="hover:bg-slate-750"><td class="p-2.5 font-mono text-amber-300">${fechaFormateada}</td><td class="p-2.5 capitalize text-slate-300">${diaSemana}</td><td class="p-2.5">${c.descripcion || 'Festivo'}</td><td class="p-2.5 text-center"><button onclick="eliminarDia('${c.idDoc}')" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-trash"></i></button></td></tr>`;
                 } else {
-                    tAdicionales.innerHTML += `<tr class="hover:bg-slate-750"><td class="p-2.5 font-mono text-emerald-300">${c.fecha}</td><td class="p-2.5 capitalize font-semibold text-emerald-400">${diaSemana}</td><td class="p-2.5">${c.descripcion || diaSemana}</td><td class="p-2.5 text-center"><button onclick="eliminarDia('${c.idDoc}')" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                    tAdicionales.innerHTML += `<tr class="hover:bg-slate-750"><td class="p-2.5 font-mono text-emerald-300">${fechaFormateada}</td><td class="p-2.5 capitalize font-semibold text-emerald-400">${diaSemana}</td><td class="p-2.5">${c.descripcion || diaSemana}</td><td class="p-2.5 text-center"><button onclick="eliminarDia('${c.idDoc}')" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-trash"></i></button></td></tr>`;
                 }
             });
         };
