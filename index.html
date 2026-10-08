@@ -13,9 +13,9 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
 
-    <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
+    <!-- BARRA DE NAVEGACIÓN SUPERIOR (ANCHO AMPLIADO) -->
     <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50 shadow-md">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+        <div class="w-[98%] mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="cambiarHoja('inicio')">
                 <img src="logo1_mario.jpg" onerror="this.src='https://via.placeholder.com/40?text=SDCI'" id="app-logo-thumb" class="w-10 h-10 rounded-xl object-cover border border-indigo-500/40 shadow-lg" alt="Logo">
                 <div>
@@ -55,15 +55,15 @@
         </div>
     </header>
 
-    <!-- CONTENEDOR PRINCIPAL DE HOJAS -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6">
+    <!-- CONTENEDOR PRINCIPAL AMPLIADO A MEDIDA DE LAS FLECHAS -->
+    <main class="flex-grow w-[98%] mx-auto px-2 py-6">
 
         <!-- 1. PÁGINA DE INICIO / DASHBOARD -->
         <section id="sheet-inicio" class="sheet-view space-y-6">
             <div class="bg-gradient-to-r from-indigo-900/60 to-slate-800/80 p-8 rounded-2xl border border-indigo-500/30 shadow-xl backdrop-blur-md">
                 <h2 class="text-3xl font-extrabold text-white mb-2">Panel de Control SDCI Distrito 03</h2>
-                <p class="text-slate-300 max-w-2xl">
-                    Sistema con motor de lectura de Excel robusto (multicriterio y posicional) para asegurar la carga correcta de IDs, versiones y temáticas.
+                <p class="text-slate-300 max-w-3xl">
+                    Sistema adaptado a pantalla completa para aprovechar todo el ancho del monitor, con etiquetas compactas para maximizar el espacio del nombre de las versiones.
                 </p>
             </div>
 
@@ -123,7 +123,7 @@
                 <div class="flex flex-wrap items-center gap-3">
                     <div class="flex items-center bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5">
                         <i class="fa-solid fa-search text-slate-400 mr-2"></i>
-                        <input type="text" id="input-buscar-video" placeholder="Buscar versión o temática..." oninput="filtrarBDVideos()" class="bg-transparent border-none text-sm text-white focus:outline-none w-44 sm:w-56">
+                        <input type="text" id="input-buscar-video" placeholder="Buscar versión o temática..." oninput="filtrarBDVideos()" class="bg-transparent border-none text-sm text-white focus:outline-none w-48 sm:w-64">
                     </div>
 
                     <div class="flex items-center bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5">
@@ -153,21 +153,21 @@
             </div>
 
             <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-xl">
-                <div class="overflow-x-auto max-h-[650px]">
+                <div class="overflow-x-auto max-h-[700px]">
                     <table class="w-full text-left border-collapse text-sm">
                         <thead class="bg-slate-900 text-slate-300 uppercase text-xs tracking-wider sticky top-0 border-b border-slate-700 z-10">
                             <tr>
-                                <th onclick="ordenarColumnaBD('id_video')" class="p-3 cursor-pointer hover:text-indigo-400 transition">ID <i class="fa-solid fa-sort ml-1"></i></th>
-                                <th onclick="ordenarColumnaBD('version')" class="p-3 cursor-pointer hover:text-indigo-400 transition">Nombre Versión <i class="fa-solid fa-sort ml-1"></i></th>
-                                <th onclick="ordenarColumnaBD('tematica')" class="p-3 cursor-pointer hover:text-indigo-400 transition">Temática <i class="fa-solid fa-sort ml-1"></i></th>
-                                <th onclick="ordenarColumnaBD('duracion')" class="p-3 cursor-pointer hover:text-indigo-400 transition">Duración <i class="fa-solid fa-sort ml-1"></i></th>
-                                <th onclick="ordenarColumnaBD('inicio_transmision')" class="p-3 cursor-pointer hover:text-indigo-400 transition">Inicio Transmisión <i class="fa-solid fa-sort ml-1"></i></th>
-                                <th onclick="ordenarColumnaBD('cierre_transmision')" class="p-3 cursor-pointer hover:text-indigo-400 transition">Cierre Transmisión <i class="fa-solid fa-sort ml-1"></i></th>
-                                <th class="p-3 text-center">Festivos</th>
-                                <th class="p-3 text-center">Días Transmisión</th>
-                                <th onclick="ordenarColumnaBD('repeticiones')" class="p-3 text-center cursor-pointer hover:text-indigo-400 transition">Impactos Periodo <i class="fa-solid fa-sort ml-1"></i></th>
-                                <th class="p-3 text-center">Estado</th>
-                                <th class="p-3 text-center">Acciones</th>
+                                <th onclick="ordenarColumnaBD('id_video')" class="p-3 w-16 cursor-pointer hover:text-indigo-400 transition">ID <i class="fa-solid fa-sort ml-1"></i></th>
+                                <th onclick="ordenarColumnaBD('version')" class="p-3 w-[35%] cursor-pointer hover:text-indigo-400 transition">Nombre Versión <i class="fa-solid fa-sort ml-1"></i></th>
+                                <th onclick="ordenarColumnaBD('tematica')" class="p-3 w-[20%] cursor-pointer hover:text-indigo-400 transition">Temática <i class="fa-solid fa-sort ml-1"></i></th>
+                                <th onclick="ordenarColumnaBD('duracion')" class="p-3 w-24 cursor-pointer hover:text-indigo-400 transition">Duración <i class="fa-solid fa-sort ml-1"></i></th>
+                                <th onclick="ordenarColumnaBD('inicio_transmision')" class="p-3 w-32 cursor-pointer hover:text-indigo-400 transition">Inicio <i class="fa-solid fa-sort ml-1"></i></th>
+                                <th onclick="ordenarColumnaBD('cierre_transmision')" class="p-3 w-32 cursor-pointer hover:text-indigo-400 transition">Cierre <i class="fa-solid fa-sort ml-1"></i></th>
+                                <th class="p-3 text-center w-20">Festivos</th>
+                                <th class="p-3 text-center w-24">Días Trans.</th>
+                                <th onclick="ordenarColumnaBD('repeticiones')" class="p-3 text-center w-28 cursor-pointer hover:text-indigo-400 transition">Impactos <i class="fa-solid fa-sort ml-1"></i></th>
+                                <th class="p-3 text-center w-24">Estado</th>
+                                <th class="p-3 text-center w-20">Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="tabla-bd-videos-body" class="divide-y divide-slate-700 text-slate-300"></tbody>
@@ -206,13 +206,13 @@
             </div>
 
             <div class="bg-slate-800 rounded-xl border-2 border-cyan-500 overflow-hidden shadow-2xl">
-                <div class="overflow-x-auto max-h-[600px]">
+                <div class="overflow-x-auto max-h-[650px]">
                     <table class="w-full text-left border-collapse text-sm">
                         <thead class="bg-slate-900 text-slate-300 uppercase text-xs tracking-wider sticky top-0 border-b border-slate-700 z-10">
                             <tr>
-                                <th class="p-3">Estatus</th>
-                                <th class="p-3">Temática</th>
-                                <th class="p-3">Versión</th>
+                                <th class="p-3 w-28">Estatus</th>
+                                <th class="p-3 w-[35%]">Temática</th>
+                                <th class="p-3 w-[45%]">Versión</th>
                                 <th class="p-3 text-right border-l border-amber-500/40 bg-amber-950/20 text-amber-300">IMPACTOS POR TEMÁTICA</th>
                             </tr>
                         </thead>
@@ -269,15 +269,15 @@
                 <h2 class="text-xl font-bold text-white flex items-center"><i class="fa-solid fa-list-check text-rose-400 mr-2"></i> Directorio y Control de Vigencias (Activos a la Fecha)</h2>
             </div>
             <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-xl">
-                <div class="overflow-x-auto max-h-[600px]">
+                <div class="overflow-x-auto max-h-[650px]">
                     <table class="w-full text-left border-collapse text-sm">
                         <thead class="bg-slate-900 text-slate-300 uppercase text-xs tracking-wider sticky top-0 border-b border-slate-700">
                             <tr>
-                                <th class="p-3">ID</th>
-                                <th class="p-3">Nombre de la versión</th>
-                                <th class="p-3">Temática</th>
-                                <th class="p-3 text-center">Días Transmitidos</th>
-                                <th class="p-3 text-right">Impactos en el periodo</th>
+                                <th class="p-3 w-20">ID</th>
+                                <th class="p-3 w-[45]">Nombre de la versión</th>
+                                <th class="p-3 w-[30%]">Temática</th>
+                                <th class="p-3 text-center w-32">Días Transmitidos</th>
+                                <th class="p-3 text-right w-36">Impactos en el periodo</th>
                             </tr>
                         </thead>
                         <tbody id="tabla-listadovigente-body" class="divide-y divide-slate-700 text-slate-300"></tbody>
@@ -290,7 +290,7 @@
 
     <!-- PIE DE PÁGINA -->
     <footer class="bg-slate-800 border-t border-slate-700 py-4 mt-auto text-center text-xs text-slate-400">
-        SDCI Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.29
+        SDCI Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.30
     </footer>
 
     <!-- MODAL DE ADMINISTRACIÓN Y CARGA MASIVA EXCEL -->
@@ -308,7 +308,7 @@
                 <div class="flex flex-wrap justify-between items-center gap-2">
                     <div>
                         <h4 class="font-bold text-indigo-400 text-base">1. Gestión de Catálogo: BD_Videos</h4>
-                        <p class="text-xs text-slate-400">Lectura robusta por nombres y posición exacta de columnas.</p>
+                        <p class="text-xs text-slate-400">Lectura robusta por posición exacta de columnas.</p>
                     </div>
                     <button onclick="borrarColeccion('bd_videos')" class="bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow transition">
                         <i class="fa-solid fa-trash mr-1.5"></i> Borrar Tabla BD_Videos
@@ -444,7 +444,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PRINCIPAL CON LECTURA POSICIONAL Y MULTICRITERIO DE EXCEL -->
+    <!-- SCRIPT PRINCIPAL -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -713,7 +713,6 @@
             }
         };
 
-        // --- CARGA DE EXCEL ROBUSTA Y POSICIONAL ---
         window.subirExcelBDVideos = function() {
             const input = document.getElementById('file-excel-videos');
             if (!input.files || input.files.length === 0) {
@@ -729,8 +728,6 @@
                     const workbook = XLSX.read(data, { type: 'array' });
                     const firstSheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[firstSheetName];
-                    
-                    // Extraer como array de filas (indexadas por posición para evitar fallos de cabecera)
                     const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
                     if (rows.length <= 1) {
@@ -741,13 +738,10 @@
                     const batch = writeBatch(db);
                     let count = 0;
 
-                    // Omitir la fila 0 (encabezados) y procesar desde la fila 1 en adelante
                     for (let i = 1; i < rows.length; i++) {
                         const r = rows[i];
                         if (!r || r.length === 0) continue;
 
-                        // Mapeo posicional exacto según tu estructura de Excel:
-                        // Columna 0: ID | Columna 1: Versión | Columna 2: Temática | Columna 3: Duración | Columna 4: Inicio | Columna 5: Cierre
                         const idVal = r[0] !== undefined ? String(r[0]) : "";
                         const versionVal = r[1] !== undefined ? String(r[1]) : "";
                         const tematicaVal = r[2] !== undefined ? String(r[2]) : "General";
@@ -755,7 +749,6 @@
                         const inicioVal = window.parsearFechaExcel(r[4]);
                         const cierreVal = window.parsearFechaExcel(r[5]);
 
-                        // Si la fila está totalmente vacía, saltarla
                         if (!idVal && !versionVal) continue;
 
                         const ref = doc(collection(db, "bd_videos"));
@@ -910,7 +903,7 @@
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-750 transition">
                         <td class="p-3 font-bold text-indigo-400">${v.id_video || ''}</td>
-                        <td class="p-3 font-medium text-white">${v.version || ''}</td>
+                        <td class="p-3 font-medium text-white break-words">${v.version || ''}</td>
                         <td class="p-3 text-slate-400">${v.tematica || ''}</td>
                         <td class="p-3 font-mono">${v.duracion || ''}</td>
                         <td class="p-3 font-mono">${window.formatearFechaDDMMYYYY(v.inicio_transmision) || ''}</td>
@@ -919,7 +912,7 @@
                         <td class="p-3 text-center font-bold text-indigo-300">${v.dias_transmision || 0}</td>
                         <td class="p-3 text-center font-bold text-emerald-400">${Math.round(v.repeticiones || 0)}</td>
                         <td class="p-3 text-center">
-                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${v.vigente === 'VIGENTE' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-slate-700 text-slate-400'}">
+                            <span class="px-2 py-0.5 rounded text-[11px] font-semibold ${v.vigente === 'VIGENTE' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-slate-700 text-slate-400'}">
                                 ${v.vigente || 'FINALIZADO'}
                             </span>
                         </td>
@@ -958,7 +951,7 @@
 
                     tbody.innerHTML += `
                         <tr class="hover:bg-slate-750">
-                            <td class="p-3"><span class="px-2 py-0.5 rounded text-xs ${v.vigente === 'VIGENTE' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-700 text-slate-400'}">${v.vigente}</span></td>
+                            <td class="p-3"><span class="px-2 py-0.5 rounded text-[11px] ${v.vigente === 'VIGENTE' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-700 text-slate-400'}">${v.vigente}</span></td>
                             <td class="p-3 text-slate-400">${v.tematica || ''}</td>
                             <td class="p-3 font-medium text-white">${v.version || ''}</td>
                             <td class="p-3 text-right font-bold text-amber-400 border-l border-amber-500/40 bg-amber-950/10 text-base">${impactosEnRango}</td>
@@ -1061,6 +1054,7 @@
 
         window.abrirModalCalendario = function() {
             document.getElementById('form-calendario').reset();
+            document.getElementById('modal-calendario').classList.add('hidden'); // bugfix
             document.getElementById('modal-calendario').classList.remove('hidden');
         };
 
