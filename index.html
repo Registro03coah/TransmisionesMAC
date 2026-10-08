@@ -273,7 +273,7 @@
 
     <!-- PIE DE PÁGINA -->
     <footer class="bg-slate-800 border-t border-slate-700 py-4 mt-auto text-center text-xs text-slate-400">
-        Contador de Impactos Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.12
+        Contador de Impactos Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.13
     </footer>
 
     <!-- MODAL NUEVO / EDITAR VIDEO -->
@@ -401,7 +401,7 @@
             const adicionalesSet = new Set(window.dbCalendario.filter(c => c.tipo === 'adicional').map(c => c.fecha));
             const hoyStr = window.FECHA_ACTUAL;
 
-            // 1. ELIMINAR DUPLICADOS DE VERSIONES EN LA MEMORIA LOCAL
+            // 1. ELIMINAR DUPLICADOS DE VERSIONES
             const versionesVistas = new Set();
             const unicos = [];
             window.dbVideos.forEach(v => {
@@ -413,16 +413,12 @@
             });
             window.dbVideos = unicos;
 
-            // 2. ORDENAMIENTO ALFABÉTICO ASCENDENTE DE IDs (A, B, C... Z, AA...) Y REASIGNACIÓN ESTRICTA SIN HUECOS
-            window.dbVideos.sort((a, b) => {
-                // Ordenar por fecha de inicio o versión si fuera necesario, pero mantenemos estabilidad
-                return (a.version || "").localeCompare(b.version || "");
-            });
+            // 2. ORDENAMIENTO ALFABÉTICO ASCENDENTE Y ASIGNACIÓN DE ID ÚNICO
+            window.dbVideos.sort((a, b) => (a.version || "").localeCompare(b.version || ""));
 
             window.dbVideos.forEach((v, index) => {
                 v.id_video = window.generarIdExcel(index);
 
-                // Vigencia
                 if (v.cierre_transmision < hoyStr) {
                     v.vigente = "FINALIZADO";
                 } else {
@@ -444,7 +440,7 @@
                     let dd = String(curr.getDate()).padStart(2, '0');
                     let fStr = `${yyyy}-${mm}-${dd}`;
 
-                    let dayOfWeek = curr.getDay();
+                    let dayOfWeek = curr.getDay(); // 0: Domingo, 6: Sábado
                     let esFestivo = festivosSet.has(fStr);
                     let esAdicional = adicionalesSet.has(fStr);
 
@@ -461,7 +457,7 @@
 
                     if (esLaboral) {
                         diasTransmisionCount++;
-                        // Si está vigente calcula hasta hoy, si está finalizado calcula SOLO hasta su fecha de cierre
+                        // Si está finalizado calcula SOLO hasta su fecha de cierre. Si está vigente calcula hasta hoy (o cierre si es menor).
                         let limiteCalculo = (v.vigente === "FINALIZADO") ? cierre : (hoy < cierre ? hoy : cierre);
                         if (curr <= limiteCalculo) {
                             let videosActivosHoy = window.dbVideos.filter(vid => fStr >= vid.inicio_transmision && fStr <= vid.cierre_transmision);
@@ -469,6 +465,7 @@
 
                             if (sumaSegundosHoy > 0) {
                                 let durSeg = window.duracionASegundos(v.duracion);
+                                // Fórmula oficial de impactos diarios
                                 let repDia = (3600 / sumaSegundosHoy) * 7 * (durSeg / 60);
                                 repeticionesAcumuladas += repDia;
                             }
@@ -482,7 +479,6 @@
                 v.repeticiones = isNaN(repeticionesAcumuladas) ? 0 : repeticionesAcumuladas;
             });
 
-            // Reordenar alfabéticamente por su ID asignado (A, B, C...)
             window.dbVideos.sort((a, b) => a.id_video.localeCompare(b.id_video, undefined, { numeric: true, sensitivity: 'base' }));
         };
 
@@ -494,38 +490,38 @@
                     window.dbVideos.push({ idDoc: docSnap.id, ...docSnap.data() });
                 });
 
-                if (window.dbVideos.length < 5) {
-                    const datosBase = [
-                        { version: "¿Por qué es necesaria una nueva Distritación Electoral?", tematica: "Distritación", duracion: "00:00:39", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
-                        { version: "Los criterios para conformar los nuevos distritos electorales", tematica: "Distritación", duracion: "00:00:50", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
-                        { version: "Juventudes y Democracia", tematica: "Educacion Civica", duracion: "00:01:07", inicio_transmision: "2026-08-21", cierre_transmision: "2026-10-07" },
-                        { version: "C5_SB_INICIA PEF 2026 2027", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "2026-10-05", cierre_transmision: "2026-11-30" }
-                    ];
-
-                    for (let i = 0; i < datosBase.length; i++) {
-                        let item = datosBase[i];
-                        item.id_video = window.generarIdExcel(i);
-                        await addDoc(collection(db, "bd_videos"), item);
-                    }
-
-                    const qReload = await getDocs(collection(db, "bd_videos"));
-                    window.dbVideos = [];
-                    qReload.forEach(d => window.dbVideos.push({ idDoc: d.id, ...d.data() }));
-                }
-
                 const calSnap = await getDocs(collection(db, "calendario_config"));
                 window.dbCalendario = [];
                 calSnap.forEach(d => window.dbCalendario.push({ idDoc: d.id, ...d.data() }));
 
+                // Precarga automática de la lista oficial de festivos y días adicionales si está vacía
                 if (window.dbCalendario.length === 0) {
-                    const calOficiales = [
-                        { tipo: "festivo", fecha: "2025-01-01", descripcion: "Año Nuevo" },
-                        { tipo: "festivo", fecha: "2025-03-17", descripcion: "Natalicio Benito Juárez" },
-                        { tipo: "adicional", fecha: "2025-01-04", descripcion: "sábado" }
+                    const festivosOficiales = [
+                        "2025-01-01", "2025-03-17", "2025-02-02", "2025-04-17", "2025-04-18",
+                        "2025-04-19", "2025-04-24", "2025-04-26", "2025-05-01", "2025-05-05",
+                        "2025-09-16", "2025-11-17", "2025-11-18", "2025-12-24", "2025-12-25",
+                        "2026-12-31", "2026-01-01", "2026-02-01", "2026-02-08", "2026-01-31"
                     ];
-                    for (let item of calOficiales) {
-                        await addDoc(collection(db, "calendario_config"), item);
-                    }
+                    const adicionalesOficiales = [
+                        "2025-01-04", "2025-01-11", "2025-01-12", "2025-01-18", "2025-01-25",
+                        "2025-02-01", "2025-02-02", "2025-02-08", "2025-02-15", "2025-02-22",
+                        "2025-03-01", "2025-03-08", "2025-03-15", "2025-03-22", "2025-03-23",
+                        "2025-03-29", "2025-04-05", "2025-04-12", "2025-04-26", "2025-05-03",
+                        "2025-05-17", "2025-05-24", "2025-05-31", "2025-02-07", "2025-05-10",
+                        "2026-02-01", "2026-02-08", "2026-01-31"
+                    ];
+
+                    const batch = writeBatch(db);
+                    festivosOficiales.forEach(f => {
+                        const ref = doc(collection(db, "calendario_config"));
+                        batch.set(ref, { tipo: "festivo", fecha: f, descripcion: "Festivo Oficial" });
+                    });
+                    adicionalesOficiales.forEach(a => {
+                        const ref = doc(collection(db, "calendario_config"));
+                        batch.set(ref, { tipo: "adicional", fecha: a, descripcion: "Sábado/Adicional Laborable" });
+                    });
+                    await batch.commit();
+
                     const c2 = await getDocs(collection(db, "calendario_config"));
                     window.dbCalendario = [];
                     c2.forEach(d => window.dbCalendario.push({ idDoc: d.id, ...d.data() }));
@@ -711,7 +707,6 @@
             const idVideoVal = document.getElementById('video-id').value;
             const versionVal = document.getElementById('video-version').value.trim().toLowerCase();
 
-            // Validación estricta anti-duplicados de versión
             const duplicado = window.dbVideos.find(v => (v.version || "").trim().toLowerCase() === versionVal && v.idDoc !== docId);
             if (duplicado) {
                 alert("¡Error! Ya existe un registro con el mismo nombre de versión.");
