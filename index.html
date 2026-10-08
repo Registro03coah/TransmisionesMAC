@@ -63,7 +63,7 @@
             <div class="bg-gradient-to-r from-indigo-900/60 to-slate-800/80 p-8 rounded-2xl border border-indigo-500/30 shadow-xl backdrop-blur-md">
                 <h2 class="text-3xl font-extrabold text-white mb-2">Panel de Control SDCI Distrito 03</h2>
                 <p class="text-slate-300 max-w-2xl">
-                    Sistema optimizado para lectura exacta de columnas Excel, filtrado por columnas y reportes dinámicos.
+                    Sistema configurado con soporte para fechas DD/MM/AAAA, IDs numéricos de orden estricto (001, 010, 100) y nombres de archivo con símbolos y extensiones.
                 </p>
             </div>
 
@@ -290,7 +290,7 @@
 
     <!-- PIE DE PÁGINA -->
     <footer class="bg-slate-800 border-t border-slate-700 py-4 mt-auto text-center text-xs text-slate-400">
-        SDCI Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.26
+        SDCI Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.27
     </footer>
 
     <!-- MODAL DE ADMINISTRACIÓN Y CARGA MASIVA EXCEL -->
@@ -308,15 +308,16 @@
                 <div class="flex flex-wrap justify-between items-center gap-2">
                     <div>
                         <h4 class="font-bold text-indigo-400 text-base">1. Gestión de Catálogo: BD_Videos</h4>
-                        <p class="text-xs text-slate-400">Borra todos los videos actuales o sube tu archivo Excel con las cabeceras exactas.</p>
+                        <p class="text-xs text-slate-400">Soporta fechas DD/MM/AAAA y IDs con formato de 3 dígitos (ej. 001, 010, 100).</p>
                     </div>
                     <button onclick="borrarColeccion('bd_videos')" class="bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow transition">
                         <i class="fa-solid fa-trash mr-1.5"></i> Borrar Tabla BD_Videos
                     </button>
                 </div>
                 <div class="bg-slate-800 p-3 rounded-lg border border-slate-700 text-xs space-y-1 text-slate-300">
-                    <span class="font-bold text-amber-300"><i class="fa-solid fa-circle-info mr-1"></i> Columnas exactas que lee tu Excel (BD_Videos):</span>
+                    <span class="font-bold text-amber-300"><i class="fa-solid fa-circle-info mr-1"></i> Formato exacto de columnas en Excel:</span>
                     <code class="block bg-slate-950 p-2 rounded text-emerald-400 font-mono">id_video | version | tematica | duracion | inicio_transmision | cierre_transmision</code>
+                    <p class="text-slate-400">Ejemplo de ID: <code>001</code>, <code>010</code>, <code>100</code> | Ejemplo de fecha: <code>01/01/2025</code> o <code>2025-01-01</code></p>
                 </div>
                 <div class="flex items-center gap-3 pt-2">
                     <input type="file" id="file-excel-videos" accept=".xlsx, .xls, .csv" class="block w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer">
@@ -331,14 +332,14 @@
                 <div class="flex flex-wrap justify-between items-center gap-2">
                     <div>
                         <h4 class="font-bold text-amber-400 text-base">2. Gestión de Días Festivos (Inhábiles)</h4>
-                        <p class="text-xs text-slate-400">Borra todos los días festivos o súbelos por Excel.</p>
+                        <p class="text-xs text-slate-400">Sube festivos con fechas DD/MM/AAAA.</p>
                     </div>
                     <button onclick="borrarColeccionFestivos('festivo')" class="bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow transition">
                         <i class="fa-solid fa-trash mr-1.5"></i> Borrar Días Festivos
                     </button>
                 </div>
                 <div class="bg-slate-800 p-3 rounded-lg border border-slate-700 text-xs space-y-1 text-slate-300">
-                    <span class="font-bold text-amber-300"><i class="fa-solid fa-circle-info mr-1"></i> Columnas exactas (Festivos):</span>
+                    <span class="font-bold text-amber-300"><i class="fa-solid fa-circle-info mr-1"></i> Columnas (Festivos):</span>
                     <code class="block bg-slate-950 p-2 rounded text-emerald-400 font-mono">fecha | descripcion</code>
                 </div>
                 <div class="flex items-center gap-3 pt-2">
@@ -354,14 +355,14 @@
                 <div class="flex flex-wrap justify-between items-center gap-2">
                     <div>
                         <h4 class="font-bold text-emerald-400 text-base">3. Gestión de Días Adicionales Laborados</h4>
-                        <p class="text-xs text-slate-400">Borra todos los días adicionales o súbelos por Excel.</p>
+                        <p class="text-xs text-slate-400">Sube días adicionales con fechas DD/MM/AAAA.</p>
                     </div>
                     <button onclick="borrarColeccionFestivos('adicional')" class="bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow transition">
                         <i class="fa-solid fa-trash mr-1.5"></i> Borrar Días Adicionales
                     </button>
                 </div>
                 <div class="bg-slate-800 p-3 rounded-lg border border-slate-700 text-xs space-y-1 text-slate-300">
-                    <span class="font-bold text-amber-300"><i class="fa-solid fa-circle-info mr-1"></i> Columnas exactas (Adicionales):</span>
+                    <span class="font-bold text-amber-300"><i class="fa-solid fa-circle-info mr-1"></i> Columnas (Adicionales):</span>
                     <code class="block bg-slate-950 p-2 rounded text-emerald-400 font-mono">fecha | descripcion</code>
                 </div>
                 <div class="flex items-center gap-3 pt-2">
@@ -389,7 +390,7 @@
                 <input type="hidden" id="video-doc-id">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">ID</label>
+                        <label class="block text-xs text-slate-400 mb-1">ID (ej. 001)</label>
                         <input type="text" id="video-id" required class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-indigo-400 font-bold text-sm">
                     </div>
                     <div>
@@ -454,7 +455,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PRINCIPAL CON CONVERSIÓN ROBUSTA DE FECHAS Y EXCEL -->
+    <!-- SCRIPT PRINCIPAL CON CONVERSIÓN INTELIGENTE DE FECHAS DD/MM/AAAA -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -479,11 +480,10 @@
         window.criterioOrdenActual = 'id_video';
         window.ordenAscendente = true;
 
-        // Función robusta para limpiar y formatear fechas de Excel
+        // Conversor inteligente para aceptar tanto DD/MM/AAAA como YYYY-MM-DD o seriales de Excel
         window.parsearFechaExcel = function(val) {
             if (!val) return "2025-01-01";
             if (typeof val === 'number') {
-                // Serial de Excel a Fecha JS
                 const date = new Date(Math.round((val - (25567 + 2)) * 86400 * 1000));
                 let y = date.getFullYear();
                 let m = String(date.getMonth() + 1).padStart(2, '0');
@@ -491,17 +491,15 @@
                 return `${y}-${m}-${d}`;
             }
             let s = String(val).trim();
+            // Si viene con formato DD/MM/AAAA (ej. 01/01/2025)
             if (s.includes('/')) {
                 const parts = s.split('/');
                 if (parts.length === 3) {
-                    // Si viene como DD/MM/YYYY
-                    if (parts[2].length === 4) {
-                        return `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
-                    }
-                    // Si viene como YYYY/MM/DD
-                    if (parts[0].length === 4) {
-                        return `${parts[0]}-${parts[1].padStart(2,'0')}-${parts[2].padStart(2,'0')}`;
-                    }
+                    let d = parts[0].padStart(2, '0');
+                    let m = parts[1].padStart(2, '0');
+                    let y = parts[2];
+                    if (y.length === 2) y = "20" + y;
+                    return `${y}-${m}-${d}`;
                 }
             }
             return s;
@@ -609,9 +607,14 @@
                 v.repeticiones = isNaN(repeticionesAcumuladas) ? 0 : repeticionesAcumuladas;
             });
 
+            // Ordenamiento inteligente (alfanumérico para IDs como 001, 010, 100)
             window.dbVideos.sort((a, b) => {
                 let valA = a[window.criterioOrdenActual] || "";
                 let valB = b[window.criterioOrdenActual] || "";
+
+                if (window.criterioOrdenActual === 'id_video') {
+                    return window.ordenAscendente ? valA.localeCompare(valB, undefined, {numeric: true}) : valB.localeCompare(valA, undefined, {numeric: true});
+                }
 
                 if (typeof valA === 'string') {
                     valA = valA.toLowerCase();
@@ -683,7 +686,6 @@
             alert('¡Datos actualizados desde Firebase!');
         };
 
-        // --- BORRADO MASIVO ---
         window.borrarColeccion = async function(nombreColeccion) {
             if (confirm(`¿ESTÁS SEGURO? Esto borrará TODOS los registros de la colección '${nombreColeccion}' en Firebase.`)) {
                 try {
@@ -694,7 +696,7 @@
                     alert(`¡Colección '${nombreColeccion}' borrada exitosamente!`);
                     await window.cargarDatosFirebase();
                 } catch (err) {
-                    console.error("Error borrando colección:", err);
+                    console.error("Error borrando:", err);
                     alert("Ocurrió un error al intentar borrar.");
                 }
             }
@@ -725,7 +727,6 @@
             }
         };
 
-        // --- CARGA DE EXCEL MEJORADA Y PRECISA ---
         window.subirExcelBDVideos = function() {
             const input = document.getElementById('file-excel-videos');
             if (!input.files || input.files.length === 0) {
@@ -744,7 +745,7 @@
                     const json = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
                     if (json.length === 0) {
-                        alert("El archivo está vacío o no tiene el formato correcto.");
+                        alert("El archivo está vacío.");
                         return;
                     }
 
@@ -753,9 +754,8 @@
                     json.forEach(row => {
                         const ref = doc(collection(db, "bd_videos"));
                         
-                        // Lectura tolerante a variaciones de mayúsculas en las cabeceras exactas de tu Excel
                         const idVal = row.id_video || row.ID || row.Id || row.id || "";
-                        const versionVal = row.version || row.Nombre || row.nombre || row.Versión || row.version || "";
+                        const versionVal = row.version || row.Nombre || row.nombre || row.Versión || "";
                         const tematicaVal = row.tematica || row.Temática || row.Tematica || "General";
                         const duracionVal = row.duracion || row.Duración || row.Duracion || "00:00:43";
                         const inicioVal = window.parsearFechaExcel(row.inicio_transmision || row.Inicio || row.inicio);
@@ -773,12 +773,12 @@
                     });
 
                     await batch.commit();
-                    alert(`¡Se cargaron exitosamente ${count} videos a BD_Videos!`);
+                    alert(`¡Se cargaron exitosamente ${count} videos!`);
                     document.getElementById('file-excel-videos').value = '';
                     await window.cargarDatosFirebase();
                 } catch(err) {
                     console.error(err);
-                    alert("Error al procesar el archivo Excel. Revisa la consola.");
+                    alert("Error al procesar el archivo Excel.");
                 }
             };
             reader.readAsArrayBuffer(file);
@@ -819,7 +819,7 @@
                     });
 
                     await batch.commit();
-                    alert(`¡Se cargaron ${count} registros de tipo '${tipoDestino}' con éxito!`);
+                    alert(`¡Se cargaron ${count} registros de '${tipoDestino}' con éxito!`);
                     input.value = '';
                     await window.cargarDatosFirebase();
                 } catch(err) {
@@ -1063,7 +1063,7 @@
             const data = {
                 tipo: document.getElementById('cal-tipo').value,
                 fecha: document.getElementById('cal-fecha').value,
-                descripcion: document.getElementById('cal-desc').value
+                descripcion: document.getElementById('cal-desc'].value
             };
             await addDoc(collection(db, "calendario_config"), data);
             window.cerrarModalCalendario();
