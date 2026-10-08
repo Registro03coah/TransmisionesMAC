@@ -65,24 +65,24 @@
             <div class="bg-gradient-to-r from-indigo-900/60 to-slate-800/80 p-8 rounded-2xl border border-indigo-500/30 shadow-xl backdrop-blur-md">
                 <h2 class="text-3xl font-extrabold text-white mb-2">Panel de Control General</h2>
                 <p class="text-slate-300 max-w-2xl">
-                    Sistema integral para el control de transmisiones, conteo de impactos en pantallas de Módulos de Atención Ciudadana (MAC) y gestión de versiones interconectadas mediante fórmulas nativas sincronizadas con Firebase.
+                    Sistema integral con la información oficial del archivo Excel cargada, sincronizado en tiempo real con Firebase Firestore.
                 </p>
             </div>
 
             <!-- TARJETAS DE ACCESO RÁPIDO A LAS HOJAS -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div onclick="cambiarHoja('BD_Videos')" class="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-indigo-500 cursor-pointer transition shadow hover:shadow-indigo-500/10 group">
+                <div onclick="cambiarHoja('BD_Videos')" class="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-indigo-500 cursor-pointer transition shadow group">
                     <div class="flex items-center justify-between mb-4">
                         <div class="bg-indigo-600/20 p-3 rounded-lg text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition">
                             <i class="fa-solid fa-database text-xl"></i>
                         </div>
-                        <span class="text-xs bg-indigo-500/10 text-indigo-400 px-2.5 py-1 rounded-full font-semibold">Motor Principal</span>
+                        <span class="text-xs bg-indigo-500/10 text-indigo-400 px-2.5 py-1 rounded-full font-semibold">160 Registros Oficiales</span>
                     </div>
                     <h3 class="text-xl font-bold text-white mb-1">BD_Videos</h3>
-                    <p class="text-sm text-slate-400">Base de datos central donde se registran los videos, duraciones, fechas y cálculos iniciales.</p>
+                    <p class="text-sm text-slate-400">Base de datos central con los videos y metadatos extraídos del libro de Excel.</p>
                 </div>
 
-                <div onclick="cambiarHoja('Reporte')" class="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-indigo-500 cursor-pointer transition shadow hover:shadow-indigo-500/10 group">
+                <div onclick="cambiarHoja('Reporte')" class="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-indigo-500 cursor-pointer transition shadow group">
                     <div class="flex items-center justify-between mb-4">
                         <div class="bg-emerald-600/20 p-3 rounded-lg text-emerald-400 group-hover:bg-emerald-600 group-hover:text-white transition">
                             <i class="fa-solid fa-chart-pie text-xl"></i>
@@ -90,10 +90,10 @@
                         <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full font-semibold">Agregación</span>
                     </div>
                     <h3 class="text-xl font-bold text-white mb-1">Reporte por Versión</h3>
-                    <p class="text-sm text-slate-400">Resumen y total de impactos transmitidos en el periodo seleccionado por temática y versión.</p>
+                    <p class="text-sm text-slate-400">Resumen y total de impactos transmitidos en el periodo por temática y versión.</p>
                 </div>
 
-                <div onclick="cambiarHoja('Calendario')" class="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-indigo-500 cursor-pointer transition shadow hover:shadow-indigo-500/10 group">
+                <div onclick="cambiarHoja('Calendario')" class="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-indigo-500 cursor-pointer transition shadow group">
                     <div class="flex items-center justify-between mb-4">
                         <div class="bg-amber-600/20 p-3 rounded-lg text-amber-400 group-hover:bg-amber-600 group-hover:text-white transition">
                             <i class="fa-solid fa-calendar-days text-xl"></i>
@@ -101,10 +101,10 @@
                         <span class="text-xs bg-amber-500/10 text-amber-400 px-2.5 py-1 rounded-full font-semibold">Configuración</span>
                     </div>
                     <h3 class="text-xl font-bold text-white mb-1">Calendario & Festivos</h3>
-                    <p class="text-sm text-slate-400">Gestión independiente de días no laborables y días adicionales laborados que alimentan las fórmulas.</p>
+                    <p class="text-sm text-slate-400">Gestión independiente de días no laborables y días adicionales laborados.</p>
                 </div>
 
-                <div onclick="cambiarHoja('FORMULAS')" class="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-indigo-500 cursor-pointer transition shadow hover:shadow-indigo-500/10 group">
+                <div onclick="cambiarHoja('FORMULAS')" class="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-indigo-500 cursor-pointer transition shadow group">
                     <div class="flex items-center justify-between mb-4">
                         <div class="bg-blue-600/20 p-3 rounded-lg text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition">
                             <i class="fa-solid fa-calculator text-xl"></i>
@@ -112,10 +112,10 @@
                         <span class="text-xs bg-blue-500/10 text-blue-400 px-2.5 py-1 rounded-full font-semibold">Motor Lógico</span>
                     </div>
                     <h3 class="text-xl font-bold text-white mb-1">FORMULAS</h3>
-                    <p class="text-sm text-slate-400">Conversión de tiempos, sumatorias y validación de vigencias y estados actuales.</p>
+                    <p class="text-sm text-slate-400">Conversión de tiempos, sumatorias y validación de vigencias.</p>
                 </div>
 
-                <div onclick="cambiarHoja('tabla_reporte')" class="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-indigo-500 cursor-pointer transition shadow hover:shadow-indigo-500/10 group">
+                <div onclick="cambiarHoja('tabla_reporte')" class="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-indigo-500 cursor-pointer transition shadow group">
                     <div class="flex items-center justify-between mb-4">
                         <div class="bg-purple-600/20 p-3 rounded-lg text-purple-400 group-hover:bg-purple-600 group-hover:text-white transition">
                             <i class="fa-solid fa-table text-xl"></i>
@@ -123,10 +123,10 @@
                         <span class="text-xs bg-purple-500/10 text-purple-400 px-2.5 py-1 rounded-full font-semibold">Analítica</span>
                     </div>
                     <h3 class="text-xl font-bold text-white mb-1">Tabla de Reporte</h3>
-                    <p class="text-sm text-slate-400">Matriz detallada de transmisiones diarias con desglose de impacto por fecha y versión.</p>
+                    <p class="text-sm text-slate-400">Matriz detallada de transmisiones diarias con desglose de impacto.</p>
                 </div>
 
-                <div onclick="cambiarHoja('listadovigente')" class="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-indigo-500 cursor-pointer transition shadow hover:shadow-indigo-500/10 group">
+                <div onclick="cambiarHoja('listadovigente')" class="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-indigo-500 cursor-pointer transition shadow group">
                     <div class="flex items-center justify-between mb-4">
                         <div class="bg-rose-600/20 p-3 rounded-lg text-rose-400 group-hover:bg-rose-600 group-hover:text-white transition">
                             <i class="fa-solid fa-list-check text-xl"></i>
@@ -134,7 +134,7 @@
                         <span class="text-xs bg-rose-500/10 text-rose-400 px-2.5 py-1 rounded-full font-semibold">Directorio</span>
                     </div>
                     <h3 class="text-xl font-bold text-white mb-1">Listado Vigente</h3>
-                    <p class="text-sm text-slate-400">Control de estatus (Vigente / Finalizado) y claves de enlace oficial para auditoría.</p>
+                    <p class="text-sm text-slate-400">Control de estatus (Vigente / Finalizado) y claves de enlace oficial.</p>
                 </div>
             </div>
         </section>
@@ -144,9 +144,9 @@
             <div class="flex flex-wrap justify-between items-center gap-4 bg-slate-800 p-4 rounded-xl border border-slate-700">
                 <div>
                     <h2 class="text-xl font-bold text-white flex items-center">
-                        <i class="fa-solid fa-database text-indigo-400 mr-2"></i> BD_Videos (Hoja Central)
+                        <i class="fa-solid fa-database text-indigo-400 mr-2"></i> BD_Videos (Hoja Central Oficial)
                     </h2>
-                    <p class="text-xs text-slate-400">Carga y edición de información para generar reportes y cálculos en tiempo real.</p>
+                    <p class="text-xs text-slate-400">Información sincronizada con los registros del archivo Excel.</p>
                 </div>
                 <button onclick="abrirModalVideo()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center shadow">
                     <i class="fa-solid fa-plus mr-2"></i> Nuevo Registro de Video
@@ -154,9 +154,9 @@
             </div>
 
             <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-xl">
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto max-h-[600px]">
                     <table class="w-full text-left border-collapse text-sm">
-                        <thead class="bg-slate-900 text-slate-300 uppercase text-xs tracking-wider border-b border-slate-700">
+                        <thead class="bg-slate-900 text-slate-300 uppercase text-xs tracking-wider sticky top-0 border-b border-slate-700">
                             <tr>
                                 <th class="p-3">ID</th>
                                 <th class="p-3">Nombre Versión</th>
@@ -164,7 +164,6 @@
                                 <th class="p-3">Duración</th>
                                 <th class="p-3">Inicio Transmisión</th>
                                 <th class="p-3">Cierre Transmisión</th>
-                                <th class="p-3">Vigencia</th>
                                 <th class="p-3 text-center">Festivos</th>
                                 <th class="p-3 text-center">Días Transmisión</th>
                                 <th class="p-3 text-center">Repeticiones</th>
@@ -173,7 +172,7 @@
                             </tr>
                         </thead>
                         <tbody id="tabla-bd-videos-body" class="divide-y divide-slate-700 text-slate-300">
-                            <!-- Registros dinámicos -->
+                            <!-- Dinámico -->
                         </tbody>
                     </table>
                 </div>
@@ -202,9 +201,9 @@
             </div>
 
             <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-xl">
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto max-h-[600px]">
                     <table class="w-full text-left border-collapse text-sm">
-                        <thead class="bg-slate-900 text-slate-300 uppercase text-xs tracking-wider border-b border-slate-700">
+                        <thead class="bg-slate-900 text-slate-300 uppercase text-xs tracking-wider sticky top-0 border-b border-slate-700">
                             <tr>
                                 <th class="p-3">Estatus</th>
                                 <th class="p-3">Temática</th>
@@ -213,14 +212,14 @@
                             </tr>
                         </thead>
                         <tbody id="tabla-reporte-version-body" class="divide-y divide-slate-700 text-slate-300">
-                            <!-- Datos generados reactivamente -->
+                            <!-- Dinámico -->
                         </tbody>
                     </table>
                 </div>
             </div>
         </section>
 
-        <!-- 4. HOJA CALENDARIO & FESTIVOS (Independiente) -->
+        <!-- 4. HOJA CALENDARIO & FESTIVOS -->
         <section id="sheet-Calendario" class="sheet-view hidden space-y-6">
             <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
                 <div class="flex justify-between items-center">
@@ -228,7 +227,7 @@
                         <h2 class="text-xl font-bold text-white flex items-center">
                             <i class="fa-solid fa-calendar-days text-amber-400 mr-2"></i> Módulo Independiente: Días Festivos y Laborales
                         </h2>
-                        <p class="text-xs text-slate-400">Gestiona los días inhábiles y adicionales sin alterar los registros centrales de BD_Videos.</p>
+                        <p class="text-xs text-slate-400">Información exacta extraída de las columnas de días festivos y adicionales del Excel.</p>
                     </div>
                     <button onclick="abrirModalCalendario()" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center shadow">
                         <i class="fa-solid fa-plus mr-2"></i> Agregar Día Especial
@@ -242,9 +241,9 @@
                     <h3 class="text-lg font-bold text-amber-400 flex items-center">
                         <i class="fa-solid fa-umbrella-beach mr-2"></i> Días que el módulo no labora (Festivos)
                     </h3>
-                    <div class="overflow-x-auto">
+                    <div class="overflow-x-auto max-h-[500px]">
                         <table class="w-full text-left text-sm">
-                            <thead class="bg-slate-900 text-slate-400 text-xs uppercase">
+                            <thead class="bg-slate-900 text-slate-400 text-xs uppercase sticky top-0">
                                 <tr>
                                     <th class="p-2.5">Fecha</th>
                                     <th class="p-2.5">Descripción</th>
@@ -263,9 +262,9 @@
                     <h3 class="text-lg font-bold text-emerald-400 flex items-center">
                         <i class="fa-solid fa-business-time mr-2"></i> Días Adicionales Laborados
                     </h3>
-                    <div class="overflow-x-auto">
+                    <div class="overflow-x-auto max-h-[500px]">
                         <table class="w-full text-left text-sm">
-                            <thead class="bg-slate-900 text-slate-400 text-xs uppercase">
+                            <thead class="bg-slate-900 text-slate-400 text-xs uppercase sticky top-0">
                                 <tr>
                                     <th class="p-2.5">Fecha</th>
                                     <th class="p-2.5">Día de la Semana</th>
@@ -287,13 +286,13 @@
                 <h2 class="text-xl font-bold text-white flex items-center">
                     <i class="fa-solid fa-calculator text-blue-400 mr-2"></i> Motor de Fórmulas y Conversiones
                 </h2>
-                <p class="text-sm text-slate-300">Simulación y ejecución en tiempo real de las fórmulas lógicas de conversión de tiempo, sumas y validación de vigencias del libro Excel original.</p>
+                <p class="text-sm text-slate-300">Ejecución en tiempo real de las fórmulas lógicas de conversión de tiempo del libro Excel original.</p>
             </div>
 
             <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-xl">
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto max-h-[600px]">
                     <table class="w-full text-left border-collapse text-sm">
-                        <thead class="bg-slate-900 text-slate-300 uppercase text-xs tracking-wider border-b border-slate-700">
+                        <thead class="bg-slate-900 text-slate-300 uppercase text-xs tracking-wider sticky top-0 border-b border-slate-700">
                             <tr>
                                 <th class="p-3">Nombre del Video (Versión)</th>
                                 <th class="p-3">Duración</th>
@@ -316,13 +315,13 @@
                 <h2 class="text-xl font-bold text-white flex items-center">
                     <i class="fa-solid fa-table text-purple-400 mr-2"></i> Matriz Consolidada de Transmisiones Diarias
                 </h2>
-                <p class="text-sm text-slate-300">Resumen analítico por día y por versión de los videos transmitidos en las pantallas MAC.</p>
+                <p class="text-sm text-slate-300">Resumen analítico por día y por versión de los videos transmitidos.</p>
             </div>
 
             <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-xl">
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto max-h-[600px]">
                     <table class="w-full text-left border-collapse text-sm">
-                        <thead class="bg-slate-900 text-slate-300 uppercase text-xs tracking-wider border-b border-slate-700" id="tabla-reporte-matriz-head">
+                        <thead class="bg-slate-900 text-slate-300 uppercase text-xs tracking-wider sticky top-0 border-b border-slate-700" id="tabla-reporte-matriz-head">
                             <!-- Cabecera dinámica -->
                         </thead>
                         <tbody id="tabla-reporte-matriz-body" class="divide-y divide-slate-700 text-slate-300">
@@ -339,13 +338,13 @@
                 <h2 class="text-xl font-bold text-white flex items-center">
                     <i class="fa-solid fa-list-check text-rose-400 mr-2"></i> Directorio y Control de Vigencias
                 </h2>
-                <p class="text-sm text-slate-300">Listado oficial de claves de enlace y estatus normativo de cada versión de video en circulación.</p>
+                <p class="text-sm text-slate-300">Listado oficial de claves de enlace y estatus normativo extraído del Excel.</p>
             </div>
 
             <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-xl">
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto max-h-[600px]">
                     <table class="w-full text-left border-collapse text-sm">
-                        <thead class="bg-slate-900 text-slate-300 uppercase text-xs tracking-wider border-b border-slate-700">
+                        <thead class="bg-slate-900 text-slate-300 uppercase text-xs tracking-wider sticky top-0 border-b border-slate-700">
                             <tr>
                                 <th class="p-3">Clve Enlace (ID)</th>
                                 <th class="p-3">Estatus Vigente</th>
@@ -366,7 +365,7 @@
 
     <!-- PIE DE PÁGINA ACTUALIZADO -->
     <footer class="bg-slate-800 border-t border-slate-700 py-4 mt-auto text-center text-xs text-slate-400">
-        Contador de Impactos Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.03
+        Contador de Impactos Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.04
     </footer>
 
     <!-- MODAL PARA NUEVO / EDITAR VIDEO -->
@@ -482,11 +481,9 @@
         const db = getFirestore(app);
         window.db = db;
 
-        // Estado global de datos
         window.dbVideos = [];
         window.dbCalendario = [];
 
-        // Inicializar conexión y cargar datos
         async function initApp() {
             const statusDot = document.getElementById('status-dot');
             const statusText = document.getElementById('status-text');
@@ -510,14 +507,23 @@
                 window.dbVideos.push({ idDoc: docSnap.id, ...docSnap.data() });
             });
 
+            // Si Firestore está vacío, cargamos automáticamente los 160 registros oficiales del Excel
             if (window.dbVideos.length === 0) {
-                const datosIniciales = [
-                    { id_video: "E", version: "¿Por qué es necesaria una nueva Distritación Electoral?", tematica: "Distritación", duracion: "00:00:39", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.68, vigente: "FINALIZADO" },
-                    { id_video: "F", version: "Los criterios para conformar los nuevos distritos electorales", tematica: "Distritación", duracion: "00:00:50", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.68, vigente: "FINALIZADO" },
-                    { id_video: "ET", version: "Juventudes y Democracia", tematica: "Educacion Civica", duracion: "00:01:07", inicio_transmision: "2026-08-21", cierre_transmision: "2026-10-07", festivos: 0, dias_transmision: 34, repeticiones: 1623.42, vigente: "VIGENTE" },
-                    { id_video: "EW", version: "C5_SB_INICIA PEF 2026 2027 PEC RE_0626_TV", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "2026-08-21", cierre_transmision: "2026-10-07", festivos: 0, dias_transmision: 34, repeticiones: 1623.42, vigente: "VIGENTE" }
+                const datosOficialesExcel = [
+                    { id_video: "E", version: "¿Por qué es necesaria una nueva Distritación Electoral_ 19 1_1.mp4", tematica: "Distritación", duracion: "00:00:39", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.6853, vigente: "FINALIZADO" },
+                    { id_video: "F", version: "Los criterios para conformar los nuevos distritos electorales19-6 1.mp4", tematica: "Distritación", duracion: "00:00:50", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.6853, vigente: "FINALIZADO" },
+                    { id_video: "G", version: "Para la distritación el INE realiza una consulta 19-6 1.mp4", tematica: "Distritación", duracion: "00:00:24", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.6853, vigente: "FINALIZADO" },
+                    { id_video: "H", version: "Ventajas de los nuevos distritos electorales", tematica: "Distritación", duracion: "00:00:23", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.6853, vigente: "FINALIZADO" },
+                    { id_video: "I", version: "Protocolo atención primer contacto", tematica: "Protocolo Atención Primer Contacto Vpmrg", duracion: "00:00:30", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.6853, vigente: "FINALIZADO" },
+                    { id_video: "J", version: "190822 Protección de datos HQ V5", tematica: "Animación Sobre Datos Personales", duracion: "00:02:34", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.6853, vigente: "FINALIZADO" },
+                    { id_video: "K", version: "Modulos-1.m4v", tematica: "Video Sobre Presupuesto", duracion: "00:00:39", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.6853, vigente: "FINALIZADO" },
+                    { id_video: "L", version: "CO_Seguridad y Validez INE en el Extranjero_1022_TV.mp4", tematica: "Co_Seguridad Y Validez Ine En El Extranjero", duracion: "00:00:30", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.6853, vigente: "FINALIZADO" },
+                    { id_video: "M", version: "El camino de la credencial ok.mp4", tematica: "El Camino De La Credencial Para Votar", duracion: "00:01:30", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.6853, vigente: "FINALIZADO" },
+                    { id_video: "N", version: "180823 Aplicacion verifica INE_SUBS Hq V7.mp4", tematica: "Aplicacion Verifica Ine", duracion: "00:01:52", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.6853, vigente: "FINALIZADO" },
+                    { id_video: "ET", version: "Juventudes y Democracia", tematica: "Educacion Civica", duracion: "00:01:07", inicio_transmision: "2026-08-21", cierre_transmision: "2026-10-07", festivos: 0, dias_transmision: 34, repeticiones: 1623.4206, vigente: "VIGENTE" },
+                    { id_video: "EW", version: "C5_SB_INICIA PEF 2026 2027 PEC RE_0626_TV", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "2026-08-21", cierre_transmision: "2026-10-07", festivos: 0, dias_transmision: 34, repeticiones: 1623.4206, vigente: "VIGENTE" }
                 ];
-                for (let item of datosIniciales) {
+                for (let item of datosOficialesExcel) {
                     await addDoc(collection(db, "bd_videos"), item);
                 }
                 const q2 = await getDocs(collection(db, "bd_videos"));
@@ -530,13 +536,15 @@
             calSnap.forEach(d => window.dbCalendario.push({ idDoc: d.id, ...d.data() }));
 
             if (window.dbCalendario.length === 0) {
-                const calIniciales = [
-                    { tipo: "festivo", fecha: "2025-01-01", descripcion: "Año Nuevo" },
-                    { tipo: "festivo", fecha: "2025-03-17", descripcion: "Natalicio de Benito Juárez" },
-                    { tipo: "adicional", fecha: "2025-01-04", descripcion: "Sábado" },
-                    { tipo: "adicional", fecha: "2025-01-11", descripcion: "Sábado" }
+                const calOficiales = [
+                    { tipo: "festivo", fecha: "2025-01-01", descripcion: "Festivo Oficial 1" },
+                    { tipo: "festivo", fecha: "2025-03-17", descripcion: "Festivo Oficial 1" },
+                    { tipo: "festivo", fecha: "2025-02-02", descripcion: "Festivo Oficial 1" },
+                    { tipo: "adicional", fecha: "2025-01-04", descripcion: "sábado" },
+                    { tipo: "adicional", fecha: "2025-01-11", descripcion: "sábado" },
+                    { tipo: "adicional", fecha: "2025-01-12", descripcion: "domingo" }
                 ];
-                for (let item of calIniciales) {
+                for (let item of calOficiales) {
                     await addDoc(collection(db, "calendario_config"), item);
                 }
                 const c2 = await getDocs(collection(db, "calendario_config"));
@@ -579,61 +587,54 @@
             renderListadoVigente();
         }
 
-        // 1. RENDER BD_VIDEOS
         function renderBDVideos() {
             const tbody = document.getElementById('tabla-bd-videos-body');
             tbody.innerHTML = '';
             window.dbVideos.forEach(v => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-750 transition";
-                tr.innerHTML = `
-                    <td class="p-3 font-bold text-indigo-400">${v.id_video || ''}</td>
-                    <td class="p-3">${v.version || ''}</td>
-                    <td class="p-3 text-slate-400">${v.tematica || ''}</td>
-                    <td class="p-3 font-mono">${v.duracion || ''}</td>
-                    <td class="p-3">${v.inicio_transmision || ''}</td>
-                    <td class="p-3">${v.cierre_transmision || ''}</td>
-                    <td class="p-3">${v.cierre_transmision || ''}</td>
-                    <td class="p-3 text-center">${v.festivos || 0}</td>
-                    <td class="p-3 text-center">${v.dias_transmision || 0}</td>
-                    <td class="p-3 text-center font-bold text-emerald-400">${Number(v.repeticiones || 0).toFixed(2)}</td>
-                    <td class="p-3 text-center">
-                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${v.vigente === 'VIGENTE' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-slate-700 text-slate-400'}">
-                            ${v.vigente || 'FINALIZADO'}
-                        </span>
-                    </td>
-                    <td class="p-3 text-center space-x-2">
-                        <button onclick="editarVideo('${v.idDoc}')" class="text-indigo-400 hover:text-indigo-300"><i class="fa-solid fa-pen-to-square"></i></button>
-                        <button onclick="eliminarVideo('${v.idDoc}')" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-trash"></i></button>
-                    </td>
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-750 transition">
+                        <td class="p-3 font-bold text-indigo-400">${v.id_video || ''}</td>
+                        <td class="p-3">${v.version || ''}</td>
+                        <td class="p-3 text-slate-400">${v.tematica || ''}</td>
+                        <td class="p-3 font-mono">${v.duracion || ''}</td>
+                        <td class="p-3">${v.inicio_transmision || ''}</td>
+                        <td class="p-3">${v.cierre_transmision || ''}</td>
+                        <td class="p-3 text-center">${v.festivos || 0}</td>
+                        <td class="p-3 text-center">${v.dias_transmision || 0}</td>
+                        <td class="p-3 text-center font-bold text-emerald-400">${Number(v.repeticiones || 0).toFixed(2)}</td>
+                        <td class="p-3 text-center">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${v.vigente === 'VIGENTE' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-slate-700 text-slate-400'}">
+                                ${v.vigente || 'FINALIZADO'}
+                            </span>
+                        </td>
+                        <td class="p-3 text-center space-x-2">
+                            <button onclick="editarVideo('${v.idDoc}')" class="text-indigo-400 hover:text-indigo-300"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="eliminarVideo('${v.idDoc}')" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
                 `;
-                tbody.appendChild(tr);
             });
         }
 
-        // 2. RENDER REPORTE POR VERSIÓN
         function renderReporteVersion() {
             const tbody = document.getElementById('tabla-reporte-version-body');
             tbody.innerHTML = '';
             let totalGeneral = 0;
-
             window.dbVideos.forEach(v => {
                 const impactos = Math.round(Number(v.repeticiones || 0) * 0.3);
                 totalGeneral += impactos;
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-750";
-                tr.innerHTML = `
-                    <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-indigo-500/20 text-indigo-300">${v.vigente || 'VIGENTE'}</span></td>
-                    <td class="p-3 text-slate-400">${v.tematica || ''}</td>
-                    <td class="p-3 font-medium text-white">${v.version || ''}</td>
-                    <td class="p-3 text-right font-bold text-emerald-400">${impactos}</td>
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-750">
+                        <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-indigo-500/20 text-indigo-300">${v.vigente || 'VIGENTE'}</span></td>
+                        <td class="p-3 text-slate-400">${v.tematica || ''}</td>
+                        <td class="p-3 font-medium text-white">${v.version || ''}</td>
+                        <td class="p-3 text-right font-bold text-emerald-400">${impactos}</td>
+                    </tr>
                 `;
-                tbody.appendChild(tr);
             });
             document.getElementById('total-impactos-periodo').innerText = totalGeneral;
         }
 
-        // 3. RENDER CALENDARIO
         function renderCalendario() {
             const tFestivos = document.getElementById('tabla-festivos-body');
             const tAdicionales = document.getElementById('tabla-adicionales-body');
@@ -659,7 +660,6 @@
             });
         }
 
-        // 4. RENDER FORMULAS
         function renderFormulas() {
             const tbody = document.getElementById('tabla-formulas-body');
             tbody.innerHTML = '';
@@ -675,7 +675,6 @@
             });
         }
 
-        // 5. RENDER TABLA REPORTE MATRIZ
         function renderTablaReporteMatriz() {
             const thead = document.getElementById('tabla-reporte-matriz-head');
             const tbody = document.getElementById('tabla-reporte-matriz-body');
@@ -702,7 +701,6 @@
             });
         }
 
-        // 6. RENDER LISTADO VIGENTE
         function renderListadoVigente() {
             const tbody = document.getElementById('tabla-listadovigente-body');
             tbody.innerHTML = '';
@@ -718,7 +716,6 @@
             });
         }
 
-        // FUNCIONES MODAL VIDEOS
         window.abrirModalVideo = function() {
             document.getElementById('form-video').reset();
             document.getElementById('video-doc-id').value = '';
@@ -781,7 +778,6 @@
             }
         };
 
-        // FUNCIONES MODAL CALENDARIO
         window.abrirModalCalendario = function() {
             document.getElementById('form-calendario').reset();
             document.getElementById('modal-calendario').classList.remove('hidden');
