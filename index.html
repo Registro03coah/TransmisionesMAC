@@ -273,7 +273,7 @@
 
     <!-- PIE DE PÁGINA -->
     <footer class="bg-slate-800 border-t border-slate-700 py-4 mt-auto text-center text-xs text-slate-400">
-        Contador de Impactos Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.08
+        Contador de Impactos Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.10
     </footer>
 
     <!-- MODAL NUEVO / EDITAR VIDEO -->
@@ -397,6 +397,7 @@
             return 30;
         }
 
+        // FUNCIÓN UBICADA AL PRINCIPIO PARA EVITAR ERRORES DE REFERENCIA
         function procesarCalculosAutomaticos() {
             const festivosSet = new Set(window.dbCalendario.filter(c => c.tipo === 'festivo').map(c => c.fecha));
             const adicionalesSet = new Set(window.dbCalendario.filter(c => c.tipo === 'adicional').map(c => c.fecha));
@@ -464,55 +465,56 @@
         }
 
         async function cargarDatosFirebase() {
-            const querySnapshot = await getDocs(collection(db, "bd_videos"));
-            window.dbVideos = [];
-            querySnapshot.forEach((docSnap) => {
-                window.dbVideos.push({ idDoc: docSnap.id, ...docSnap.data() });
-            });
-
-            if (window.dbVideos.length <= 1) {
-                const batch = writeBatch(db);
-                querySnapshot.forEach(d => batch.delete(d.ref));
-                await batch.commit();
-
-                const datosBase = [
-                    { version: "¿Por qué es necesaria una nueva Distritación Electoral?", tematica: "Distritación", duracion: "00:00:39", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
-                    { version: "Los criterios para conformar los nuevos distritos electorales", tematica: "Distritación", duracion: "00:00:50", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
-                    { version: "Juventudes y Democracia", tematica: "Educacion Civica", duracion: "00:01:07", inicio_transmision: "2026-08-21", cierre_transmision: "2026-10-07" },
-                    { version: "C5_SB_INICIA PEF 2026 2027", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "2026-10-05", cierre_transmision: "2026-11-30" }
-                ];
-
-                for (let i = 0; i < datosBase.length; i++) {
-                    let item = datosBase[i];
-                    item.id_video = generarIdExcel(i);
-                    await addDoc(collection(db, "bd_videos"), item);
-                }
-
-                const qReload = await getDocs(collection(db, "bd_videos"));
+            try {
+                const querySnapshot = await getDocs(collection(db, "bd_videos"));
                 window.dbVideos = [];
-                qReload.forEach(d => window.dbVideos.push({ idDoc: d.id, ...d.data() }));
-            }
+                querySnapshot.forEach((docSnap) => {
+                    window.dbVideos.push({ idDoc: docSnap.id, ...docSnap.data() });
+                });
 
-            const calSnap = await getDocs(collection(db, "calendario_config"));
-            window.dbCalendario = [];
-            calSnap.forEach(d => window.dbCalendario.push({ idDoc: d.id, ...d.data() }));
+                if (window.dbVideos.length === 0) {
+                    const datosBase = [
+                        { version: "¿Por qué es necesaria una nueva Distritación Electoral?", tematica: "Distritación", duracion: "00:00:39", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
+                        { version: "Los criterios para conformar los nuevos distritos electorales", tematica: "Distritación", duracion: "00:00:50", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
+                        { version: "Juventudes y Democracia", tematica: "Educacion Civica", duracion: "00:01:07", inicio_transmision: "2026-08-21", cierre_transmision: "2026-10-07" },
+                        { version: "C5_SB_INICIA PEF 2026 2027", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "2026-10-05", cierre_transmision: "2026-11-30" }
+                    ];
 
-            if (window.dbCalendario.length === 0) {
-                const calOficiales = [
-                    { tipo: "festivo", fecha: "2025-01-01", descripcion: "Año Nuevo" },
-                    { tipo: "festivo", fecha: "2025-03-17", descripcion: "Natalicio Benito Juárez" },
-                    { tipo: "adicional", fecha: "2025-01-04", descripcion: "sábado" }
-                ];
-                for (let item of calOficiales) {
-                    await addDoc(collection(db, "calendario_config"), item);
+                    for (let i = 0; i < datosBase.length; i++) {
+                        let item = datosBase[i];
+                        item.id_video = generarIdExcel(i);
+                        await addDoc(collection(db, "bd_videos"), item);
+                    }
+
+                    const qReload = await getDocs(collection(db, "bd_videos"));
+                    window.dbVideos = [];
+                    qReload.forEach(d => window.dbVideos.push({ idDoc: d.id, ...d.data() }));
                 }
-                const c2 = await getDocs(collection(db, "calendario_config"));
-                window.dbCalendario = [];
-                c2.forEach(d => window.dbCalendario.push({ idDoc: d.id, ...d.data() }));
-            }
 
-            procesarCalculosAutomaticos();
-            renderizarTodo();
+                const calSnap = await getDocs(collection(db, "calendario_config"));
+                window.dbCalendario = [];
+                calSnap.forEach(d => window.dbCalendario.push({ idDoc: d.id, ...d.data() }));
+
+                if (window.dbCalendario.length === 0) {
+                    const calOficiales = [
+                        { tipo: "festivo", fecha: "2025-01-01", descripcion: "Año Nuevo" },
+                        { tipo: "festivo", fecha: "2025-03-17", descripcion: "Natalicio Benito Juárez" },
+                        { tipo: "adicional", fecha: "2025-01-04", descripcion: "sábado" }
+                    ];
+                    for (let item of calOficiales) {
+                        await addDoc(collection(db, "calendario_config"), item);
+                    }
+                    const c2 = await getDocs(collection(db, "calendario_config"));
+                    window.dbCalendario = [];
+                    c2.forEach(d => window.dbCalendario.push({ idDoc: d.id, ...d.data() }));
+                }
+
+                procesarCalculosAutomaticos();
+                renderizarTodo();
+            } catch (err) {
+                console.error("Detalle del error en Firebase:", err);
+                throw err;
+            }
         }
 
         async function initApp() {
@@ -736,6 +738,7 @@
 
         window.abrirModalCalendario = function() {
             document.getElementById('form-calendario').reset();
+            document.getElementById('modal-calendario').classList.add('hidden'); // hidden by default on open reset
             document.getElementById('modal-calendario').classList.remove('hidden');
         };
         window.cerrarModalCalendario = function() {
