@@ -284,7 +284,7 @@
 
     <!-- PIE DE PÁGINA -->
     <footer class="bg-slate-800 border-t border-slate-700 py-4 mt-auto text-center text-xs text-slate-400">
-        Contador de Impactos Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.18
+        Contador de Impactos Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.19
     </footer>
 
     <!-- MODAL NUEVO / EDITAR VIDEO -->
@@ -386,10 +386,9 @@
         window.dbCalendario = [];
         window.FECHA_ACTUAL = new Date().toISOString().split('T')[0];
 
-        // Función para formatear YYYY-MM-DD a DD/MM/AAAA
         window.formatearFechaDDMMYYYY = function(fechaStr) {
             if (!fechaStr) return "";
-            if (fechaStr.includes('/')) return fechaStr; // Ya está formateada
+            if (fechaStr.includes('/')) return fechaStr;
             const partes = fechaStr.split('-');
             if (partes.length === 3) {
                 return `${partes[2]}/${partes[1]}/${partes[0]}`;
@@ -397,7 +396,6 @@
             return fechaStr;
         };
 
-        // Función para obtener el día de la semana en español automáticamente a partir de una fecha YYYY-MM-DD
         window.obtenerDiaSemana = function(fechaStr) {
             if (!fechaStr) return "";
             const limpio = fechaStr.includes('/') ? fechaStr.split('/').reverse().join('-') : fechaStr;
@@ -423,7 +421,6 @@
             const adicionalesSet = new Set(window.dbCalendario.filter(c => c.tipo === 'adicional').map(c => c.fecha));
             const hoyStr = window.FECHA_ACTUAL;
 
-            // 1. ELIMINAR DUPLICADOS DE VERSIONES
             const versionesVistas = new Set();
             const unicos = [];
             window.dbVideos.forEach(v => {
@@ -435,7 +432,6 @@
             });
             window.dbVideos = unicos;
 
-            // 2. ORDENAMIENTO ESTRICTO POR FECHA DE INICIO (DE MENOR A MAYOR)
             window.dbVideos.sort((a, b) => {
                 const fechaA = a.inicio_transmision || "9999-12-31";
                 const fechaB = b.inicio_transmision || "9999-12-31";
@@ -464,7 +460,7 @@
                     let dd = String(curr.getDate()).padStart(2, '0');
                     let fStr = `${yyyy}-${mm}-${dd}`;
 
-                    let dayOfWeek = curr.getDay(); // 0: Domingo, 6: Sábado
+                    let dayOfWeek = curr.getDay();
                     let esFestivo = festivosSet.has(fStr);
                     let esAdicional = adicionalesSet.has(fStr);
 
@@ -703,30 +699,35 @@
                 window.dbCalendario = [];
                 calSnap.forEach(d => window.dbCalendario.push({ idDoc: d.id, ...d.data() }));
 
-                if (window.dbCalendario.length === 0) {
+                // Sincronización completa de los días festivos y adicionales de la imagen si faltan registros
+                if (window.dbCalendario.length < 25) {
                     const festivosOficiales = [
-                        { fecha: "2025-01-01", desc: "Año Nuevo" }, { fecha: "2025-03-17", desc: "Natalicio Benito Juárez" },
-                        { fecha: "2025-02-02", desc: "Día Festivo" }, { fecha: "2025-04-17", desc: "Jueves Santo" },
-                        { fecha: "2025-04-18", desc: "Viernes Santo" }, { fecha: "2025-04-19", desc: "Sábado de Gloria" },
-                        { fecha: "2025-04-24", desc: "Día Festivo" }, { fecha: "2025-04-26", desc: "Día Festivo" },
-                        { fecha: "2025-05-01", desc: "Día del Trabajo" }, { fecha: "2025-05-05", desc: "Batalla de Puebla" },
-                        { fecha: "2025-09-16", desc: "Independencia de México" }, { fecha: "2025-11-17", desc: "Revolución Mexicana" },
-                        { fecha: "2025-11-18", desc: "Día Festivo" }, { fecha: "2025-12-24", desc: "Nochebuena" },
-                        { fecha: "2025-12-25", desc: "Navidad" }, { fecha: "2026-12-31", desc: "Fin de Año" },
+                        { fecha: "2025-01-01", desc: "Año Nuevo" },
+                        { fecha: "2025-03-17", desc: "Natalicio Benito Juárez" },
+                        { fecha: "2025-02-02", desc: "Día Festivo" },
+                        { fecha: "2025-04-17", desc: "Jueves Santo" },
+                        { fecha: "2025-04-18", desc: "Viernes Santo" },
+                        { fecha: "2025-04-19", desc: "Sábado de Gloria" },
+                        { fecha: "2025-04-24", desc: "Día Festivo" },
+                        { fecha: "2025-04-26", desc: "Día Festivo" },
+                        { fecha: "2025-05-01", desc: "Día del Trabajo" },
+                        { fecha: "2025-05-05", desc: "Batalla de Puebla" },
+                        { fecha: "2025-09-16", desc: "Independencia de México" },
+                        { fecha: "2025-11-17", desc: "Revolución Mexicana" },
+                        { fecha: "2025-11-18", desc: "Día Festivo" },
+                        { fecha: "2025-12-24", desc: "Nochebuena" },
+                        { fecha: "2025-12-25", desc: "Navidad" },
+                        { fecha: "2026-12-31", desc: "Fin de Año" },
                         { fecha: "2026-01-01", desc: "Año Nuevo" }
                     ];
 
                     const adicionalesOficiales = [
-                        { fecha: "2025-01-04" }, { fecha: "2025-01-11" }, { fecha: "2025-01-12" },
-                        { fecha: "2025-01-18" }, { fecha: "2025-01-25" }, { fecha: "2025-02-01" },
-                        { fecha: "2025-02-02" }, { fecha: "2025-02-08" }, { fecha: "2025-02-15" },
-                        { fecha: "2025-02-22" }, { fecha: "2025-03-01" }, { fecha: "2025-03-08" },
-                        { fecha: "2025-03-15" }, { fecha: "2025-03-22" }, { fecha: "2025-03-23" },
-                        { fecha: "2025-03-29" }, { fecha: "2025-04-05" }, { fecha: "2025-04-12" },
-                        { fecha: "2025-04-26" }, { fecha: "2025-05-03" }, { fecha: "2025-05-17" },
-                        { fecha: "2025-05-24" }, { fecha: "2025-05-31" }, { fecha: "2025-02-07" },
-                        { fecha: "2025-05-10" }, { fecha: "2026-02-01" }, { fecha: "2026-02-08" },
-                        { fecha: "2026-01-31" }
+                        "2025-01-04", "2025-01-11", "2025-01-12", "2025-01-18", "2025-01-25",
+                        "2025-02-01", "2025-02-02", "2025-02-08", "2025-02-15", "2025-02-22",
+                        "2025-03-01", "2025-03-08", "2025-03-15", "2025-03-22", "2025-03-23",
+                        "2025-03-29", "2025-04-05", "2025-04-12", "2025-04-26", "2025-05-03",
+                        "2025-05-17", "2025-05-24", "2025-05-31", "2025-02-07", "2025-05-10",
+                        "2026-02-01", "2026-02-08", "2026-01-31"
                     ];
 
                     const batchCal = writeBatch(db);
@@ -736,7 +737,7 @@
                     });
                     adicionalesOficiales.forEach(a => {
                         const ref = doc(collection(db, "calendario_config"));
-                        batchCal.set(ref, { tipo: "adicional", fecha: a.fecha, descripcion: window.obtenerDiaSemana(a.fecha) });
+                        batchCal.set(ref, { tipo: "adicional", fecha: a, descripcion: window.obtenerDiaSemana(a) });
                     });
                     await batchCal.commit();
 
@@ -754,7 +755,15 @@
         };
 
         window.recargarDatosForzado = async function() {
-            if (confirm('¿Desea sincronizar y recargar todos los registros oficiales?')) {
+            if (confirm('¿Desea sincronizar y recargar todos los registros oficiales (Videos y Calendario)?')) {
+                // Borrar configuración anterior de calendario si se desea forzar re-creación
+                try {
+                    const calSnap = await getDocs(collection(db, "calendario_config"));
+                    const batchDel = writeBatch(db);
+                    calSnap.forEach(d => batchDel.delete(d.ref));
+                    await batchDel.commit();
+                } catch(e) {}
+
                 await window.cargarDatosFirebase();
                 alert('¡Sincronización completada con éxito!');
             }
@@ -780,7 +789,6 @@
             window.procesarCalculosAutomaticos();
             document.getElementById('contador-videos').innerText = window.dbVideos.length;
 
-            // Actualizar contador de videos vigentes en la insignia naranja
             const vigentesCount = window.dbVideos.filter(v => v.vigente === 'VIGENTE').length;
             document.getElementById('badge-vigentes').innerText = vigentesCount;
 
@@ -845,14 +853,21 @@
             const tAdicionales = document.getElementById('tabla-adicionales-body');
             tFestivos.innerHTML = '';
             tAdicionales.innerHTML = '';
-            window.dbCalendario.forEach(c => {
+
+            // Ordenar por fecha
+            const festivosList = window.dbCalendario.filter(c => c.tipo === 'festivo').sort((a,b) => a.fecha.localeCompare(b.fecha));
+            const adicionalesList = window.dbCalendario.filter(c => c.tipo === 'adicional').sort((a,b) => a.fecha.localeCompare(b.fecha));
+
+            festivosList.forEach(c => {
                 const diaSemana = window.obtenerDiaSemana(c.fecha);
                 const fechaFormateada = window.formatearFechaDDMMYYYY(c.fecha);
-                if (c.tipo === 'festivo') {
-                    tFestivos.innerHTML += `<tr class="hover:bg-slate-750"><td class="p-2.5 font-mono text-amber-300">${fechaFormateada}</td><td class="p-2.5 capitalize text-slate-300">${diaSemana}</td><td class="p-2.5">${c.descripcion || 'Festivo'}</td><td class="p-2.5 text-center"><button onclick="eliminarDia('${c.idDoc}')" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-trash"></i></button></td></tr>`;
-                } else {
-                    tAdicionales.innerHTML += `<tr class="hover:bg-slate-750"><td class="p-2.5 font-mono text-emerald-300">${fechaFormateada}</td><td class="p-2.5 capitalize font-semibold text-emerald-400">${diaSemana}</td><td class="p-2.5">${c.descripcion || diaSemana}</td><td class="p-2.5 text-center"><button onclick="eliminarDia('${c.idDoc}')" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-trash"></i></button></td></tr>`;
-                }
+                tFestivos.innerHTML += `<tr class="hover:bg-slate-750"><td class="p-2.5 font-mono text-amber-300">${fechaFormateada}</td><td class="p-2.5 capitalize text-slate-300">${diaSemana}</td><td class="p-2.5">${c.descripcion || 'Festivo'}</td><td class="p-2.5 text-center"><button onclick="eliminarDia('${c.idDoc}')" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+            });
+
+            adicionalesList.forEach(c => {
+                const diaSemana = window.obtenerDiaSemana(c.fecha);
+                const fechaFormateada = window.formatearFechaDDMMYYYY(c.fecha);
+                tAdicionales.innerHTML += `<tr class="hover:bg-slate-750"><td class="p-2.5 font-mono text-emerald-300">${fechaFormateada}</td><td class="p-2.5 capitalize font-semibold text-emerald-400">${diaSemana}</td><td class="p-2.5">${c.descripcion || diaSemana}</td><td class="p-2.5 text-center"><button onclick="eliminarDia('${c.idDoc}')" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-trash"></i></button></td></tr>`;
             });
         };
 
