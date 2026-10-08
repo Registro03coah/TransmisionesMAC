@@ -65,7 +65,7 @@
             <div class="bg-gradient-to-r from-indigo-900/60 to-slate-800/80 p-8 rounded-2xl border border-indigo-500/30 shadow-xl backdrop-blur-md">
                 <h2 class="text-3xl font-extrabold text-white mb-2">Panel de Control General</h2>
                 <p class="text-slate-300 max-w-2xl">
-                    Sistema integral con reglas automáticas de ID alfabético, cálculo de vigencias y repeticiones acumuladas hasta la fecha actual (2026-10-08).
+                    Sistema integral con reglas automáticas de ID alfabético, cálculo de vigencias y repeticiones acumuladas hasta la fecha actual.
                 </p>
             </div>
 
@@ -111,7 +111,7 @@
                     <h2 class="text-xl font-bold text-white flex items-center">
                         <i class="fa-solid fa-database text-indigo-400 mr-2"></i> BD_Videos (Hoja Central Oficial)
                     </h2>
-                    <p class="text-xs text-slate-400">Orden alfabético automático de ID (A-ZZZ) y recálculo con base en festivos y fecha actual (2026-10-08).</p>
+                    <p class="text-xs text-slate-400">Orden alfabético automático de ID y recálculo con base en festivos y fecha actual.</p>
                 </div>
                 <button onclick="abrirModalVideo()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center shadow">
                     <i class="fa-solid fa-plus mr-2"></i> Nuevo Registro de Video
@@ -136,9 +136,7 @@
                                 <th class="p-3 text-center">Acciones</th>
                             </tr>
                         </thead>
-                        <tbody id="tabla-bd-videos-body" class="divide-y divide-slate-700 text-slate-300">
-                            <!-- Dinámico ordenado alfabéticamente -->
-                        </tbody>
+                        <tbody id="tabla-bd-videos-body" class="divide-y divide-slate-700 text-slate-300"></tbody>
                     </table>
                 </div>
             </div>
@@ -226,7 +224,6 @@
         <section id="sheet-FORMULAS" class="sheet-view hidden space-y-6">
             <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
                 <h2 class="text-xl font-bold text-white flex items-center"><i class="fa-solid fa-calculator text-blue-400 mr-2"></i> Motor de Fórmulas y Conversiones</h2>
-                <p class="text-sm text-slate-300">Cálculo de tiempos en segundos y acumulado diario hasta la fecha actual.</p>
             </div>
             <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-xl">
                 <div class="overflow-x-auto max-h-[600px]">
@@ -276,7 +273,7 @@
 
     <!-- PIE DE PÁGINA -->
     <footer class="bg-slate-800 border-t border-slate-700 py-4 mt-auto text-center text-xs text-slate-400">
-        Contador de Impactos Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.06
+        Contador de Impactos Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.07
     </footer>
 
     <!-- MODAL NUEVO / EDITAR VIDEO -->
@@ -376,9 +373,8 @@
 
         window.dbVideos = [];
         window.dbCalendario = [];
-        window.FECHA_ACTUAL = "2026-10-08"; // Fecha de referencia actual
+        window.FECHA_ACTUAL = new Date().toISOString().split('T')[0]; // Fecha actual dinámica del sistema
 
-        // Función para generar IDs alfabéticos estilo Excel (A, B... Z, AA, AB... ZZZ)
         function generarIdExcel(n) {
             let result = "";
             let num = n;
@@ -389,6 +385,83 @@
             return result;
         }
         window.generarIdExcel = generarIdExcel;
+
+        function duracionASegundos(dur) {
+            if (!dur) return 30;
+            const partes = dur.split(':').map(Number);
+            if (partes.length === 3) {
+                return partes[0] * 3600 + partes[1] * 60 + partes[2];
+            } else if (partes.length === 2) {
+                return partes[0] * 60 + partes[1];
+            }
+            return 30;
+        }
+
+        function procesarCalculosAutomaticos() {
+            const festivosSet = new Set(window.dbCalendario.filter(c => c.tipo === 'festivo').map(c => c.fecha));
+            const adicionalesSet = new Set(window.dbCalendario.filter(c => c.tipo === 'adicional').map(c => c.fecha));
+            const hoyStr = window.FECHA_ACTUAL;
+
+            window.dbVideos.forEach(v => {
+                if (v.cierre_transmision < hoyStr) {
+                    v.vigente = "FINALIZADO";
+                } else {
+                    v.vigente = "VIGENTE";
+                }
+
+                let inicio = new Date(v.inicio_transmision + "T00:00:00");
+                let cierre = new Date(v.cierre_transmision + "T00:00:00");
+                let hoy = new Date(hoyStr + "T00:00:00");
+
+                let festivosEnRango = 0;
+                let diasTransmisionCount = 0;
+                let repeticionesAcumuladas = 0;
+
+                let curr = new Date(inicio);
+                while (curr <= cierre) {
+                    let yyyy = curr.getFullYear();
+                    let mm = String(curr.getMonth() + 1).padStart(2, '0');
+                    let dd = String(curr.getDate()).padStart(2, '0');
+                    let fStr = `${yyyy}-${mm}-${dd}`;
+
+                    let dayOfWeek = curr.getDay();
+                    let esFestivo = festivosSet.has(fStr);
+                    let esAdicional = adicionalesSet.has(fStr);
+
+                    let esLaboral = false;
+                    if (esFestivo && !esAdicional) {
+                        esLaboral = false;
+                    } else if (dayOfWeek !== 0 || esAdicional) {
+                        esLaboral = true;
+                    }
+
+                    if (esFestivo && curr >= inicio && curr <= cierre) {
+                        festivosEnRango++;
+                    }
+
+                    if (esLaboral) {
+                        diasTransmisionCount++;
+                        if (curr <= hoy && curr <= cierre) {
+                            let videosActivosHoy = window.dbVideos.filter(vid => fStr >= vid.inicio_transmision && fStr <= vid.cierre_transmision);
+                            let sumaSegundosHoy = videosActivosHoy.reduce((acc, vid) => acc + duracionASegundos(vid.duracion), 0);
+
+                            if (sumaSegundosHoy > 0) {
+                                let durSeg = duracionASegundos(v.duracion);
+                                let repDia = (3600 / sumaSegundosHoy) * 7 * (durSeg / 60);
+                                repeticionesAcumuladas += repDia;
+                            }
+                        }
+                    }
+                    curr.setDate(curr.getDate() + 1);
+                }
+
+                v.festivos = festivosEnRango;
+                v.dias_transmision = diasTransmisionCount;
+                v.repeticiones = isNaN(repeticionesAcumuladas) ? 0 : repeticionesAcumuladas;
+            });
+
+            window.dbVideos.sort((a, b) => a.id_video.localeCompare(b.id_video, undefined, { numeric: true, sensitivity: 'base' }));
+        }
 
         async function initApp() {
             const statusDot = document.getElementById('status-dot');
@@ -456,93 +529,6 @@
 
             procesarCalculosAutomaticos();
             renderizarTodo();
-        }
-
-        // Función para convertir duración MM:SS a segundos
-        function duracionASegundos(dur) {
-            if (!dur) return 30;
-            const partes = dur.split(':').map(Number);
-            if (partes.length === 3) {
-                return partes[0] * 3600 + partes[1] * 60 + partes[2];
-            } else if (partes.length === 2) {
-                return partes[0] * 60 + partes[1];
-            }
-            return 30;
-        }
-
-        // Procesar cálculos de vigencia, festivos, días hábiles y repeticiones acumuladas día a día hasta 2026-10-08
-        function procesarCalculosAutomaticos() {
-            const festivosSet = new Set(window.dbCalendario.filter(c => c.tipo === 'festivo').map(c => c.fecha));
-            const adicionalesSet = new Set(window.dbCalendario.filter(c => c.tipo === 'adicional').map(c => c.fecha));
-            const hoyStr = window.FECHA_ACTUAL;
-
-            window.dbVideos.forEach(v => {
-                // 1. Estatus Vigencia
-                if (v.cierre_transmision < hoyStr) {
-                    v.vigente = "FINALIZADO";
-                } else {
-                    v.vigente = "VIGENTE";
-                }
-
-                // 2. Conteo de festivos y días hábiles en el rango
-                let inicio = new Date(v.inicio_transmision + "T00:00:00");
-                let cierre = new Date(v.cierre_transmision + "T00:00:00");
-                let hoy = new Date(hoyStr + "T00:00:00");
-
-                let festivosEnRango = 0;
-                let diasTransmisionCount = 0;
-                let repeticionesAcumuladas = 0;
-
-                let curr = new Date(inicio);
-                while (curr <= cierre) {
-                    let yyyy = curr.getFullYear();
-                    let mm = String(curr.getMonth() + 1).padStart(2, '0');
-                    let dd = String(curr.getDate()).padStart(2, '0');
-                    let fStr = `${yyyy}-${mm}-${dd}`;
-
-                    let dayOfWeek = curr.getDay(); // 0 = Domingo, 6 = Sábado
-                    let esFestivo = festivosSet.has(fStr);
-                    let esAdicional = adicionalesSet.has(fStr);
-
-                    let esLaboral = false;
-                    if (esFestivo && !esAdicional) {
-                        esLaboral = false;
-                    } else if (dayOfWeek !== 0 || esAdicional) { // Lunes a sábado o adicional
-                        esLaboral = true;
-                    }
-
-                    if (esFestivo && curr >= inicio && curr <= cierre) {
-                        festivosEnRango++;
-                    }
-
-                    if (esLaboral) {
-                        diasTransmisionCount++;
-
-                        // Si la fecha actual ya alcanzó o pasó este día, calculamos repeticiones para este día
-                        if (curr <= hoy && curr <= cierre) {
-                            // Encontrar todos los videos activos en este día 'fStr'
-                            let videosActivosHoy = window.dbVideos.filter(vid => fStr >= vid.inicio_transmision && fStr <= vid.cierre_transmision);
-                            let sumaSegundosHoy = videosActivosHoy.reduce((acc, vid) => acc + duracionASegundos(vid.duracion), 0);
-
-                            if (sumaSegundosHoy > 0) {
-                                let durSeg = duracionASegundos(v.duracion);
-                                // Fórmula: (60 minutos / sumaSegundosHoy) * 7 horas * (durSeg en mins o proporción) -> Ajustado proporcional al impacto diario
-                                let repDia = (3600 / sumaSegundosHoy) * 7 * (durSeg / 60); 
-                                repeticionesAcumuladas += repDia;
-                            }
-                        }
-                    }
-
-                    curr.setDate(curr.getDate() + 1);
-                }
-
-                v.festivos = festivosEnRango;
-                v.dias_transmision = diasTransmisionCount;
-                v.repeticiones = isNaN(repeticionesAcumuladas) ? 0 : repeticionesAcumuladas;
-            });
-
-            // Ordenar alfabéticamente por ID (A, B, C... Z, AA, AB...)
-            window.dbVideos.sort((a, b) => a.id_video.localeCompare(b.id_video, undefined, { numeric: true, sensitivity: 'base' }));
         }
 
         window.cargarDatosFirebase = cargarDatosFirebase;
@@ -692,7 +678,6 @@
         window.abrirModalVideo = function() {
             document.getElementById('form-video').reset();
             document.getElementById('video-doc-id').value = '';
-            // Asignar ID automático consecutivo estilo Excel (A, B, C... Z, AA...)
             const siguienteId = generarIdExcel(window.dbVideos.length);
             document.getElementById('video-id').value = siguienteId;
             document.getElementById('modal-video-titulo').innerText = `Registrar Nuevo Video (ID: ${siguienteId})`;
