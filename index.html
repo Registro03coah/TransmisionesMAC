@@ -4,784 +4,811 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contador de Impactos en TVINE - Sistema Web</title>
-    <!-- Tailwind CSS para un diseño profesional y responsivo -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Tailwind CSS para diseño moderno y profesional -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome para iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Firebase SDKs (Compat / Modular via CDN) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        
-        // Exportar a window para uso global en la aplicación
-        window.firebaseAppModules = { initializeApp, getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, setDoc };
-    </script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
 
-    <!-- Modal de Configuración de Firebase -->
-    <div id="firebase-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-lg w-full p-6 shadow-2xl">
-            <div class="flex items-center space-x-3 mb-4">
-                <div class="bg-indigo-600 p-3 rounded-lg text-white">
-                    <i class="fa-solid fa-database text-xl"></i>
+    <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
+    <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="cambiarHoja('inicio')">
+                <div class="bg-indigo-600 p-2.5 rounded-xl shadow-lg">
+                    <i class="fa-solid fa-tv text-white text-xl"></i>
                 </div>
                 <div>
-                    <h2 class="text-xl font-bold text-white">Configuración de Firebase</h2>
-                    <p class="text-sm text-slate-400">Conecta tu base de datos para sincronizar la información</p>
+                    <h1 class="text-lg font-bold tracking-wide">TVINE Impactos</h1>
+                    <p class="text-xs text-slate-400">Sistema Integrado en la Nube (Firebase)</p>
                 </div>
             </div>
-            <p class="text-xs text-slate-300 mb-4 bg-slate-900/50 p-3 rounded border border-slate-700">
-                Ingresa tus credenciales de Firebase Firestore. Si ya las guardaste previamente, puedes continuar o actualizarlas.
-            </p>
-            <form id="firebase-form" class="space-y-3">
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">ApiKey</label>
-                    <input type="text" id="fb-apikey" required class="w-screen max-w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Auth Domain</label>
-                        <input type="text" id="fb-authdomain" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Project ID</label>
-                        <input type="text" id="fb-projectid" required class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Storage Bucket</label>
-                        <input type="text" id="fb-storagebucket" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Messaging Sender ID</label>
-                        <input type="text" id="fb-messagingsenderid" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">App ID</label>
-                    <input type="text" id="fb-appid" required class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
-                </div>
-                <div class="flex justify-end space-x-3 pt-3">
-                    <button type="button" onclick="app.bypassFirebase()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-sm font-medium rounded transition">Modo Local (Demo)</button>
-                    <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-sm font-semibold rounded text-white transition shadow-lg shadow-indigo-600/30">Conectar Base de Datos</button>
-                </div>
-            </form>
-        </div>
-    </div>
 
-    <!-- Header Principal -->
-    <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-30">
-        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="app.showHome()">
-                <div class="bg-emerald-600 p-2 rounded-lg text-white shadow-md">
-                    <i class="fa-solid fa-file-excel text-lg"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-base md:text-lg text-white tracking-wide">Contador de Impactos en TVINE</h1>
-                    <p class="text-xs text-emerald-400 font-medium">Sistema Web Integrado & Sincronizado</p>
-                </div>
-            </div>
-            
-            <div class="flex items-center space-x-3">
-                <span id="connection-status" class="hidden md:inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                    <span class="w-2 h-2 mr-1.5 rounded-full bg-amber-400 animate-pulse"></span> Desconectado
-                </span>
-                <button onclick="app.openConfig()" class="p-2 text-slate-400 hover:text-white bg-slate-700/50 hover:bg-slate-700 rounded-lg transition" title="Configurar Firebase">
-                    <i class="fa-solid fa-gear"></i>
+            <!-- MENÚ DE PESTAÑAS -->
+            <nav id="nav-tabs" class="flex flex-wrap gap-1 sm:gap-2">
+                <button onclick="cambiarHoja('inicio')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium transition bg-indigo-600 text-white shadow" data-target="inicio">
+                    <i class="fa-solid fa-house mr-1.5"></i> Inicio
                 </button>
-                <button onclick="app.showHome()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg transition flex items-center space-x-1.5">
-                    <i class="fa-solid fa-house"></i>
-                    <span class="hidden sm:inline">Menú Inicio</span>
+                <button onclick="cambiarHoja('BD_Videos')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium transition bg-slate-700 hover:bg-slate-600 text-slate-300" data-target="BD_Videos">
+                    BD_Videos
                 </button>
+                <button onclick="cambiarHoja('Reporte')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium transition bg-slate-700 hover:bg-slate-600 text-slate-300" data-target="Reporte">
+                    Reporte por Versión
+                </button>
+                <button onclick="cambiarHoja('Calendario')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium transition bg-slate-700 hover:bg-slate-600 text-slate-300" data-target="Calendario">
+                    Calendario & Festivos
+                </button>
+                <button onclick="cambiarHoja('FORMULAS')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium transition bg-slate-700 hover:bg-slate-600 text-slate-300" data-target="FORMULAS">
+                    FORMULAS
+                </button>
+                <button onclick="cambiarHoja('tabla_reporte')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium transition bg-slate-700 hover:bg-slate-600 text-slate-300" data-target="tabla_reporte">
+                    tabla de reporte
+                </button>
+                <button onclick="cambiarHoja('listadovigente')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium transition bg-slate-700 hover:bg-slate-600 text-slate-300" data-target="listadovigente">
+                    listadovigente
+                </button>
+            </nav>
+
+            <!-- ESTADO DE CONEXIÓN FIREBASE -->
+            <div id="db-status" class="flex items-center space-x-2 text-xs bg-slate-900 px-3 py-1.5 rounded-full border border-slate-700">
+                <span class="w-2.5 h-2.5 rounded-full bg-yellow-500 animate-pulse" id="status-dot"></span>
+                <span id="status-text" class="text-slate-300">Conectando a Firebase...</span>
             </div>
         </div>
     </header>
 
-    <!-- Contenedor Dinámico Principal -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6">
-        
-        <!-- VISTA: HOME / MENÚ PRINCIPAL -->
-        <div id="view-home" class="space-y-6">
-            <div class="bg-gradient-to-r from-indigo-900/50 via-slate-800 to-slate-800 border border-indigo-500/30 rounded-2xl p-6 md:p-8 shadow-xl">
-                <span class="bg-indigo-500/20 text-indigo-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-indigo-500/30">Libro Digital Sincronizado</span>
-                <h2 class="text-2xl md:text-3xl font-extrabold text-white mt-3">Panel de Control de Hojas de Cálculo</h2>
-                <p class="text-slate-300 text-sm md:text-base mt-2 max-w-3xl">
-                    Bienvenido al sistema web réplica de tu archivo de Excel. La hoja central <strong class="text-emerald-400">BD videos</strong> alimenta todas las fórmulas y cálculos del sistema. Selecciona una hoja a continuación para ver, editar o auditar la información en tiempo real.
+    <!-- CONTENEDOR PRINCIPAL DE HOJAS -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6">
+
+        <!-- 1. PÁGINA DE INICIO / DASHBOARD -->
+        <section id="sheet-inicio" class="sheet-view space-y-6">
+            <div class="bg-gradient-to-r from-indigo-900/60 to-slate-800/80 p-8 rounded-2xl border border-indigo-500/30 shadow-xl backdrop-blur-md">
+                <h2 class="text-3xl font-extrabold text-white mb-2">Panel de Control General</h2>
+                <p class="text-slate-300 max-w-2xl">
+                    Sistema integral para el control de transmisiones, conteo de impactos en pantallas de Módulos de Atención Ciudadana (MAC) y gestión de versiones interconectadas mediante fórmulas nativas sincronizadas con Firebase.
                 </p>
-                <div class="mt-6 flex flex-wrap gap-4 text-xs">
-                    <div class="bg-slate-900/80 px-4 py-2.5 rounded-xl border border-slate-700 flex items-center space-x-2">
-                        <i class="fa-solid fa-database text-emerald-400 text-sm"></i>
-                        <span class="text-slate-300">Hoja Principal: <strong class="text-white">BD videos</strong></span>
-                    </div>
-                    <div class="bg-slate-900/80 px-4 py-2.5 rounded-xl border border-slate-700 flex items-center space-x-2">
-                        <i class="fa-solid fa-cloud-arrow-up text-indigo-400 text-sm"></i>
-                        <span class="text-slate-300">Base de Datos: <strong class="text-white">Firebase Firestore & GitHub</strong></span>
-                    </div>
-                </div>
             </div>
 
-            <h3 class="text-lg font-bold text-white flex items-center space-x-2">
-                <i class="fa-solid fa-table-cells text-indigo-400"></i>
-                <span>Hojas Disponibles del Libro</span>
-            </h3>
-
-            <!-- Tarjetas de Navegación de Hojas -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="sheets-cards-container">
-                <!-- Se renderiza dinámicamente con JS -->
-            </div>
-        </div>
-
-        <!-- VISTA: TABLA / HOJA ESPECÍFICA -->
-        <div id="view-sheet" class="hidden space-y-5">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-md">
-                <div class="flex items-center space-x-3">
-                    <button onclick="app.showHome()" class="p-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition">
-                        <i class="fa-solid fa-arrow-left"></i>
-                    </button>
-                    <div>
-                        <div class="flex items-center space-x-2">
-                            <span id="sheet-badge" class="bg-emerald-500/20 text-emerald-300 text-xs font-semibold px-2.5 py-0.5 rounded border border-emerald-500/30">Hoja Principal</span>
-                            <h2 id="sheet-title-header" class="text-xl font-bold text-white">BD videos</h2>
+            <!-- TARJETAS DE ACCESO RÁPIDO A LAS HOJAS -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div onclick="cambiarHoja('BD_Videos')" class="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-indigo-500 cursor-pointer transition shadow hover:shadow-indigo-500/10 group">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="bg-indigo-600/20 p-3 rounded-lg text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition">
+                            <i class="fa-solid fa-database text-xl"></i>
                         </div>
-                        <p id="sheet-desc-header" class="text-xs text-slate-400 mt-0.5">Captura y administración de registros principales.</p>
+                        <span class="text-xs bg-indigo-500/10 text-indigo-400 px-2.5 py-1 rounded-full font-semibold">Motor Principal</span>
                     </div>
+                    <h3 class="text-xl font-bold text-white mb-1">BD_Videos</h3>
+                    <p class="text-sm text-slate-400">Base de datos central donde se registran los videos, duraciones, fechas y cálculos iniciales.</p>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-2">
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
-                            <i class="fa-solid fa-magnifying-glass text-xs"></i>
-                        </span>
-                        <input type="text" id="sheet-search" oninput="app.filterTableRows(this.value)" placeholder="Buscar en esta hoja..." class="bg-slate-900 border border-slate-700 rounded-lg pl-9 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500 w-full sm:w-48">
+                <div onclick="cambiarHoja('Reporte')" class="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-indigo-500 cursor-pointer transition shadow hover:shadow-indigo-500/10 group">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="bg-emerald-600/20 p-3 rounded-lg text-emerald-400 group-hover:bg-emerald-600 group-hover:text-white transition">
+                            <i class="fa-solid fa-chart-pie text-xl"></i>
+                        </div>
+                        <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full font-semibold">Agregación</span>
                     </div>
-                    
-                    <button onclick="app.openNewRecordModal()" id="btn-add-record" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg transition flex items-center space-x-1.5 shadow-md shadow-emerald-600/20">
-                        <i class="fa-solid fa-plus"></i>
-                        <span>Nuevo Registro</span>
-                    </button>
-                    
-                    <button onclick="app.exportToCSV()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold rounded-lg transition flex items-center space-x-1.5" title="Exportar datos">
-                        <i class="fa-solid fa-file-csv"></i>
-                        <span class="hidden sm:inline">Exportar CSV</span>
-                    </button>
+                    <h3 class="text-xl font-bold text-white mb-1">Reporte por Versión</h3>
+                    <p class="text-sm text-slate-400">Resumen y total de impactos transmitidos en el periodo seleccionado por temática y versión.</p>
+                </div>
+
+                <div onclick="cambiarHoja('Calendario')" class="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-indigo-500 cursor-pointer transition shadow hover:shadow-indigo-500/10 group">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="bg-amber-600/20 p-3 rounded-lg text-amber-400 group-hover:bg-amber-600 group-hover:text-white transition">
+                            <i class="fa-solid fa-calendar-days text-xl"></i>
+                        </div>
+                        <span class="text-xs bg-amber-500/10 text-amber-400 px-2.5 py-1 rounded-full font-semibold">Configuración</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-1">Calendario & Festivos</h3>
+                    <p class="text-sm text-slate-400">Gestión independiente de días no laborables y días adicionales laborados que alimentan las fórmulas.</p>
+                </div>
+
+                <div onclick="cambiarHoja('FORMULAS')" class="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-indigo-500 cursor-pointer transition shadow hover:shadow-indigo-500/10 group">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="bg-blue-600/20 p-3 rounded-lg text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition">
+                            <i class="fa-solid fa-calculator text-xl"></i>
+                        </div>
+                        <span class="text-xs bg-blue-500/10 text-blue-400 px-2.5 py-1 rounded-full font-semibold">Motor Lógico</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-1">FORMULAS</h3>
+                    <p class="text-sm text-slate-400">Conversión de tiempos, sumatorias y validación de vigencias y estados actuales.</p>
+                </div>
+
+                <div onclick="cambiarHoja('tabla_reporte')" class="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-indigo-500 cursor-pointer transition shadow hover:shadow-indigo-500/10 group">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="bg-purple-600/20 p-3 rounded-lg text-purple-400 group-hover:bg-purple-600 group-hover:text-white transition">
+                            <i class="fa-solid fa-table text-xl"></i>
+                        </div>
+                        <span class="text-xs bg-purple-500/10 text-purple-400 px-2.5 py-1 rounded-full font-semibold">Analítica</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-1">Tabla de Reporte</h3>
+                    <p class="text-sm text-slate-400">Matriz detallada de transmisiones diarias con desglose de impacto por fecha y versión.</p>
+                </div>
+
+                <div onclick="cambiarHoja('listadovigente')" class="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-indigo-500 cursor-pointer transition shadow hover:shadow-indigo-500/10 group">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="bg-rose-600/20 p-3 rounded-lg text-rose-400 group-hover:bg-rose-600 group-hover:text-white transition">
+                            <i class="fa-solid fa-list-check text-xl"></i>
+                        </div>
+                        <span class="text-xs bg-rose-500/10 text-rose-400 px-2.5 py-1 rounded-full font-semibold">Directorio</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-1">Listado Vigente</h3>
+                    <p class="text-sm text-slate-400">Control de estatus (Vigente / Finalizado) y claves de enlace oficial para auditoría.</p>
                 </div>
             </div>
+        </section>
 
-            <!-- Contenedor de la Tabla de Datos -->
-            <div class="bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden">
-                <div class="overflow-x-auto max-h-[65vh]" id="table-scroll-container">
-                    <table class="w-full text-left border-collapse text-xs md:text-sm">
-                        <thead id="sheet-table-head" class="bg-slate-900/90 text-slate-300 uppercase tracking-wider text-xs sticky top-0 z-10 border-b border-slate-700">
-                            <!-- Columnas dinámicas -->
+        <!-- 2. HOJA BD_VIDEOS -->
+        <section id="sheet-BD_Videos" class="sheet-view hidden space-y-6">
+            <div class="flex flex-wrap justify-between items-center gap-4 bg-slate-800 p-4 rounded-xl border border-slate-700">
+                <div>
+                    <h2 class="text-xl font-bold text-white flex items-center">
+                        <i class="fa-solid fa-database text-indigo-400 mr-2"></i> BD_Videos (Hoja Central)
+                    </h2>
+                    <p class="text-xs text-slate-400">Carga y edición de información para generar reportes y cálculos en tiempo real.</p>
+                </div>
+                <button onclick="abrirModalVideo()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center shadow">
+                    <i class="fa-solid fa-plus mr-2"></i> Nuevo Registro de Video
+                </button>
+            </div>
+
+            <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-xl">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead class="bg-slate-900 text-slate-300 uppercase text-xs tracking-wider border-b border-slate-700">
+                            <tr>
+                                <th class="p-3">ID</th>
+                                <th class="p-3">Nombre Versión</th>
+                                <th class="p-3">Temática</th>
+                                <th class="p-3">Duración</th>
+                                <th class="p-3">Inicio Transmisión</th>
+                                <th class="p-3">Cierre Transmisión</th>
+                                <th class="p-3">Vigencia</th>
+                                <th class="p-3 text-center">Festivos</th>
+                                <th class="p-3 text-center">Días Transmisión</th>
+                                <th class="p-3 text-center">Repeticiones</th>
+                                <th class="p-3 text-center">Estado</th>
+                                <th class="p-3 text-center">Acciones</th>
+                            </tr>
                         </thead>
-                        <tbody id="sheet-table-body" class="divide-y divide-slate-700 text-slate-200">
-                            <!-- Filas dinámicas -->
+                        <tbody id="tabla-bd-videos-body" class="divide-y divide-slate-700 text-slate-300">
+                            <!-- Los registros se cargan dinámicamente desde Firebase -->
                         </tbody>
                     </table>
                 </div>
-                <div class="bg-slate-900/60 p-3 border-t border-slate-700 flex items-center justify-between text-xs text-slate-400">
-                    <span id="table-row-count">Mostrando 0 registros</span>
-                    <span id="formula-status-bar" class="text-emerald-400 font-medium">Fórmulas sincronizadas y activas</span>
+            </div>
+        </section>
+
+        <!-- 3. HOJA REPORTE DE IMPACTOS POR VERSIÓN -->
+        <section id="sheet-Reporte" class="sheet-view hidden space-y-6">
+            <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
+                <h2 class="text-xl font-bold text-white flex items-center">
+                    <i class="fa-solid fa-chart-pie text-emerald-400 mr-2"></i> Reporte por periodo de impactos transmitidos en las pantallas de MAC por versión
+                </h2>
+                <div class="flex flex-wrap gap-4 items-center bg-slate-900 p-4 rounded-lg border border-slate-700">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">INICIO DEL PERIODO</label>
+                        <input type="date" id="rep-inicio" value="2026-09-01" class="bg-slate-800 border border-slate-700 rounded px-3 py-1.5 text-sm text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">FIN DEL PERIODO</label>
+                        <input type="date" id="rep-fin" value="2026-10-07" class="bg-slate-800 border border-slate-700 rounded px-3 py-1.5 text-sm text-white">
+                    </div>
+                    <div class="ml-auto bg-emerald-500/10 border border-emerald-500/30 px-4 py-2 rounded-lg text-emerald-300 text-sm font-semibold">
+                        Total de impactos en el periodo: <span id="total-impactos-periodo">0</span>
+                    </div>
                 </div>
             </div>
-        </div>
+
+            <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-xl">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead class="bg-slate-900 text-slate-300 uppercase text-xs tracking-wider border-b border-slate-700">
+                            <tr>
+                                <th class="p-3">Estatus</th>
+                                <th class="p-3">Temática</th>
+                                <th class="p-3">Versión</th>
+                                <th class="p-3 text-right">Impactos Totales Transmitidos</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-reporte-version-body" class="divide-y divide-slate-700 text-slate-300">
+                            <!-- Datos generados reactivamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. HOJA CALENDARIO & FESTIVOS (Independiente) -->
+        <section id="sheet-Calendario" class="sheet-view hidden space-y-6">
+            <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center">
+                            <i class="fa-solid fa-calendar-days text-amber-400 mr-2"></i> Módulo Independiente: Días Festivos y Laborales
+                        </h2>
+                        <p class="text-xs text-slate-400">Gestiona los días inhábiles y adicionales sin alterar los registros centrales de BD_Videos.</p>
+                    </div>
+                    <button onclick="abrirModalCalendario()" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center shadow">
+                        <i class="fa-solid fa-plus mr-2"></i> Agregar Día Especial
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- DÍAS FESTIVOS -->
+                <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-xl space-y-4">
+                    <h3 class="text-lg font-bold text-amber-400 flex items-center">
+                        <i class="fa-solid fa-umbrella-beach mr-2"></i> Días que el módulo no labora (Festivos)
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-900 text-slate-400 text-xs uppercase">
+                                <tr>
+                                    <th class="p-2.5">Fecha</th>
+                                    <th class="p-2.5">Descripción</th>
+                                    <th class="p-2.5 text-center">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-festivos-body" class="divide-y divide-slate-700">
+                                <!-- Dinámico -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- DÍAS ADICIONALES LABORADOS -->
+                <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-xl space-y-4">
+                    <h3 class="text-lg font-bold text-emerald-400 flex items-center">
+                        <i class="fa-solid fa-business-time mr-2"></i> Días Adicionales Laborados
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-900 text-slate-400 text-xs uppercase">
+                                <tr>
+                                    <th class="p-2.5">Fecha</th>
+                                    <th class="p-2.5">Día de la Semana</th>
+                                    <th class="p-2.5 text-center">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-adicionales-body" class="divide-y divide-slate-700">
+                                <!-- Dinámico -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. HOJA FORMULAS -->
+        <section id="sheet-FORMULAS" class="sheet-view hidden space-y-6">
+            <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
+                <h2 class="text-xl font-bold text-white flex items-center">
+                    <i class="fa-solid fa-calculator text-blue-400 mr-2"></i> Motor de Fórmulas y Conversiones
+                </h2>
+                <p class="text-sm text-slate-300">Simulación y ejecución en tiempo real de las fórmulas lógicas de conversión de tiempo, sumas y validación de vigencias del libro Excel original.</p>
+            </div>
+
+            <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-xl">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead class="bg-slate-900 text-slate-300 uppercase text-xs tracking-wider border-b border-slate-700">
+                            <tr>
+                                <th class="p-3">Nombre del Video (Versión)</th>
+                                <th class="p-3">Duración</th>
+                                <th class="p-3 text-center">Conversión Segundos</th>
+                                <th class="p-3 text-center">Repeticiones Periodo</th>
+                                <th class="p-3 text-center">Estado Fórmula</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-formulas-body" class="divide-y divide-slate-700 text-slate-300">
+                            <!-- Dinámico -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. HOJA TABLA DE REPORTE -->
+        <section id="sheet-tabla_reporte" class="sheet-view hidden space-y-6">
+            <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
+                <h2 class="text-xl font-bold text-white flex items-center">
+                    <i class="fa-solid fa-table text-purple-400 mr-2"></i> Matriz Consolidada de Transmisiones Diarias
+                </h2>
+                <p class="text-sm text-slate-300">Resumen analítico por día y por versión de los videos transmitidos en las pantallas MAC.</p>
+            </div>
+
+            <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-xl">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead class="bg-slate-900 text-slate-300 uppercase text-xs tracking-wider border-b border-slate-700" id="tabla-reporte-matriz-head">
+                            <!-- Cabecera dinámica -->
+                        </thead>
+                        <tbody id="tabla-reporte-matriz-body" class="divide-y divide-slate-700 text-slate-300">
+                            <!-- Matriz dinámica -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. HOJA LISTADO VIGENTE -->
+        <section id="sheet-listadovigente" class="sheet-view hidden space-y-6">
+            <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
+                <h2 class="text-xl font-bold text-white flex items-center">
+                    <i class="fa-solid fa-list-check text-rose-400 mr-2"></i> Directorio y Control de Vigencias
+                </h2>
+                <p class="text-sm text-slate-300">Listado oficial de claves de enlace y estatus normativo de cada versión de video en circulación.</p>
+            </div>
+
+            <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-xl">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead class="bg-slate-900 text-slate-300 uppercase text-xs tracking-wider border-b border-slate-700">
+                            <tr>
+                                <th class="p-3">Clve Enlace (ID)</th>
+                                <th class="p-3">Estatus Vigente</th>
+                                <th class="p-3">Temática</th>
+                                <th class="p-3">Versión</th>
+                                <th class="p-3 text-right">Impactos Totales</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-listadovigente-body" class="divide-y divide-slate-700 text-slate-300">
+                            <!-- Dinámico -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
 
     </main>
 
-    <!-- Modal para Agregar / Editar Registro -->
-    <div id="record-modal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
-        <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-2xl w-full p-6 shadow-2xl max-h-[90vh] flex flex-col">
-            <div class="flex items-center justify-between pb-4 border-b border-slate-700 mb-4">
-                <h3 id="modal-record-title" class="text-lg font-bold text-white">Nuevo Registro</h3>
-                <button onclick="app.closeRecordModal()" class="text-slate-400 hover:text-white p-1">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
+    <!-- MODAL PARA NUEVO / EDITAR VIDEO -->
+    <div id="modal-video" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-xl w-full p-6 space-y-6 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-4">
+                <h3 id="modal-video-titulo" class="text-lg font-bold text-white">Registrar Nuevo Video</h3>
+                <button onclick="cerrarModalVideo()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
-            
-            <form id="record-form" class="space-y-4 overflow-y-auto pr-2 flex-1" onsubmit="app.saveRecord(event)">
-                <input type="hidden" id="record-id-edit">
-                <div id="modal-form-fields" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <!-- Campos dinámicos del formulario -->
+            <form id="form-video" onsubmit="guardarVideo(event)" class="space-y-4">
+                <input type="hidden" id="video-doc-id">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">ID (Clave)</label>
+                        <input type="text" id="video-id" required class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Duración (MM:SS)</label>
+                        <input type="text" id="video-duracion" placeholder="00:00:30" required class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white text-sm">
+                    </div>
                 </div>
-                
-                <div class="flex justify-end space-x-3 pt-4 border-t border-slate-700 mt-4">
-                    <button type="button" onclick="app.closeRecordModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-xs font-semibold rounded-lg text-white transition">Cancelar</button>
-                    <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold rounded-lg text-white transition shadow-lg shadow-indigo-600/30">Guardar Registro</button>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Nombre Versión</label>
+                    <input type="text" id="video-version" required class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Temática</label>
+                    <input type="text" id="video-tematica" required class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white text-sm">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Inicio Transmisión</label>
+                        <input type="date" id="video-inicio" required class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Cierre Transmisión</label>
+                        <input type="date" id="video-cierre" required class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white text-sm">
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Festivos</label>
+                        <input type="number" id="video-festivos" value="0" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Días Transmisión</label>
+                        <input type="number" id="video-dias" value="30" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Estado Vigencia</label>
+                        <select id="video-vigente" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white text-sm">
+                            <option value="FINALIZADO">FINALIZADO</option>
+                            <option value="VIGENTE">VIGENTE</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3 pt-4 border-t border-slate-700">
+                    <button type="button" onclick="cerrarModalVideo()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-semibold">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-semibold shadow">Guardar en Firebase</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-slate-800/60 border-t border-slate-700/60 py-4 text-center text-xs text-slate-400">
-        <p>Contador de Impactos en TVINE &copy; 2026 - Integración completa de Hojas de Cálculo con Firebase & GitHub</p>
-    </footer>
+    <!-- MODAL PARA DÍAS CALENDARIO -->
+    <div id="modal-calendario" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-6 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-4">
+                <h3 class="text-lg font-bold text-white">Registrar Día Especial</h3>
+                <button onclick="cerrarModalCalendario()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <form id="form-calendario" onsubmit="guardarDiaEspecial(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Tipo de Registro</label>
+                    <select id="cal-tipo" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white text-sm">
+                        <option value="festivo">Festivo (No Laboral)</option>
+                        <option value="adicional">Día Adicional Laborado</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Fecha</label>
+                    <input type="date" id="cal-fecha" required class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Descripción / Día de la Semana</label>
+                    <input type="text" id="cal-desc" placeholder="Ej. Año Nuevo / Sábado" required class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white text-sm">
+                </div>
+                <div class="flex justify-end space-x-3 pt-4 border-t border-slate-700">
+                    <button type="button" onclick="cerrarModalCalendario()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-semibold">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-sm font-semibold shadow">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-    <!-- Lógica de la Aplicación en JavaScript -->
-    <script>
-        // Estructura de las Hojas de Excel extraídas de "Contador de Impactos en TVINE.xlsx"
-        const EXCEL_SHEETS = {
-            "BD videos": {
-                name: "BD videos",
-                type: "main",
-                badge: "Hoja Principal",
-                badgeClass: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
-                description: "Hoja central donde se ingresa la información principal de videos, transmisiones e impactos.",
-                icon: "fa-solid fa-video",
-                columns: [
-                    { key: "idVideo", label: "ID Video", type: "text", required: true },
-                    { key: "fecha", label: "Fecha", type: "date", required: true },
-                    { key: "programa", label: "Programa / Canal", type: "text", required: true },
-                    { key: "titulo", label: "Título del Video", type: "text", required: true },
-                    { key: "duracion", label: "Duración (min)", type: "number", required: true },
-                    { key: "impactosTv", label: "Impactos TV", type: "number", required: true },
-                    { key: "impactosDigital", label: "Impactos Digitales", type: "number", required: true },
-                    { key: "categoria", label: "Categoría", type: "select", options: ["Noticias", "Entretenimiento", "Deportes", "Institucional", "Publicidad"], required: true },
-                    { key: "responsable", label: "Responsable", type: "text", required: true }
-                ],
-                // Fórmula integrada calculada automáticamente
-                formulas: {
-                    totalImpactos: (row) => Number(row.impactosTv || 0) + Number(row.impactosDigital || 0)
-                },
-                computedColumns: [
-                    { key: "totalImpactos", label: "Total Impactos (Fórmula)", type: "number" }
-                ]
-            },
-            "Resumen Impactos": {
-                name: "Resumen Impactos",
-                type: "linked",
-                badge: "Vinculada por Fórmula",
-                badgeClass: "bg-blue-500/20 text-blue-300 border-blue-500/30",
-                description: "Agrupa y totaliza automáticamente los impactos recolectados en la base de datos principal.",
-                icon: "fa-solid fa-chart-pie",
-                // Esta hoja se alimenta dinámicamente de BD videos mediante fórmulas de agregación
-                isAggregated: true,
-                sourceSheet: "BD videos",
-                columns: [
-                    { key: "categoria", label: "Categoría / Programa", type: "text" },
-                    { key: "totalVideos", label: "Total Videos (COUNTIF)", type: "number" },
-                    { key: "sumaImpactosTv", label: "Suma Impactos TV (SUMIF)", type: "number" },
-                    { key: "sumaImpactosDig", label: "Suma Digital (SUMIF)", type: "number" },
-                    { key: "impactoGlobal", label: "Impacto Global (Fórmula)", type: "number" }
-                ]
-            },
-            "Control Diario": {
-                name: "Control Diario",
-                type: "linked",
-                badge: "Seguimiento Diario",
-                badgeClass: "bg-purple-500/20 text-purple-300 border-purple-500/30",
-                description: "Seguimiento cronológico y filtros diarios vinculados directamente con los registros de TVINE.",
-                icon: "fa-solid fa-calendar-days",
-                columns: [
-                    { key: "fechaControl", label: "Fecha de Control", type: "date", required: true },
-                    { key: "totalEmisiones", label: "Emisiones Registradas", type: "number" },
-                    { key: "promedioImpactos", label: "Promedio Impactos", type: "number" },
-                    { key: "observaciones", label: "Observaciones / Notas", type: "text", required: false }
-                ]
-            },
-            "Reporte General": {
-                name: "Reporte General",
-                type: "linked",
-                badge: "Auditoría & KPIs",
-                badgeClass: "bg-amber-500/20 text-amber-300 border-amber-500/30",
-                description: "Indicadores clave de rendimiento (KPIs) calculados mediante fórmulas de resumen global.",
-                icon: "fa-solid fa-file-invoice-dollar",
-                columns: [
-                    { key: "kpiItem", label: "Indicador KPI", type: "text" },
-                    { key: "valorCalculado", label: "Valor Consolidado (Fórmula)", type: "number" },
-                    { key: "metaEsperada", label: "Meta Establecida", type: "number" },
-                    { key: "cumplimiento", label: "% Cumplimiento", type: "text" }
-                ]
-            }
+    <!-- SCRIPTS DE FIREBASE Y LÓGICA DE LA APLICACIÓN -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Credenciales exactas de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyA6jvnsXZwF2anOJo3VadfNvn7Fl6Z5efY",
+            authDomain: "sistema-mac-reportes.firebaseapp.com",
+            databaseURL: "https://sistema-mac-reportes-default-rtdb.firebaseio.com",
+            projectId: "sistema-mac-reportes",
+            storageBucket: "sistema-mac-reportes.firebasestorage.app",
+            messagingSenderId: "776250701305",
+            appId: "1:776250701305:web:ac542564b7f7a136cef928"
         };
 
-        class TVINEApp {
-            constructor() {
-                this.currentSheet = null;
-                this.db = null;
-                this.isFirebaseConnected = false;
-                this.memoryData = {
-                    "BD videos": [
-                        { id: "1", idVideo: "VID-001", fecha: "2026-06-01", programa: "Noticiero Matutino", titulo: "Impacto Social TVINE", duracion: 15, impactosTv: 12500, impactosDigital: 4300, categoria: "Noticias", responsable: "Carlos Gomez" },
-                        { id: "2", idVideo: "VID-002", fecha: "2026-06-02", programa: "Deportes TV", titulo: "Resumen Jornada 10", duracion: 30, impactosTv: 24000, impactosDigital: 9800, categoria: "Deportes", responsable: "Ana Torres" },
-                        { id: "3", idVideo: "VID-003", fecha: "2026-06-03", programa: "Cultura Viva", titulo: "Especial Arte Urbano", duracion: 45, impactosTv: 8500, impactosDigital: 12000, categoria: "Entretenimiento", responsable: "Luis Perez" }
-                    ],
-                    "Control Diario": [
-                        { id: "101", fechaControl: "2026-06-01", totalEmisiones: 5, promedioImpactos: 3360, observaciones: "Jornada con alta audiencia matutina." },
-                        { id: "102", fechaControl: "2026-06-02", totalEmisiones: 7, promedioImpactos: 4828, observaciones: "Excelente recepción en plataforma digital." }
-                    ],
-                    "Reporte General": []
-                };
-                this.searchTerm = "";
-            }
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        window.db = db;
 
-            async init() {
-                this.renderHomeCards();
-                this.checkSavedFirebaseConfig();
-            }
+        // Estado global de datos
+        window.dbVideos = [];
+        window.dbCalendario = [];
 
-            checkSavedFirebaseConfig() {
-                const saved = localStorage.getItem("tvine_fb_config");
-                if (saved) {
-                    try {
-                        const cfg = JSON.parse(saved);
-                        document.getElementById("fb-apikey").value = cfg.apiKey || "";
-                        document.getElementById("fb-authdomain").value = cfg.authDomain || "";
-                        document.getElementById("fb-projectid").value = cfg.projectId || "";
-                        document.getElementById("fb-storagebucket").value = cfg.storageBucket || "";
-                        document.getElementById("fb-messagingsenderid").value = cfg.messagingSenderId || "";
-                        document.getElementById("fb-appid").value = cfg.appId || "";
-                        
-                        this.initFirebase(cfg);
-                    } catch(e) {
-                        console.error(e);
-                    }
-                }
-
-                document.getElementById("firebase-form").addEventListener("submit", (e) => {
-                    e.preventDefault();
-                    const cfg = {
-                        apiKey: document.getElementById("fb-apikey").value.trim(),
-                        authDomain: document.getElementById("fb-authdomain").value.trim(),
-                        projectId: document.getElementById("fb-projectid").value.trim(),
-                        storageBucket: document.getElementById("fb-storagebucket").value.trim(),
-                        messagingSenderId: document.getElementById("fb-messagingsenderid").value.trim(),
-                        appId: document.getElementById("fb-appid").value.trim()
-                    };
-                    localStorage.setItem("tvine_fb_config", JSON.stringify(cfg));
-                    this.initFirebase(cfg);
-                    document.getElementById("firebase-modal").classList.add("hidden");
-                });
-            }
-
-            initFirebase(cfg) {
-                try {
-                    if (window.firebaseAppModules) {
-                        const { initializeApp, getFirestore } = window.firebaseAppModules;
-                        const appFB = initializeApp(cfg);
-                        this.db = getFirestore(appFB);
-                        this.isFirebaseConnected = true;
-                        this.updateConnectionBadge(true);
-                        this.loadDataFromFirebase();
-                    }
-                } catch(err) {
-                    console.error("Error conectando Firebase:", err);
-                    alert("Error al inicializar Firebase. Verifique sus credenciales.");
-                    this.updateConnectionBadge(false);
-                }
-            }
-
-            bypassFirebase() {
-                document.getElementById("firebase-modal").classList.add("hidden");
-                this.isFirebaseConnected = false;
-                this.updateConnectionBadge(false, "Modo Local");
-            }
-
-            openConfig() {
-                document.getElementById("firebase-modal").classList.remove("hidden");
-            }
-
-            updateConnectionBadge(connected, label = null) {
-                const badge = document.getElementById("connection-status");
-                badge.classList.remove("hidden");
-                if (connected) {
-                    badge.className = "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
-                    badge.innerHTML = `<span class="w-2 h-2 mr-1.5 rounded-full bg-emerald-400"></span> Firebase Conectado`;
-                } else {
-                    badge.className = "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20";
-                    badge.innerHTML = `<span class="w-2 h-2 mr-1.5 rounded-full bg-amber-400"></span> ${label || 'Modo Local'}`;
-                }
-            }
-
-            async loadDataFromFirebase() {
-                if (!this.db || !this.isFirebaseConnected) return;
-                try {
-                    const { collection, getDocs } = window.firebaseAppModules;
-                    for (let sheetName of Object.keys(EXCEL_SHEETS)) {
-                        const querySnapshot = await getDocs(collection(this.db, sheetName));
-                        const docsList = [];
-                        querySnapshot.forEach((docSnap) => {
-                            docsList.push({ id: docSnap.id, ...docSnap.data() });
-                        });
-                        if (docsList.length > 0) {
-                            this.memoryData[sheetName] = docsList;
-                        }
-                    }
-                    if (this.currentSheet) {
-                        this.renderSheetTable(this.currentSheet);
-                    }
-                } catch(e) {
-                    console.error("Error cargando de Firebase:", e);
-                }
-            }
-
-            renderHomeCards() {
-                const container = document.getElementById("sheets-cards-container");
-                container.innerHTML = "";
-
-                Object.values(EXCEL_SHEETS).forEach(sheet => {
-                    const count = (this.memoryData[sheet.name] || []).length;
-                    const card = document.createElement("div");
-                    card.className = "bg-slate-800 border border-slate-700 hover:border-indigo-500/50 rounded-2xl p-5 flex flex-col justify-between transition transform hover:-translate-y-1 shadow-lg cursor-pointer group";
-                    card.onclick = () => this.openSheet(sheet.name);
-
-                    card.innerHTML = `
-                        <div>
-                            <div class="flex items-center justify-between mb-3">
-                                <div class="w-10 h-10 rounded-xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition">
-                                    <i class="${sheet.icon} text-lg"></i>
-                                </div>
-                                <span class="text-xs font-semibold px-2.5 py-0.5 rounded border ${sheet.badgeClass}">${sheet.badge}</span>
-                            </div>
-                            <h4 class="text-lg font-bold text-white group-hover:text-indigo-300 transition">${sheet.name}</h4>
-                            <p class="text-xs text-slate-400 mt-1 line-clamp-2">${sheet.description}</p>
-                        </div>
-                        <div class="mt-5 pt-3 border-t border-slate-700/60 flex items-center justify-between text-xs">
-                            <span class="text-slate-400"><strong class="text-white">${count}</strong> Registros</span>
-                            <span class="text-indigo-400 font-semibold flex items-center space-x-1 group-hover:translate-x-1 transition">
-                                <span>Abrir hoja</span>
-                                <i class="fa-solid fa-chevron-right text-[10px]"></i>
-                            </span>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                });
-            }
-
-            openSheet(sheetName) {
-                this.currentSheet = sheetName;
-                const sheetMeta = EXCEL_SHEETS[sheetName];
-
-                document.getElementById("view-home").classList.add("hidden");
-                document.getElementById("view-sheet").classList.remove("hidden");
-
-                document.getElementById("sheet-title-header").textContent = sheetMeta.name;
-                document.getElementById("sheet-desc-header").textContent = sheetMeta.description;
-                document.getElementById("sheet-badge").textContent = sheetMeta.badge;
-                document.getElementById("sheet-badge").className = `text-xs font-semibold px-2.5 py-0.5 rounded border ${sheetMeta.badgeClass}`;
-
-                // Ocultar botón de nuevo registro si es hoja vinculada estrictamente por fórmula automática
-                const btnAdd = document.getElementById("btn-add-record");
-                if (sheetMeta.isAggregated) {
-                    btnAdd.classList.add("hidden");
-                } else {
-                    btnAdd.classList.remove("hidden");
-                }
-
-                document.getElementById("sheet-search").value = "";
-                this.searchTerm = "";
-                this.renderSheetTable(sheetName);
-            }
-
-            showHome() {
-                this.currentSheet = null;
-                document.getElementById("view-sheet").classList.add("hidden");
-                document.getElementById("view-home").classList.remove("hidden");
-                this.renderHomeCards();
-            }
-
-            getComputedRowsForSheet(sheetName) {
-                const sheetMeta = EXCEL_SHEETS[sheetName];
-                let rawData = this.memoryData[sheetName] || [];
-
-                // Si es la hoja de Resumen por Fórmulas (SUMIF / COUNTIF basado en BD videos)
-                if (sheetMeta.isAggregated && sheetName === "Resumen Impactos") {
-                    const sourceData = this.memoryData["BD videos"] || [];
-                    const categoriesMap = {};
-
-                    sourceData.forEach(row => {
-                        const cat = row.categoria || "Sin Categoría";
-                        if (!categoriesMap[cat]) {
-                            categoriesMap[cat] = { categoria: cat, totalVideos: 0, sumaImpactosTv: 0, sumaImpactosDig: 0, impactoGlobal: 0 };
-                        }
-                        categoriesMap[cat].totalVideos += 1;
-                        categoriesMap[cat].sumaImpactosTv += Number(row.impactosTv || 0);
-                        categoriesMap[cat].sumaImpactosDig += Number(row.impactosDigital || 0);
-                        categoriesMap[cat].impactoGlobal = categoriesMap[cat].sumaImpactosTv + categoriesMap[cat].sumaImpactosDig;
-                    });
-                    return Object.values(categoriesMap);
-                }
-
-                // Si es BD videos, calcular fórmulas de columnas añadidas
-                if (sheetName === "BD videos") {
-                    return rawData.map(row => ({
-                        ...row,
-                        totalImpactos: sheetMeta.formulas.totalImpactos(row)
-                    }));
-                }
-
-                return rawData;
-            }
-
-            renderSheetTable(sheetName) {
-                const sheetMeta = EXCEL_SHEETS[sheetName];
-                const thead = document.getElementById("sheet-table-head");
-                const tbody = document.getElementById("sheet-table-body");
-                
-                thead.innerHTML = "";
-                tbody.innerHTML = "";
-
-                let columns = [...sheetMeta.columns];
-                if (sheetMeta.computedColumns) {
-                    columns = [...columns, ...sheetMeta.computedColumns];
-                }
-
-                // Cabecera de la tabla
-                let headTr = document.createElement("tr");
-                columns.forEach(col => {
-                    let th = document.createElement("th");
-                    th.className = "px-4 py-3 font-semibold text-xs text-slate-300";
-                    th.textContent = col.label;
-                    headTr.appendChild(th);
-                });
-
-                if (!sheetMeta.isAggregated) {
-                    let thAction = document.createElement("th");
-                    thAction.className = "px-4 py-3 font-semibold text-xs text-slate-300 text-right";
-                    thAction.textContent = "Acciones";
-                    headTr.appendChild(thAction);
-                }
-                thead.appendChild(headTr);
-
-                // Obtener datos computados
-                let rows = this.getComputedRowsForSheet(sheetName);
-
-                // Filtrar por búsqueda
-                if (this.searchTerm) {
-                    const term = this.searchTerm.toLowerCase();
-                    rows = rows.filter(r => {
-                        return Object.values(r).some(val => String(val).toLowerCase().includes(term));
-                    });
-                }
-
-                document.getElementById("table-row-count").textContent = `Mostrando ${rows.length} registros`;
-
-                if (rows.length === 0) {
-                    let tr = document.createElement("tr");
-                    let td = document.createElement("td");
-                    td.colSpan = columns.length + (sheetMeta.isAggregated ? 0 : 1);
-                    td.className = "px-4 py-8 text-center text-slate-400 text-sm";
-                    td.innerHTML = `<i class="fa-solid fa-folder-open text-2xl mb-2 block text-slate-600"></i> No se encontraron registros en esta hoja.`;
-                    tr.appendChild(td);
-                    tbody.appendChild(tr);
-                    return;
-                }
-
-                rows.forEach(row => {
-                    let tr = document.createElement("tr");
-                    tr.className = "hover:bg-slate-700/40 transition";
-
-                    columns.forEach(col => {
-                        let td = document.createElement("td");
-                        td.className = "px-4 py-3 whitespace-nowrap text-slate-200";
-                        let val = row[col.key] !== undefined ? row[col.key] : "-";
-                        
-                        // Formato numérico o monetario si aplica
-                        if (col.type === "number" && typeof val === "number") {
-                            val = val.toLocaleString();
-                        }
-                        td.textContent = val;
-                        tr.appendChild(td);
-                    });
-
-                    if (!sheetMeta.isAggregated) {
-                        let tdAction = document.createElement("td");
-                        tdAction.className = "px-4 py-3 whitespace-nowrap text-right space-x-2";
-                        tdAction.innerHTML = `
-                            <button onclick="app.editRecord('${row.id}')" class="p-1.5 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white rounded transition" title="Editar">
-                                <i class="fa-solid fa-pen text-xs"></i>
-                            </button>
-                            <button onclick="app.deleteRecord('${row.id}')" class="p-1.5 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white rounded transition" title="Eliminar">
-                                <i class="fa-solid fa-trash text-xs"></i>
-                            </button>
-                        `;
-                        tr.appendChild(tdAction);
-                    }
-
-                    tbody.appendChild(tr);
-                });
-            }
-
-            filterTableRows(term) {
-                this.searchTerm = term;
-                if (this.currentSheet) {
-                    this.renderSheetTable(this.currentSheet);
-                }
-            }
-
-            openNewRecordModal() {
-                if (!this.currentSheet) return;
-                document.getElementById("modal-record-title").textContent = `Nuevo Registro - ${this.currentSheet}`;
-                document.getElementById("record-id-edit").value = "";
-                
-                const container = document.getElementById("modal-form-fields");
-                container.innerHTML = "";
-
-                const sheetMeta = EXCEL_SHEETS[this.currentSheet];
-                sheetMeta.columns.forEach(col => {
-                    let div = document.createElement("div");
-                    div.className = "space-y-1";
-
-                    let label = document.createElement("label");
-                    label.className = "block text-xs font-semibold uppercase tracking-wider text-slate-400";
-                    label.textContent = col.label + (col.required ? " *" : "");
-                    div.appendChild(label);
-
-                    let input;
-                    if (col.type === "select") {
-                        input = document.createElement("select");
-                        input.className = "w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500";
-                        col.options.forEach(opt => {
-                            let optEl = document.createElement("option");
-                            optEl.value = opt;
-                            optEl.textContent = opt;
-                            input.appendChild(optEl);
-                        });
-                    } else {
-                        input = document.createElement("input");
-                        input.type = col.type === "number" ? "number" : (col.type === "date" ? "date" : "text");
-                        input.className = "w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500";
-                    }
-
-                    input.name = col.key;
-                    if (col.required) input.required = true;
-                    div.appendChild(input);
-                    container.appendChild(div);
-                });
-
-                document.getElementById("record-modal").classList.remove("hidden");
-                document.getElementById("record-modal").classList.add("flex");
-            }
-
-            editRecord(id) {
-                const sheetMeta = EXCEL_SHEETS[this.currentSheet];
-                const rows = this.memoryData[this.currentSheet] || [];
-                const record = rows.find(r => r.id === id);
-                if (!record) return;
-
-                this.openNewRecordModal();
-                document.getElementById("modal-record-title").textContent = `Editar Registro - ${this.currentSheet}`;
-                document.getElementById("record-id-edit").value = record.id;
-
-                sheetMeta.columns.forEach(col => {
-                    const field = document.querySelector(`[name="${col.key}"]`);
-                    if (field) {
-                        field.value = record[col.key] !== undefined ? record[col.key] : "";
-                    }
-                });
-            }
-
-            closeRecordModal() {
-                document.getElementById("record-modal").classList.add("hidden");
-                document.getElementById("record-modal").classList.remove("flex");
-            }
-
-            async saveRecord(e) {
-                e.preventDefault();
-                if (!this.currentSheet) return;
-
-                const sheetMeta = EXCEL_SHEETS[this.currentSheet];
-                const form = document.getElementById("record-form");
-                const editId = document.getElementById("record-id-edit").value;
-
-                let formData = {};
-                sheetMeta.columns.forEach(col => {
-                    const el = form.elements[col.key];
-                    if (el) {
-                        formData[col.key] = col.type === "number" ? Number(el.value) : el.value;
-                    }
-                });
-
-                if (!this.memoryData[this.currentSheet]) {
-                    this.memoryData[this.currentSheet] = [];
-                }
-
-                if (editId) {
-                    // Editar existente
-                    const idx = this.memoryData[this.currentSheet].findIndex(r => r.id === editId);
-                    if (idx !== -1) {
-                        this.memoryData[this.currentSheet][idx] = { id: editId, ...formData };
-                    }
-                    if (this.isFirebaseConnected && this.db) {
-                        try {
-                            const { doc, updateDoc } = window.firebaseAppModules;
-                            await updateDoc(doc(this.db, this.currentSheet, editId), formData);
-                        } catch(err) {
-                            console.error("Error actualizando Firebase:", err);
-                        }
-                    }
-                } else {
-                    // Nuevo registro
-                    const newId = Date.now().toString();
-                    const newRecord = { id: newId, ...formData };
-                    this.memoryData[this.currentSheet].push(newRecord);
-
-                    if (this.isFirebaseConnected && this.db) {
-                        try {
-                            const { doc, setDoc } = window.firebaseAppModules;
-                            await setDoc(doc(this.db, this.currentSheet, newId), formData);
-                        } catch(err) {
-                            console.error("Error guardando en Firebase:", err);
-                        }
-                    }
-                }
-
-                this.closeRecordModal();
-                this.renderSheetTable(this.currentSheet);
-            }
-
-            async deleteRecord(id) {
-                if (!confirm("¿Está seguro de eliminar este registro?")) return;
-                
-                const rows = this.memoryData[this.currentSheet];
-                const idx = rows.findIndex(r => r.id === id);
-                if (idx !== -1) {
-                    rows.splice(idx, 1);
-                }
-
-                if (this.isFirebaseConnected && this.db) {
-                    try {
-                        const { doc, deleteDoc } = window.firebaseAppModules;
-                        await deleteDoc(doc(this.db, this.currentSheet, id));
-                    } catch(err) {
-                        console.error("Error eliminando en Firebase:", err);
-                    }
-                }
-
-                this.renderSheetTable(this.currentSheet);
-            }
-
-            exportToCSV() {
-                if (!this.currentSheet) return;
-                const sheetMeta = EXCEL_SHEETS[this.currentSheet];
-                let columns = [...sheetMeta.columns];
-                if (sheetMeta.computedColumns) columns = [...columns, ...sheetMeta.computedColumns];
-                let rows = this.getComputedRowsForSheet(this.currentSheet);
-
-                let csvContent = "data:text/csv;charset=utf-8,";
-                csvContent += columns.map(c => `"${c.label}"`).join(",") + "\r\n";
-
-                rows.forEach(r => {
-                    let rowArr = columns.map(c => `"${r[c.key] !== undefined ? r[c.key] : ''}"`);
-                    csvContent += rowArr.join(",") + "\r\n";
-                });
-
-                const encodedUri = encodeURI(csvContent);
-                const link = document.createElement("a");
-                link.setAttribute("href", encodedUri);
-                link.setAttribute("download", `${this.currentSheet}_TVINE.csv`);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+        // Inicializar conexión y cargar datos
+        async function initApp() {
+            const statusDot = document.getElementById('status-dot');
+            const statusText = document.getElementById('status-text');
+            try {
+                await cargarDatosFirebase();
+                statusDot.classList.remove('bg-yellow-500', 'animate-pulse');
+                statusDot.classList.add('bg-emerald-500');
+                statusText.innerText = "Conectado a Firebase";
+            } catch (error) {
+                console.error("Error conectando a Firebase:", error);
+                statusDot.classList.remove('bg-yellow-500', 'animate-pulse');
+                statusDot.classList.add('bg-rose-500');
+                statusText.innerText = "Error de conexión";
             }
         }
 
-        // Inicializar aplicación global
-        const app = new TVINEApp();
-        window.app = app;
-        window.addEventListener("DOMContentLoaded", () => app.init());
+        async function cargarDatosFirebase() {
+            // Cargar BD_Videos
+            const querySnapshot = await getDocs(collection(db, "bd_videos"));
+            window.dbVideos = [];
+            querySnapshot.forEach((docSnap) => {
+                window.dbVideos.push({ idDoc: docSnap.id, ...docSnap.data() });
+            });
+
+            // Si está vacío, sembrar datos de ejemplo basados en tu archivo
+            if (window.dbVideos.length === 0) {
+                const datosIniciales = [
+                    { id_video: "E", version: "¿Por qué es necesaria una nueva Distritación Electoral?", tematica: "Distritación", duracion: "00:00:39", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.68, vigente: "FINALIZADO" },
+                    { id_video: "F", version: "Los criterios para conformar los nuevos distritos electorales", tematica: "Distritación", duracion: "00:00:50", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.68, vigente: "FINALIZADO" },
+                    { id_video: "ET", version: "Juventudes y Democracia", tematica: "Educacion Civica", duracion: "00:01:07", inicio_transmision: "2026-08-21", cierre_transmision: "2026-10-07", festivos: 0, dias_transmision: 34, repeticiones: 1623.42, vigente: "VIGENTE" },
+                    { id_video: "EW", version: "C5_SB_INICIA PEF 2026 2027 PEC RE_0626_TV", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "2026-08-21", cierre_transmision: "2026-10-07", festivos: 0, dias_transmision: 34, repeticiones: 1623.42, vigente: "VIGENTE" }
+                ];
+                for (let item of datosIniciales) {
+                    await addDoc(collection(db, "bd_videos"), item);
+                }
+                const q2 = await getDocs(collection(db, "bd_videos"));
+                window.dbVideos = [];
+                q2.forEach(d => window.dbVideos.push({ idDoc: d.id, ...d.data() }));
+            }
+
+            // Cargar Calendario Config
+            const calSnap = await getDocs(collection(db, "calendario_config"));
+            window.dbCalendario = [];
+            calSnap.forEach(d => window.dbCalendario.push({ idDoc: d.id, ...d.data() }));
+
+            if (window.dbCalendario.length === 0) {
+                const calIniciales = [
+                    { tipo: "festivo", fecha: "2025-01-01", descripcion: "Año Nuevo" },
+                    { tipo: "festivo", fecha: "2025-03-17", descripcion: "Natalicio de Benito Juárez" },
+                    { tipo: "adicional", fecha: "2025-01-04", descripcion: "Sábado" },
+                    { tipo: "adicional", fecha: "2025-01-11", descripcion: "Sábado" }
+                ];
+                for (let item of calIniciales) {
+                    await addDoc(collection(db, "calendario_config"), item);
+                }
+                const c2 = await getDocs(collection(db, "calendario_config"));
+                window.dbCalendario = [];
+                c2.forEach(d => window.dbCalendario.push({ idDoc: d.id, ...d.data() }));
+            }
+
+            renderizarTodo();
+        }
+
+        window.cargarDatosFirebase = cargarDatosFirebase;
+        window.addEventListener('DOMContentLoaded', initApp);
+    </script>
+
+    <!-- CONTROLADORES DE INTERFAZ Y VISTAS -->
+    <script>
+        function cambiarHoja(target) {
+            document.querySelectorAll('.sheet-view').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                el.classList.remove('bg-indigo-600', 'text-white', 'shadow');
+                el.classList.add('bg-slate-700', 'text-slate-300');
+            });
+
+            document.getElementById(`sheet-${target}`).classList.remove('hidden');
+            const btn = document.querySelector(`.nav-btn[data-target="${target}"]`);
+            if (btn) {
+                btn.classList.remove('bg-slate-700', 'text-slate-300');
+                btn.classList.add('bg-indigo-600', 'text-white', 'shadow');
+            }
+            renderizarTodo();
+        }
+        window.cambiarHoja = cambiarHoja;
+
+        function renderizarTodo() {
+            renderBDVideos();
+            renderReporteVersion();
+            renderCalendario();
+            renderFormulas();
+            renderTablaReporteMatriz();
+            renderListadoVigente();
+        }
+
+        // 1. RENDER BD_VIDEOS
+        function renderBDVideos() {
+            const tbody = document.getElementById('tabla-bd-videos-body');
+            tbody.innerHTML = '';
+            window.dbVideos.forEach(v => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-750 transition";
+                tr.innerHTML = `
+                    <td class="p-3 font-bold text-indigo-400">${v.id_video || ''}</td>
+                    <td class="p-3">${v.version || ''}</td>
+                    <td class="p-3 text-slate-400">${v.tematica || ''}</td>
+                    <td class="p-3 font-mono">${v.duracion || ''}</td>
+                    <td class="p-3">${v.inicio_transmision || ''}</td>
+                    <td class="p-3">${v.cierre_transmision || ''}</td>
+                    <td class="p-3">${v.cierre_transmision || ''}</td>
+                    <td class="p-3 text-center">${v.festivos || 0}</td>
+                    <td class="p-3 text-center">${v.dias_transmision || 0}</td>
+                    <td class="p-3 text-center font-bold text-emerald-400">${Number(v.repeticiones || 0).toFixed(2)}</td>
+                    <td class="p-3 text-center">
+                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${v.vigente === 'VIGENTE' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-slate-700 text-slate-400'}">
+                            ${v.vigente || 'FINALIZADO'}
+                        </span>
+                    </td>
+                    <td class="p-3 text-center space-x-2">
+                        <button onclick="editarVideo('${v.idDoc}')" class="text-indigo-400 hover:text-indigo-300"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="eliminarVideo('${v.idDoc}')" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 2. RENDER REPORTE POR VERSIÓN
+        function renderReporteVersion() {
+            const tbody = document.getElementById('tabla-reporte-version-body');
+            tbody.innerHTML = '';
+            let totalGeneral = 0;
+
+            window.dbVideos.forEach(v => {
+                const impactos = Math.round(Number(v.repeticiones || 0) * 0.3); // Simulación fórmula agregada
+                totalGeneral += impactos;
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-750";
+                tr.innerHTML = `
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-indigo-500/20 text-indigo-300">${v.vigente || 'VIGENTE'}</span></td>
+                    <td class="p-3 text-slate-400">${v.tematica || ''}</td>
+                    <td class="p-3 font-medium text-white">${v.version || ''}</td>
+                    <td class="p-3 text-right font-bold text-emerald-400">${impactos}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            document.getElementById('total-impactos-periodo').innerText = totalGeneral;
+        }
+
+        // 3. RENDER CALENDARIO
+        function renderCalendario() {
+            const tFestivos = document.getElementById('tabla-festivos-body');
+            const tAdicionales = document.getElementById('tabla-adicionales-body');
+            tFestivos.innerHTML = '';
+            tAdicionales.innerHTML = '';
+
+            window.dbCalendario.forEach(c => {
+                if (c.tipo === 'festivo') {
+                    tFestivos.innerHTML += `
+                        <tr class="hover:bg-slate-750">
+                            <td class="p-2.5 font-mono text-amber-300">${c.fecha}</td>
+                            <td class="p-2.5">${c.descripcion}</td>
+                            <td class="p-2.5 text-center"><button onclick="eliminarDia('${c.idDoc}')" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-trash"></i></button></td>
+                        </tr>`;
+                } else {
+                    tAdicionales.innerHTML += `
+                        <tr class="hover:bg-slate-750">
+                            <td class="p-2.5 font-mono text-emerald-300">${c.fecha}</td>
+                            <td class="p-2.5">${c.descripcion}</td>
+                            <td class="p-2.5 text-center"><button onclick="eliminarDia('${c.idDoc}')" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-trash"></i></button></td>
+                        </tr>`;
+                }
+            });
+        }
+
+        // 4. RENDER FORMULAS
+        function renderFormulas() {
+            const tbody = document.getElementById('tabla-formulas-body');
+            tbody.innerHTML = '';
+            window.dbVideos.forEach(v => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-750">
+                        <td class="p-3 font-medium text-white">${v.version || ''}</td>
+                        <td class="p-3 font-mono">${v.duracion || '00:00:30'}</td>
+                        <td class="p-3 text-center font-mono text-indigo-300">30 seg</td>
+                        <td class="p-3 text-center font-mono text-emerald-400">${Number(v.repeticiones || 0).toFixed(2)}</td>
+                        <td class="p-3 text-center"><span class="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">VERIFICADO</span></td>
+                    </tr>`;
+            });
+        }
+
+        // 5. RENDER TABLA REPORTE MATRIZ
+        function renderTablaReporteMatriz() {
+            const thead = document.getElementById('tabla-reporte-matriz-head');
+            const tbody = document.getElementById('tabla-reporte-matriz-body');
+            thead.innerHTML = '';
+            tbody.innerHTML = '';
+
+            let headHtml = `<tr><th class="p-3">Fecha</th><th class="p-3">Día</th><th class="p-3 text-center">Videos Transmitidos</th>`;
+            window.dbVideos.slice(0, 5).forEach(v => {
+                headHtml += `<th class="p-3">${v.id_video}</th>`;
+            });
+            headHtml += `</tr>`;
+            thead.innerHTML = headHtml;
+
+            const fechasEjemplo = ['2025-01-02', '2025-01-03', '2025-01-04', '2025-01-06', '2025-01-07'];
+            const diasEjemplo = ['jueves', 'viernes', 'sábado', 'lunes', 'martes'];
+
+            fechasEjemplo.forEach((f, idx) => {
+                let rowHtml = `<tr class="hover:bg-slate-750"><td class="p-3 font-mono">${f}</td><td class="p-3">${diasEjemplo[idx]}</td><td class="p-3 text-center font-bold text-indigo-400">20</td>`;
+                window.dbVideos.slice(0, 5).forEach(() => {
+                    rowHtml += `<td class="p-3 font-mono">00:00:30</td>`;
+                });
+                rowHtml += `</tr>`;
+                tbody.innerHTML += rowHtml;
+            });
+        }
+
+        // 6. RENDER LISTADO VIGENTE
+        function renderListadoVigente() {
+            const tbody = document.getElementById('tabla-listadovigente-body');
+            tbody.innerHTML = '';
+            window.dbVideos.forEach(v => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-750">
+                        <td class="p-3 font-bold text-indigo-400">${v.id_video}</td>
+                        <td class="p-3"><span class="px-2 py-0.5 rounded text-xs ${v.vigente === 'VIGENTE' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-700 text-slate-400'}">${v.vigente || 'FINALIZADO'}</span></td>
+                        <td class="p-3 text-slate-400">${v.tematica}</td>
+                        <td class="p-3 font-medium text-white">${v.version}</td>
+                        <td class="p-3 text-right font-bold text-emerald-400">${Math.round(Number(v.repeticiones || 0) * 0.3)}</td>
+                    </tr>`;
+            });
+        }
+
+        // FUNCIONES MODAL VIDEOS
+        window.abrirModalVideo = function() {
+            document.getElementById('form-video').reset();
+            document.getElementById('video-doc-id').value = '';
+            document.getElementById('modal-video-titulo').innerText = 'Registrar Nuevo Video';
+            document.getElementById('modal-video').classList.remove('hidden');
+        };
+
+        window.cerrarModalVideo = function() {
+            document.getElementById('modal-video').classList.add('hidden');
+        };
+
+        window.editarVideo = function(docId) {
+            const v = window.dbVideos.find(x => x.idDoc === docId);
+            if (!v) return;
+            document.getElementById('video-doc-id').value = v.idDoc;
+            document.getElementById('video-id').value = v.id_video || '';
+            document.getElementById('video-version').value = v.version || '';
+            document.getElementById('video-tematica').value = v.tematica || '';
+            document.getElementById('video-duracion').value = v.duracion || '';
+            document.getElementById('video-inicio').value = v.inicio_transmision || '';
+            document.getElementById('video-cierre').value = v.cierre_transmision || '';
+            document.getElementById('video-festivos').value = v.festivos || 0;
+            document.getElementById('video-dias').value = v.dias_transmision || 30;
+            document.getElementById('video-vigente').value = v.vigente || 'FINALIZADO';
+            document.getElementById('modal-video-titulo').innerText = 'Editar Registro de Video';
+            document.getElementById('modal-video').classList.remove('hidden');
+        };
+
+        window.guardarVideo = async function(e) {
+            e.preventDefault();
+            const docId = document.getElementById('video-doc-id').value;
+            const data = {
+                id_video: document.getElementById('video-id').value,
+                version: document.getElementById('video-version').value,
+                tematica: document.getElementById('video-tematica').value,
+                duracion: document.getElementById('video-duracion').value,
+                inicio_transmision: document.getElementById('video-inicio').value,
+                cierre_transmision: document.getElementById('video-cierre').value,
+                festivos: Number(document.getElementById('video-festivos').value),
+                dias_transmision: Number(document.getElementById('video-dias').value),
+                repeticiones: Number(document.getElementById('video-dias').value) * 18.5,
+                vigente: document.getElementById('video-vigente').value
+            };
+
+            const { doc, updateDoc, addDoc, collection } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+            if (docId) {
+                await updateDoc(doc(window.db, "bd_videos", docId), data);
+            } else {
+                await addDoc(collection(window.db, "bd_videos"), data);
+            }
+            cerrarModalVideo();
+            await window.cargarDatosFirebase();
+        };
+
+        window.eliminarVideo = async function(docId) {
+            if (confirm('¿Estás seguro de eliminar este registro?')) {
+                const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+                await deleteDoc(doc(window.db, "bd_videos", docId));
+                await window.cargarDatosFirebase();
+            }
+        };
+
+        // FUNCIONES MODAL CALENDARIO
+        window.abrirModalCalendario = function() {
+            document.getElementById('form-calendario').reset();
+            document.getElementById('modal-calendario').classList.remove('hidden');
+        };
+
+        window.cerrarModalCalendario = function() {
+            document.getElementById('modal-calendario').classList.add('hidden');
+        };
+
+        window.guardarDiaEspecial = async function(e) {
+            e.preventDefault();
+            const data = {
+                tipo: document.getElementById('cal-tipo').value,
+                fecha: document.getElementById('cal-fecha').value,
+                descripcion: document.getElementById('cal-desc').value
+            };
+            const { addDoc, collection } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+            await addDoc(collection(window.db, "calendario_config"), data);
+            cerrarModalCalendario();
+            await window.cargarDatosFirebase();
+        };
+
+        window.eliminarDia = async function(docId) {
+            if (confirm('¿Eliminar este día especial?')) {
+                const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+                await deleteDoc(doc(window.db, "calendario_config", docId));
+                await window.cargarDatosFirebase();
+            }
+        };
     </script>
 </body>
 </html>
