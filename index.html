@@ -30,7 +30,7 @@
                     <i class="fa-solid fa-house mr-1.5"></i> Inicio
                 </button>
                 <button onclick="cambiarHoja('BD_Videos')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium transition bg-slate-700 hover:bg-slate-600 text-slate-300" data-target="BD_Videos">
-                    BD_Videos
+                    BD_Videos (<span id="contador-videos">0</span>)
                 </button>
                 <button onclick="cambiarHoja('Reporte')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium transition bg-slate-700 hover:bg-slate-600 text-slate-300" data-target="Reporte">
                     Reporte por Versión
@@ -65,7 +65,7 @@
             <div class="bg-gradient-to-r from-indigo-900/60 to-slate-800/80 p-8 rounded-2xl border border-indigo-500/30 shadow-xl backdrop-blur-md">
                 <h2 class="text-3xl font-extrabold text-white mb-2">Panel de Control General</h2>
                 <p class="text-slate-300 max-w-2xl">
-                    Sistema integral con reglas automáticas de ID alfabético, cálculo de vigencias y repeticiones acumuladas hasta la fecha actual.
+                    Sistema integral con reglas automáticas de ID alfabético ascendente, control estricto de duplicados y cálculo de impactos por periodo.
                 </p>
             </div>
 
@@ -79,7 +79,7 @@
                         <span class="text-xs bg-indigo-500/10 text-indigo-400 px-2.5 py-1 rounded-full font-semibold">Motor Central</span>
                     </div>
                     <h3 class="text-xl font-bold text-white mb-1">BD_Videos</h3>
-                    <p class="text-sm text-slate-400">Base de datos central con orden alfabético automático y recálculo reactivo.</p>
+                    <p class="text-sm text-slate-400">Base de datos central con más de 160 registros únicos ordenados alfabéticamente.</p>
                 </div>
                 <div onclick="cambiarHoja('Reporte')" class="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-indigo-500 cursor-pointer transition shadow group">
                     <div class="flex items-center justify-between mb-4">
@@ -111,7 +111,7 @@
                     <h2 class="text-xl font-bold text-white flex items-center">
                         <i class="fa-solid fa-database text-indigo-400 mr-2"></i> BD_Videos (Hoja Central Oficial)
                     </h2>
-                    <p class="text-xs text-slate-400">Orden alfabético automático de ID y recálculo con base en festivos y fecha actual.</p>
+                    <p class="text-xs text-slate-400">IDs únicos en orden ascendente alfabético sin versiones duplicadas.</p>
                 </div>
                 <button onclick="abrirModalVideo()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center shadow">
                     <i class="fa-solid fa-plus mr-2"></i> Nuevo Registro de Video
@@ -119,9 +119,9 @@
             </div>
 
             <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-xl">
-                <div class="overflow-x-auto max-h-[600px]">
+                <div class="overflow-x-auto max-h-[650px]">
                     <table class="w-full text-left border-collapse text-sm">
-                        <thead class="bg-slate-900 text-slate-300 uppercase text-xs tracking-wider sticky top-0 border-b border-slate-700">
+                        <thead class="bg-slate-900 text-slate-300 uppercase text-xs tracking-wider sticky top-0 border-b border-slate-700 z-10">
                             <tr>
                                 <th class="p-3">ID</th>
                                 <th class="p-3">Nombre Versión</th>
@@ -131,7 +131,7 @@
                                 <th class="p-3">Cierre Transmisión</th>
                                 <th class="p-3 text-center">Festivos</th>
                                 <th class="p-3 text-center">Días Transmisión</th>
-                                <th class="p-3 text-center">Repeticiones</th>
+                                <th class="p-3 text-center">Impactos Periodo</th>
                                 <th class="p-3 text-center">Estado</th>
                                 <th class="p-3 text-center">Acciones</th>
                             </tr>
@@ -229,7 +229,7 @@
                 <div class="overflow-x-auto max-h-[600px]">
                     <table class="w-full text-left border-collapse text-sm">
                         <thead class="bg-slate-900 text-slate-300 uppercase text-xs tracking-wider sticky top-0 border-b border-slate-700">
-                            <tr><th class="p-3">Versión</th><th class="p-3">Duración</th><th class="p-3 text-center">Segundos</th><th class="p-3 text-center">Repeticiones Calculadas</th><th class="p-3 text-center">Estado</th></tr>
+                            <tr><th class="p-3">Versión</th><th class="p-3">Duración</th><th class="p-3 text-center">Segundos</th><th class="p-3 text-center">Impactos Calculados</th><th class="p-3 text-center">Estado</th></tr>
                         </thead>
                         <tbody id="tabla-formulas-body" class="divide-y divide-slate-700 text-slate-300"></tbody>
                     </table>
@@ -273,7 +273,7 @@
 
     <!-- PIE DE PÁGINA -->
     <footer class="bg-slate-800 border-t border-slate-700 py-4 mt-auto text-center text-xs text-slate-400">
-        Contador de Impactos Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.11
+        Contador de Impactos Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.12
     </footer>
 
     <!-- MODAL NUEVO / EDITAR VIDEO -->
@@ -375,7 +375,6 @@
         window.dbCalendario = [];
         window.FECHA_ACTUAL = new Date().toISOString().split('T')[0];
 
-        // FUNCIONES GLOBALES EXPUESTAS AL WINDOW
         window.generarIdExcel = function(n) {
             let result = "";
             let num = n;
@@ -402,7 +401,28 @@
             const adicionalesSet = new Set(window.dbCalendario.filter(c => c.tipo === 'adicional').map(c => c.fecha));
             const hoyStr = window.FECHA_ACTUAL;
 
+            // 1. ELIMINAR DUPLICADOS DE VERSIONES EN LA MEMORIA LOCAL
+            const versionesVistas = new Set();
+            const unicos = [];
             window.dbVideos.forEach(v => {
+                const nombreVer = (v.version || "").trim().toLowerCase();
+                if (nombreVer && !versionesVistas.has(nombreVer)) {
+                    versionesVistas.add(nombreVer);
+                    unicos.push(v);
+                }
+            });
+            window.dbVideos = unicos;
+
+            // 2. ORDENAMIENTO ALFABÉTICO ASCENDENTE DE IDs (A, B, C... Z, AA...) Y REASIGNACIÓN ESTRICTA SIN HUECOS
+            window.dbVideos.sort((a, b) => {
+                // Ordenar por fecha de inicio o versión si fuera necesario, pero mantenemos estabilidad
+                return (a.version || "").localeCompare(b.version || "");
+            });
+
+            window.dbVideos.forEach((v, index) => {
+                v.id_video = window.generarIdExcel(index);
+
+                // Vigencia
                 if (v.cierre_transmision < hoyStr) {
                     v.vigente = "FINALIZADO";
                 } else {
@@ -441,7 +461,9 @@
 
                     if (esLaboral) {
                         diasTransmisionCount++;
-                        if (curr <= hoy && curr <= cierre) {
+                        // Si está vigente calcula hasta hoy, si está finalizado calcula SOLO hasta su fecha de cierre
+                        let limiteCalculo = (v.vigente === "FINALIZADO") ? cierre : (hoy < cierre ? hoy : cierre);
+                        if (curr <= limiteCalculo) {
                             let videosActivosHoy = window.dbVideos.filter(vid => fStr >= vid.inicio_transmision && fStr <= vid.cierre_transmision);
                             let sumaSegundosHoy = videosActivosHoy.reduce((acc, vid) => acc + window.duracionASegundos(vid.duracion), 0);
 
@@ -460,6 +482,7 @@
                 v.repeticiones = isNaN(repeticionesAcumuladas) ? 0 : repeticionesAcumuladas;
             });
 
+            // Reordenar alfabéticamente por su ID asignado (A, B, C...)
             window.dbVideos.sort((a, b) => a.id_video.localeCompare(b.id_video, undefined, { numeric: true, sensitivity: 'base' }));
         };
 
@@ -471,7 +494,7 @@
                     window.dbVideos.push({ idDoc: docSnap.id, ...docSnap.data() });
                 });
 
-                if (window.dbVideos.length === 0) {
+                if (window.dbVideos.length < 5) {
                     const datosBase = [
                         { version: "¿Por qué es necesaria una nueva Distritación Electoral?", tematica: "Distritación", duracion: "00:00:39", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
                         { version: "Los criterios para conformar los nuevos distritos electorales", tematica: "Distritación", duracion: "00:00:50", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
@@ -534,6 +557,7 @@
 
         window.renderizarTodo = function() {
             window.procesarCalculosAutomaticos();
+            document.getElementById('contador-videos').innerText = window.dbVideos.length;
             window.renderBDVideos();
             window.renderReporteVersion();
             window.renderCalendario();
@@ -556,7 +580,7 @@
                         <td class="p-3">${v.cierre_transmision || ''}</td>
                         <td class="p-3 text-center">${v.festivos || 0}</td>
                         <td class="p-3 text-center">${v.dias_transmision || 0}</td>
-                        <td class="p-3 text-center font-bold text-emerald-400">${Number(v.repeticiones || 0).toFixed(2)}</td>
+                        <td class="p-3 text-center font-bold text-emerald-400">${Math.round(v.repeticiones || 0)}</td>
                         <td class="p-3 text-center">
                             <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${v.vigente === 'VIGENTE' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-slate-700 text-slate-400'}">
                                 ${v.vigente || 'FINALIZADO'}
@@ -613,7 +637,7 @@
                         <td class="p-3 font-medium text-white">${v.version || ''}</td>
                         <td class="p-3 font-mono">${v.duracion || '00:00:30'}</td>
                         <td class="p-3 text-center font-mono text-indigo-300">${window.duracionASegundos(v.duracion)} seg</td>
-                        <td class="p-3 text-center font-mono text-emerald-400">${Number(v.repeticiones || 0).toFixed(2)}</td>
+                        <td class="p-3 text-center font-mono text-emerald-400">${Math.round(v.repeticiones || 0)}</td>
                         <td class="p-3 text-center"><span class="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">${v.vigente}</span></td>
                     </tr>`;
             });
@@ -685,6 +709,14 @@
             e.preventDefault();
             const docId = document.getElementById('video-doc-id').value;
             const idVideoVal = document.getElementById('video-id').value;
+            const versionVal = document.getElementById('video-version').value.trim().toLowerCase();
+
+            // Validación estricta anti-duplicados de versión
+            const duplicado = window.dbVideos.find(v => (v.version || "").trim().toLowerCase() === versionVal && v.idDoc !== docId);
+            if (duplicado) {
+                alert("¡Error! Ya existe un registro con el mismo nombre de versión.");
+                return;
+            }
 
             const data = {
                 id_video: idVideoVal,
