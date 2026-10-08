@@ -65,7 +65,7 @@
             <div class="bg-gradient-to-r from-indigo-900/60 to-slate-800/80 p-8 rounded-2xl border border-indigo-500/30 shadow-xl backdrop-blur-md">
                 <h2 class="text-3xl font-extrabold text-white mb-2">Panel de Control General</h2>
                 <p class="text-slate-300 max-w-2xl">
-                    Sistema integral con reglas automáticas de ID alfabético ascendente, control estricto de duplicados y cálculo de impactos por periodo.
+                    Sistema integral con conservación de IDs originales, ordenamiento cronológico por fecha de inicio y control de impactos por periodo.
                 </p>
             </div>
 
@@ -79,7 +79,7 @@
                         <span class="text-xs bg-indigo-500/10 text-indigo-400 px-2.5 py-1 rounded-full font-semibold">Motor Central</span>
                     </div>
                     <h3 class="text-xl font-bold text-white mb-1">BD_Videos</h3>
-                    <p class="text-sm text-slate-400">Base de datos central con más de 160 registros únicos ordenados alfabéticamente.</p>
+                    <p class="text-sm text-slate-400">Base de datos central con capacidad para los 160 registros ordenados por fecha.</p>
                 </div>
                 <div onclick="cambiarHoja('Reporte')" class="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-indigo-500 cursor-pointer transition shadow group">
                     <div class="flex items-center justify-between mb-4">
@@ -111,7 +111,7 @@
                     <h2 class="text-xl font-bold text-white flex items-center">
                         <i class="fa-solid fa-database text-indigo-400 mr-2"></i> BD_Videos (Hoja Central Oficial)
                     </h2>
-                    <p class="text-xs text-slate-400">IDs únicos en orden ascendente alfabético sin versiones duplicadas.</p>
+                    <p class="text-xs text-slate-400">Registros ordenados de menor a mayor por su fecha de inicio de transmisión.</p>
                 </div>
                 <button onclick="abrirModalVideo()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center shadow">
                     <i class="fa-solid fa-plus mr-2"></i> Nuevo Registro de Video
@@ -273,7 +273,7 @@
 
     <!-- PIE DE PÁGINA -->
     <footer class="bg-slate-800 border-t border-slate-700 py-4 mt-auto text-center text-xs text-slate-400">
-        Contador de Impactos Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.13
+        Contador de Impactos Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.14
     </footer>
 
     <!-- MODAL NUEVO / EDITAR VIDEO -->
@@ -287,8 +287,8 @@
                 <input type="hidden" id="video-doc-id">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">ID (Automático alfabético)</label>
-                        <input type="text" id="video-id" readonly class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-indigo-400 font-bold text-sm cursor-not-allowed">
+                        <label class="block text-xs text-slate-400 mb-1">ID (Original)</label>
+                        <input type="text" id="video-id" required class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-indigo-400 font-bold text-sm">
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">Duración (MM:SS)</label>
@@ -375,16 +375,6 @@
         window.dbCalendario = [];
         window.FECHA_ACTUAL = new Date().toISOString().split('T')[0];
 
-        window.generarIdExcel = function(n) {
-            let result = "";
-            let num = n;
-            while (num >= 0) {
-                result = String.fromCharCode(65 + (num % 26)) + result;
-                num = Math.floor(num / 26) - 1;
-            }
-            return result;
-        };
-
         window.duracionASegundos = function(dur) {
             if (!dur) return 30;
             const partes = dur.split(':').map(Number);
@@ -413,12 +403,14 @@
             });
             window.dbVideos = unicos;
 
-            // 2. ORDENAMIENTO ALFABÉTICO ASCENDENTE Y ASIGNACIÓN DE ID ÚNICO
-            window.dbVideos.sort((a, b) => (a.version || "").localeCompare(b.version || ""));
+            // 2. ORDENAMIENTO ESTRICTO POR FECHA DE INICIO (DE MENOR A MAYOR)
+            window.dbVideos.sort((a, b) => {
+                const fechaA = a.inicio_transmision || "9999-12-31";
+                const fechaB = b.inicio_transmision || "9999-12-31";
+                return fechaA.localeCompare(fechaB);
+            });
 
-            window.dbVideos.forEach((v, index) => {
-                v.id_video = window.generarIdExcel(index);
-
+            window.dbVideos.forEach(v => {
                 if (v.cierre_transmision < hoyStr) {
                     v.vigente = "FINALIZADO";
                 } else {
@@ -457,7 +449,6 @@
 
                     if (esLaboral) {
                         diasTransmisionCount++;
-                        // Si está finalizado calcula SOLO hasta su fecha de cierre. Si está vigente calcula hasta hoy (o cierre si es menor).
                         let limiteCalculo = (v.vigente === "FINALIZADO") ? cierre : (hoy < cierre ? hoy : cierre);
                         if (curr <= limiteCalculo) {
                             let videosActivosHoy = window.dbVideos.filter(vid => fStr >= vid.inicio_transmision && fStr <= vid.cierre_transmision);
@@ -465,7 +456,6 @@
 
                             if (sumaSegundosHoy > 0) {
                                 let durSeg = window.duracionASegundos(v.duracion);
-                                // Fórmula oficial de impactos diarios
                                 let repDia = (3600 / sumaSegundosHoy) * 7 * (durSeg / 60);
                                 repeticionesAcumuladas += repDia;
                             }
@@ -478,8 +468,6 @@
                 v.dias_transmision = diasTransmisionCount;
                 v.repeticiones = isNaN(repeticionesAcumuladas) ? 0 : repeticionesAcumuladas;
             });
-
-            window.dbVideos.sort((a, b) => a.id_video.localeCompare(b.id_video, undefined, { numeric: true, sensitivity: 'base' }));
         };
 
         window.cargarDatosFirebase = async function() {
@@ -677,9 +665,7 @@
         window.abrirModalVideo = function() {
             document.getElementById('form-video').reset();
             document.getElementById('video-doc-id').value = '';
-            const siguienteId = window.generarIdExcel(window.dbVideos.length);
-            document.getElementById('video-id').value = siguienteId;
-            document.getElementById('modal-video-titulo').innerText = `Registrar Nuevo Video (ID: ${siguienteId})`;
+            document.getElementById('modal-video-titulo').innerText = `Registrar Nuevo Video`;
             document.getElementById('modal-video').classList.remove('hidden');
         };
 
@@ -704,7 +690,7 @@
         window.guardarVideo = async function(e) {
             e.preventDefault();
             const docId = document.getElementById('video-doc-id').value;
-            const idVideoVal = document.getElementById('video-id').value;
+            const idVideoVal = document.getElementById('video-id').value.trim();
             const versionVal = document.getElementById('video-version').value.trim().toLowerCase();
 
             const duplicado = window.dbVideos.find(v => (v.version || "").trim().toLowerCase() === versionVal && v.idDoc !== docId);
@@ -756,13 +742,13 @@
             };
             await addDoc(collection(db, "calendario_config"), data);
             window.cerrarModalCalendario();
-            await window.cargarDatosFirebase();
+            window.cargarDatosFirebase();
         };
 
         window.eliminarDia = async function(docId) {
             if (confirm('¿Eliminar este día especial?')) {
                 await deleteDoc(doc(db, "calendario_config", docId));
-                await window.cargarDatosFirebase();
+                window.cargarDatosFirebase();
             }
         };
 
