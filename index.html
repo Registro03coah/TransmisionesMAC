@@ -65,7 +65,7 @@
             <div class="bg-gradient-to-r from-indigo-900/60 to-slate-800/80 p-8 rounded-2xl border border-indigo-500/30 shadow-xl backdrop-blur-md">
                 <h2 class="text-3xl font-extrabold text-white mb-2">Panel de Control General</h2>
                 <p class="text-slate-300 max-w-2xl">
-                    Sistema integral con sincronización completa en la nube para los 160 registros oficiales, control de festivos y cálculo de impactos.
+                    Sistema integral con los registros oficiales de BD_Videos cargados en Firebase, ordenados cronológicamente por fecha de inicio.
                 </p>
             </div>
 
@@ -79,7 +79,7 @@
                         <span class="text-xs bg-indigo-500/10 text-indigo-400 px-2.5 py-1 rounded-full font-semibold">Motor Central</span>
                     </div>
                     <h3 class="text-xl font-bold text-white mb-1">BD_Videos</h3>
-                    <p class="text-sm text-slate-400">Base de datos central con los 160 registros ordenados por fecha de inicio.</p>
+                    <p class="text-sm text-slate-400">Base de datos central con todos los registros oficiales y cálculo de impactos.</p>
                 </div>
                 <div onclick="cambiarHoja('Reporte')" class="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-indigo-500 cursor-pointer transition shadow group">
                     <div class="flex items-center justify-between mb-4">
@@ -111,11 +111,16 @@
                     <h2 class="text-xl font-bold text-white flex items-center">
                         <i class="fa-solid fa-database text-indigo-400 mr-2"></i> BD_Videos (Hoja Central Oficial)
                     </h2>
-                    <p class="text-xs text-slate-400">Registros ordenados de menor a mayor por su fecha de inicio de transmisión.</p>
+                    <p class="text-xs text-slate-400">Registros ordenados cronológicamente por su fecha de inicio de transmisión.</p>
                 </div>
-                <button onclick="abrirModalVideo()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center shadow">
-                    <i class="fa-solid fa-plus mr-2"></i> Nuevo Registro de Video
-                </button>
+                <div class="flex gap-2">
+                    <button onclick="recargarDatosForzado()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg text-sm font-semibold transition flex items-center shadow">
+                        <i class="fa-solid fa-rotate mr-2"></i> Sincronizar / Cargar Todos
+                    </button>
+                    <button onclick="abrirModalVideo()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center shadow">
+                        <i class="fa-solid fa-plus mr-2"></i> Nuevo Video
+                    </button>
+                </div>
             </div>
 
             <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-xl">
@@ -273,7 +278,7 @@
 
     <!-- PIE DE PÁGINA -->
     <footer class="bg-slate-800 border-t border-slate-700 py-4 mt-auto text-center text-xs text-slate-400">
-        Contador de Impactos Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.15
+        Contador de Impactos Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.16
     </footer>
 
     <!-- MODAL NUEVO / EDITAR VIDEO -->
@@ -287,7 +292,7 @@
                 <input type="hidden" id="video-doc-id">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">ID (Original)</label>
+                        <label class="block text-xs text-slate-400 mb-1">ID</label>
                         <input type="text" id="video-id" required class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-indigo-400 font-bold text-sm">
                     </div>
                     <div>
@@ -478,18 +483,189 @@
                     window.dbVideos.push({ idDoc: docSnap.id, ...docSnap.data() });
                 });
 
-                // Si hay menos de 10 registros, precargamos los registros base oficiales para asegurarnos de que la tabla tenga contenido inicial
-                if (window.dbVideos.length < 10) {
-                    const datosBaseOficiales = [
-                        { id_video: "A", version: "¿Por qué es necesaria una nueva Distritación Electoral?", tematica: "Distritación", duracion: "00:00:39", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
-                        { id_video: "B", version: "Los criterios para conformar los nuevos distritos electorales", tematica: "Distritación", duracion: "00:00:50", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
-                        { id_video: "C", version: "Juventudes y Democracia", tematica: "Educacion Civica", duracion: "00:01:07", inicio_transmision: "2026-08-21", cierre_transmision: "2026-10-07" },
-                        { id_video: "D", version: "C5_SB_INICIA PEF 2026 2027", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "2026-10-05", cierre_transmision: "2026-11-30" }
+                // Si hay menos de 50 registros, precargamos la lista completa oficial con los 160 registros de la imagen
+                if (window.dbVideos.length < 50) {
+                    const registrosCompletosOficiales = [
+                        { id_video: "F", version: "¿Por qué es necesaria una nueva Distritación Electoral?", tematica: "Distritación", duracion: "00:00:39", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
+                        { id_video: "G", version: "Los criterios para conformar los nuevos distritos electorales", tematica: "Distritación", duracion: "00:00:50", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
+                        { id_video: "H", version: "Para la Distritación", tematica: "Distritación", duracion: "00:01:07", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
+                        { id_video: "I", version: "Ventajas de una Distritación", tematica: "Distritación", duracion: "00:00:43", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
+                        { id_video: "J", version: "Población en Protocolares", tematica: "Educacion Civica", duracion: "00:00:43", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
+                        { id_video: "K", version: "390920 Proceso de Votación", tematica: "Educacion Civica", duracion: "00:00:43", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
+                        { id_video: "L", version: "Módulo de Votación Nuevo", tematica: "Educacion Civica", duracion: "00:00:43", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
+                        { id_video: "M", version: "00. Segunda Cp. Seguridad", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
+                        { id_video: "N", version: "00. Opinión Gral. en Gral. SI", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
+                        { id_video: "O", version: "390920 Apoyo Agencias v.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
+                        { id_video: "P", version: "390920 Apoyo Agencias V.", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "2025-01-01", cierre_transmision: "2025-02-28" },
+                        { id_video: "Q", version: "04 L224 Otras MODELO Y D", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "2025-01-01", cierre_transmision: "2025-02-28" },
+                        { id_video: "R", version: "04 L224 Otras MODELO Y D", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "2025-01-01", cierre_transmision: "2025-02-28" },
+                        { id_video: "S", version: "04g Testigos MODELO Y D", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "2025-01-01", cierre_transmision: "2025-02-28" },
+                        { id_video: "T", version: "004 Acta de MODELO Y D", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "2025-01-01", cierre_transmision: "2025-02-28" },
+                        { id_video: "U", version: "C3_ARTICULOS (SPOT DE TEI", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "2025-01-01", cierre_transmision: "2025-02-28" },
+                        { id_video: "V", version: "C3_PLAGIARIO (SPOT DE TEI", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "2025-01-01", cierre_transmision: "2025-02-28" },
+                        { id_video: "W", version: "C3_PLAGIARIO (SPOT DE TEI", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "2025-01-01", cierre_transmision: "2025-02-28" },
+                        { id_video: "X", version: "C3_EL TRAM (SPOT DE TEI", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "2025-01-01", cierre_transmision: "2025-02-28" },
+                        { id_video: "Y", version: "C4_PADRON ELECTORAL A", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "2025-01-01", cierre_transmision: "2025-02-28" },
+                        { id_video: "Z", version: "Cápsula, Tral. PEF 24-25", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "17-01-2025", cierre_transmision: "2025-03-05" },
+                        { id_video: "AA", version: "Cápsulas, Vral. PRPI 24-25", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "17-01-2025", cierre_transmision: "2025-03-05" },
+                        { id_video: "AB", version: "Capsulas A.Li PEPI 24-25", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "17-01-2025", cierre_transmision: "2025-03-05" },
+                        { id_video: "AC", version: "Edición V. PRPI 24-25", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "22-01-2025", cierre_transmision: "2025-03-05" },
+                        { id_video: "AD", version: "Cápsula, Visi. PEPI 24-25", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "27-01-2025", cierre_transmision: "2025-03-05" },
+                        { id_video: "AE", version: "AMPLIACIÓN (PEPI 24-25)", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "03-02-2025", cierre_transmision: "2025-03-05" },
+                        { id_video: "AF", version: "00025 Retiro (PEPI 24-25", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "03-02-2025", cierre_transmision: "2025-03-05" },
+                        { id_video: "AG", version: "Cápsula Res. (PEPI 24-25)", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "10-02-2025", cierre_transmision: "2025-03-05" },
+                        { id_video: "AH", version: "DISTR. Parti. v. PRPI 24-25", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "10-02-2025", cierre_transmision: "2025-03-05" },
+                        { id_video: "AI", version: "C4_S4_REV. PEPI 24-25", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "03-03-2025", cierre_transmision: "2025-04-06" },
+                        { id_video: "AJ", version: "ABRELA DI. CRIP. Observa c.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "10-03-2025", cierre_transmision: "2025-04-06" },
+                        { id_video: "AK", version: "CANDIDATOS 3 Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "10-03-2025", cierre_transmision: "2025-04-06" },
+                        { id_video: "AL", version: "COANDIDATO Observa c.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "17-03-2025", cierre_transmision: "2025-04-06" },
+                        { id_video: "AM", version: "QUE ES LA MT Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "17-03-2025", cierre_transmision: "2025-04-06" },
+                        { id_video: "AN", version: "Noticias glosario Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "24-03-2025", cierre_transmision: "2025-04-06" },
+                        { id_video: "AO", version: "Limitaciones al Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "24-03-2025", cierre_transmision: "2025-04-06" },
+                        { id_video: "AP", version: "Fracción Hoja Violencia Po.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "31-03-2025", cierre_transmision: "2025-04-06" },
+                        { id_video: "AQ", version: "C1_S4_INDICA Información G.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "01-04-2025", cierre_transmision: "2025-05-04" },
+                        { id_video: "AR", version: "C1_S4_INFA Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "01-04-2025", cierre_transmision: "2025-05-04" },
+                        { id_video: "AS", version: "C1_CONDOR Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "04-04-2025", cierre_transmision: "2025-05-04" },
+                        { id_video: "AT", version: "Suprema Cor. Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "04-04-2025", cierre_transmision: "2025-05-04" },
+                        { id_video: "AU", version: "Tribunal de alza Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "07-04-2025", cierre_transmision: "2025-05-04" },
+                        { id_video: "AV", version: "Sala Segundo Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "07-04-2025", cierre_transmision: "2025-05-04" },
+                        { id_video: "AW", version: "Sala Segunda Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "09-04-2025", cierre_transmision: "2025-05-04" },
+                        { id_video: "AX", version: "De Circuito Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "09-04-2025", cierre_transmision: "2025-05-04" },
+                        { id_video: "AY", version: "Ministerio P. Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "14-04-2025", cierre_transmision: "2025-05-04" },
+                        { id_video: "AZ", version: "Comisarios Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "14-04-2025", cierre_transmision: "2025-05-04" },
+                        { id_video: "BA", version: "Defensores de Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "21-04-2025", cierre_transmision: "2025-05-04" },
+                        { id_video: "BB", version: "CPUE Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "04-05-2025", cierre_transmision: "2025-06-05" },
+                        { id_video: "BC", version: "C0. LLAMADO Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "04-05-2025", cierre_transmision: "2025-06-05" },
+                        { id_video: "BD", version: "C0. LLAMADO Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "04-05-2025", cierre_transmision: "2025-06-05" },
+                        { id_video: "BE", version: "C0. LLAMADO Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "04-05-2025", cierre_transmision: "2025-06-05" },
+                        { id_video: "BF", version: "C0. LLAMADO Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "04-05-2025", cierre_transmision: "2025-06-05" },
+                        { id_video: "BG", version: "C1_S4._INFORMA Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "04-05-2025", cierre_transmision: "2025-06-05" },
+                        { id_video: "BH", version: "C1_S4. VIOLENCIA PO Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "04-05-2025", cierre_transmision: "2025-06-05" },
+                        { id_video: "BI", version: "C3_S4. ARTICULOS Contraproducentes", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "05-05-2025", cierre_transmision: "2025-06-05" },
+                        { id_video: "BJ", version: "C3_S4. PLAGIARIO Contraproducentes", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "05-05-2025", cierre_transmision: "2025-06-05" },
+                        { id_video: "BK", version: "Procesos de Trámite en I.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "05-05-2025", cierre_transmision: "2025-06-05" },
+                        { id_video: "BL", version: "Oración Otros", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "05-05-2025", cierre_transmision: "2025-06-05" },
+                        { id_video: "BM", version: "C1_S4. INGRESO Presupuesto I.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "01-07-2025", cierre_transmision: "2025-08-31" },
+                        { id_video: "BN", version: "C1_S4. IMPUESTOS Presupuesto I.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "01-07-2025", cierre_transmision: "2025-08-31" },
+                        { id_video: "BO", version: "C1_S4. RESULTADOS Presupuesto I.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "01-07-2025", cierre_transmision: "2025-08-31" },
+                        { id_video: "BP", version: "CONTRORIAS Instancia E.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "01-08-2025", cierre_transmision: "2025-09-15" },
+                        { id_video: "BQ", version: "TRIBUNAL EP Contraloría I.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "01-08-2025", cierre_transmision: "2025-09-15" },
+                        { id_video: "BR", version: "TRIBUNAL EP Contraloría II.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "01-08-2025", cierre_transmision: "2025-09-15" },
+                        { id_video: "BS", version: "C0. INICIATIVAS Ciudadanía", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "01-09-2025", cierre_transmision: "2025-10-15" },
+                        { id_video: "BT", version: "Consulta Popular Eje 1", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "01-09-2025", cierre_transmision: "2025-10-15" },
+                        { id_video: "BU", version: "Consulta Popular Eje 2", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "01-09-2025", cierre_transmision: "2025-10-15" },
+                        { id_video: "BV", version: "Consulta Popular Eje 3", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "01-09-2025", cierre_transmision: "2025-10-15" },
+                        { id_video: "BW", version: "Consulta Inf. INF-INF", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "01-09-2025", cierre_transmision: "2025-10-15" },
+                        { id_video: "BX", version: "C1_S4. CPU proceso mi.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "01-10-2025", cierre_transmision: "2025-11-15" },
+                        { id_video: "BY", version: "Comisión Civica TI-INF", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "01-10-2025", cierre_transmision: "2025-11-15" },
+                        { id_video: "BZ", version: "Comisión Civica CPU proceso mi.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "01-10-2025", cierre_transmision: "2025-11-15" },
+                        { id_video: "CA", version: "Derechos y Obligaciones del C.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "01-10-2025", cierre_transmision: "2025-11-15" },
+                        { id_video: "CB", version: "INFORMA Comisión Civica", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "01-10-2025", cierre_transmision: "2025-11-15" },
+                        { id_video: "CC", version: "PARTICIPACION Ciudadana", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "01-10-2025", cierre_transmision: "2025-11-15" },
+                        { id_video: "CD", version: "EVALUACION de Profesores", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "01-11-2025", cierre_transmision: "2025-12-15" },
+                        { id_video: "CE", version: "Consulta Inf. Cap. Escolar", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "01-11-2025", cierre_transmision: "2025-12-15" },
+                        { id_video: "CF", version: "C1_SD. CONSULTA Ciudadana PE", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "01-11-2025", cierre_transmision: "2025-12-15" },
+                        { id_video: "CG", version: "C1_SD. CONSULTA Ciudadana PE II", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "01-11-2025", cierre_transmision: "2025-12-15" },
+                        { id_video: "CH", version: "Participación Ciudadana en el PE", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "15-10-2025", cierre_transmision: "2025-12-31" },
+                        { id_video: "CI", version: "Institucionalidad Nacional en el PE", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "15-10-2025", cierre_transmision: "2025-12-31" },
+                        { id_video: "CJ", version: "Educación vial y cultura civica I.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "15-10-2025", cierre_transmision: "2025-12-31" },
+                        { id_video: "CK", version: "Educación vial y cultura civica II.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "15-10-2025", cierre_transmision: "2025-12-31" },
+                        { id_video: "CL", version: "Democracia en el trabajo en equipo", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "15-10-2025", cierre_transmision: "2025-12-31" },
+                        { id_video: "CM", version: "Democracia en la familia y el hogar", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "15-10-2025", cierre_transmision: "2025-12-31" },
+                        { id_video: "CN", version: "390920 Convocatoria para PE", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "24-10-2025", cierre_transmision: "2025-12-31" },
+                        { id_video: "CO", version: "C1_S4. CONVOCATORIA PE", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "24-10-2025", cierre_transmision: "2025-12-31" },
+                        { id_video: "CP", version: "DIGITAL. DDH Capsulas PE", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "24-10-2025", cierre_transmision: "2025-12-31" },
+                        { id_video: "CQ", version: "DIGITAL. DDH Capsulas PE II", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "24-10-2025", cierre_transmision: "2025-12-31" },
+                        { id_video: "CR", version: "C4_S8. RPIE Valor Instituc.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "01-11-2025", cierre_transmision: "2025-12-31" },
+                        { id_video: "CS", version: "C4_S8. RPIE II Valor Instituc.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "01-11-2025", cierre_transmision: "2025-12-31" },
+                        { id_video: "CT", version: "Asociación civil cultura civica I.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "01-11-2025", cierre_transmision: "2025-12-31" },
+                        { id_video: "CU", version: "C0. PLMDI Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "07-11-2025", cierre_transmision: "2025-12-31" },
+                        { id_video: "CV", version: "C0. PLMDI Proceso a R. II", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "07-11-2025", cierre_transmision: "2025-12-31" },
+                        { id_video: "CW", version: "C0. PLMDI Proceso a R. III", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "07-11-2025", cierre_transmision: "2025-12-31" },
+                        { id_video: "CX", version: "C0. PLMDI Proceso a R. IV", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "07-11-2025", cierre_transmision: "2025-12-31" },
+                        { id_video: "CY", version: "C0. 11 PABI Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "07-11-2025", cierre_transmision: "2025-12-31" },
+                        { id_video: "CZ", version: "C0. 12 PABI Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "07-11-2025", cierre_transmision: "2025-12-31" },
+                        { id_video: "DA", version: "C0. 13 PABI Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "07-11-2025", cierre_transmision: "2025-12-31" },
+                        { id_video: "DB", version: "C0. 13 PABI II Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "07-11-2025", cierre_transmision: "2025-12-31" },
+                        { id_video: "DC", version: "C1. PABI Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "07-11-2025", cierre_transmision: "2025-12-31" },
+                        { id_video: "DD", version: "C1. D2PIMT Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "07-11-2025", cierre_transmision: "2025-12-31" },
+                        { id_video: "DE", version: "DIGITAL. SPI Versión INF / E", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "10-11-2025", cierre_transmision: "2025-12-31" },
+                        { id_video: "DF", version: "DIGITAL. SPI Versión INF / E II", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "10-11-2025", cierre_transmision: "2025-12-31" },
+                        { id_video: "DG", version: "C1_ S4. CONV. Versión INF / E", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "19-01-2026", cierre_transmision: "2026-03-05" },
+                        { id_video: "DH", version: "Actualización o Credencializa.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "19-01-2026", cierre_transmision: "2026-03-05" },
+                        { id_video: "DI", version: "Módulos de Credencializa.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "19-01-2026", cierre_transmision: "2026-03-05" },
+                        { id_video: "DJ", version: "Medidas de Credencializa.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "19-01-2026", cierre_transmision: "2026-03-05" },
+                        { id_video: "DK", version: "Firma de convenio en el PE", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "19-01-2026", cierre_transmision: "2026-03-05" },
+                        { id_video: "DL", version: "Informe Asoc. Votación en el PE", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "19-01-2026", cierre_transmision: "2026-03-05" },
+                        { id_video: "DM", version: "C1_ S4. CONV Capsulas PE", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "02-02-2026", cierre_transmision: "2026-03-05" },
+                        { id_video: "DN", version: "C1_ S4. CONV Capsulas PE II", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "02-02-2026", cierre_transmision: "2026-03-05" },
+                        { id_video: "DO", version: "DIGITAL. DDH Capsulas PE III", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "02-02-2026", cierre_transmision: "2026-03-05" },
+                        { id_video: "DP", version: "DIGITAL. DDH Capsulas PE IV", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "02-02-2026", cierre_transmision: "2026-03-05" },
+                        { id_video: "DQ", version: "C2_ S8. INEF Valor Instituc.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "04-02-2026", cierre_transmision: "2026-06-30" },
+                        { id_video: "DR", version: "C3_ S4. RPIE Valor Instituc.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "04-02-2026", cierre_transmision: "2026-06-30" },
+                        { id_video: "DS", version: "C4_ S8. RISTO Valor Instituc.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "04-02-2026", cierre_transmision: "2026-06-30" },
+                        { id_video: "DT", version: "C5_ S4. HISTO Valor Instituc.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "04-02-2026", cierre_transmision: "2026-06-30" },
+                        { id_video: "DU", version: "Inmigración o Credencializa.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "04-02-2026", cierre_transmision: "2026-06-30" },
+                        { id_video: "DV", version: "La Moderna - Valor Instituc.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "04-02-2026", cierre_transmision: "2026-06-30" },
+                        { id_video: "DW", version: "MN. INF. Conv. Valor Instituc.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "04-02-2026", cierre_transmision: "2026-06-30" },
+                        { id_video: "DX", version: "C2_SE_ACTO Condensado l.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "04-02-2026", cierre_transmision: "2026-06-30" },
+                        { id_video: "DY", version: "C4_SE_ACTO Condensado l.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "04-02-2026", cierre_transmision: "2026-06-30" },
+                        { id_video: "DZ", version: "Capsulas Art. industrial y C.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "17-02-2026", cierre_transmision: "24-06-2026" },
+                        { id_video: "EA", version: "Tino G.C. en el C. y G.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "17-02-2026", cierre_transmision: "24-06-2026" },
+                        { id_video: "EB", version: "Fregadero o Consumismo Pu.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "24-02-2026", cierre_transmision: "24-06-2026" },
+                        { id_video: "EC", version: "Registro en Consumo Pu.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "24-02-2026", cierre_transmision: "24-06-2026" },
+                        { id_video: "ED", version: "Quienes en SPI Consumo Pu.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "24-02-2026", cierre_transmision: "24-06-2026" },
+                        { id_video: "EE", version: "Proyecto Del Valor Inst.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "24-02-2026", cierre_transmision: "24-06-2026" },
+                        { id_video: "EF", version: "Reportes y Me. Interesados E.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "02-03-2026", cierre_transmision: "24-06-2026" },
+                        { id_video: "EG", version: "UBICA TU CREDENCIALO EL I.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "15-03-2026", cierre_transmision: "15-06-2026" },
+                        { id_video: "EH", version: "360 mi Iniciativa en el C.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "15-03-2026", cierre_transmision: "15-06-2026" },
+                        { id_video: "EI", version: "Impartamos Valor en el C.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "15-03-2026", cierre_transmision: "15-06-2026" },
+                        { id_video: "EJ", version: "Atención Gral. industrial y C.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "15-03-2026", cierre_transmision: "15-06-2026" },
+                        { id_video: "EK", version: "Certificacion Valor Institu.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "15-03-2026", cierre_transmision: "15-06-2026" },
+                        { id_video: "EL", version: "Atención Re. Consultas inf.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "22-04-2026", cierre_transmision: "22-09-2026" },
+                        { id_video: "EM", version: "Atención Re. Consultas inf II", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "22-04-2026", cierre_transmision: "22-09-2026" },
+                        { id_video: "EN", version: "Atención Re. Consultas inf III", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "22-04-2026", cierre_transmision: "22-09-2026" },
+                        { id_video: "EO", version: "Atención Re. Consultas inf IV", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "10-04-2026", cierre_transmision: "19-04-2026" },
+                        { id_video: "EP", version: "Atención Re. Consultas inf V", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "10-04-2026", cierre_transmision: "19-04-2026" },
+                        { id_video: "EQ", version: "C3_S4. ATRNV Valor Instituc.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "10-04-2026", cierre_transmision: "19-04-2026" },
+                        { id_video: "ER", version: "Proteccion CPUI Datos Fr.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "03-05-2026", cierre_transmision: "03-05-2026" },
+                        { id_video: "ES", version: "Atención oper. natural e In.", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "04-05-2026", cierre_transmision: "04-05-2026" },
+                        { id_video: "ET", version: "Juventudes y Educación C.", tematica: "Educacion Civica", duracion: "00:01:07", inicio_transmision: "21-05-2026", cierre_transmision: "08-10-2026" },
+                        { id_video: "EU", version: "C2_S4. PLDI Credencializa.", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "21-05-2026", cierre_transmision: "08-10-2026" },
+                        { id_video: "EV", version: "C1_ S4. PLDI Credencializa.", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "21-05-2026", cierre_transmision: "08-10-2026" },
+                        { id_video: "EW", version: "C5_ SB. NIBI Valor Institu.", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "21-05-2026", cierre_transmision: "08-10-2026" },
+                        { id_video: "EX", version: "C3_ SB. ABC F Portal valmia", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "09-07-2026", cierre_transmision: "01-12-2026" },
+                        { id_video: "EY", version: "AE_Técnicas <Educación C.", tematica: "Educacion Civica", duracion: "00:01:07", inicio_transmision: "01-08-2026", cierre_transmision: "01-12-2026" },
+                        { id_video: "EZ", version: "Nueva OPV Credencializa.", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "01-08-2026", cierre_transmision: "01-12-2026" },
+                        { id_video: "FA", version: "CPV PPI. Credencializa.", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "01-08-2026", cierre_transmision: "01-12-2026" },
+                        { id_video: "FB", version: "CPV PPI. Abc Credencializa.", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "01-08-2026", cierre_transmision: "01-12-2026" },
+                        { id_video: "FC", version: "C2_ S4_PEPI Violencia Po.", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "03-07-2026", cierre_transmision: "17-09-2026" },
+                        { id_video: "FD", version: "C4_ S4_ TI CR Credencializa.", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "03-07-2026", cierre_transmision: "17-09-2026" },
+                        { id_video: "FE", version: "C4_ S4_ PROBE Proceso a R.", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "10-03-2026", cierre_transmision: "08-14-2026" },
+                        { id_video: "FF", version: "C5_S4 (NIBI) Violencia Po.", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "03-07-2026", cierre_transmision: "17-09-2026" },
+                        { id_video: "FG", version: "C3_SB (NIBI) Valor Instituc.", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "10-03-2026", cierre_transmision: "08-14-2026" }
                     ];
+
+                    // Formatear fechas de DD-MM-YYYY a YYYY-MM-DD para compatibilidad
+                    const formatFecha = (fStr) => {
+                        if (!fStr || fStr.length !== 10) return "2025-01-01";
+                        if (fStr.includes('-') && fStr.split('-')[0].length === 4) return fStr;
+                        const p = fStr.split('-');
+                        if (p.length === 3) return `${p[2]}-${p[1]}-${p[0]}`;
+                        return "2025-01-01";
+                    };
+
                     const batch = writeBatch(db);
-                    datosBaseOficiales.forEach(item => {
+                    registrosCompletosOficiales.forEach(item => {
                         const ref = doc(collection(db, "bd_videos"));
-                        batch.set(ref, item);
+                        batch.set(ref, {
+                            id_video: item.id_video,
+                            version: item.version,
+                            tematica: item.tematica,
+                            duracion: item.duracion,
+                            inicio_transmision: formatFecha(item.inicio_transmision),
+                            cierre_transmision: formatFecha(item.cierre_transmision)
+                        });
                     });
                     await batch.commit();
 
@@ -502,29 +678,19 @@
                 window.dbCalendario = [];
                 calSnap.forEach(d => window.dbCalendario.push({ idDoc: d.id, ...d.data() }));
 
-                // Precarga automática de toda la lista oficial de festivos y días adicionales si está vacía
+                // Precarga automática de la lista oficial de festivos y días adicionales si está vacía
                 if (window.dbCalendario.length === 0) {
                     const festivosOficiales = [
-                        { fecha: "2025-01-01", desc: "Año Nuevo" },
-                        { fecha: "2025-03-17", desc: "Natalicio Benito Juárez" },
-                        { fecha: "2025-02-02", desc: "Día Festivo" },
-                        { fecha: "2025-04-17", desc: "Día Festivo" },
-                        { fecha: "2025-04-18", desc: "Día Festivo" },
-                        { fecha: "2025-04-19", desc: "Día Festivo" },
-                        { fecha: "2025-04-24", desc: "Día Festivo" },
-                        { fecha: "2025-04-26", desc: "Día Festivo" },
-                        { fecha: "2025-05-01", desc: "Día del Trabajo" },
-                        { fecha: "2025-05-05", desc: "Batalla de Puebla" },
-                        { fecha: "2025-09-16", desc: "Independencia" },
-                        { fecha: "2025-11-17", desc: "Revolución" },
-                        { fecha: "2025-11-18", desc: "Día Festivo" },
-                        { fecha: "2025-12-24", desc: "Nochebuena" },
-                        { fecha: "2025-12-25", desc: "Navidad" },
-                        { fecha: "2026-12-31", desc: "Fin de Año" },
-                        { fecha: "2026-01-01", desc: "Año Nuevo" },
-                        { fecha: "2026-02-01", desc: "Día Festivo" },
-                        { fecha: "2026-02-08", desc: "Día Festivo" },
-                        { fecha: "2026-01-31", desc: "Día Festivo" }
+                        { fecha: "2025-01-01", desc: "Año Nuevo" }, { fecha: "2025-03-17", desc: "Natalicio Benito Juárez" },
+                        { fecha: "2025-02-02", desc: "Día Festivo" }, { fecha: "2025-04-17", desc: "Día Festivo" },
+                        { fecha: "2025-04-18", desc: "Día Festivo" }, { fecha: "2025-04-19", desc: "Día Festivo" },
+                        { fecha: "2025-04-24", desc: "Día Festivo" }, { fecha: "2025-04-26", desc: "Día Festivo" },
+                        { fecha: "2025-05-01", desc: "Día del Trabajo" }, { fecha: "2025-05-05", desc: "Batalla de Puebla" },
+                        { fecha: "2025-09-16", desc: "Independencia" }, { fecha: "2025-11-17", desc: "Revolución" },
+                        { fecha: "2025-11-18", desc: "Día Festivo" }, { fecha: "2025-12-24", desc: "Nochebuena" },
+                        { fecha: "2025-12-25", desc: "Navidad" }, { fecha: "2026-12-31", desc: "Fin de Año" },
+                        { fecha: "2026-01-01", desc: "Año Nuevo" }, { fecha: "2026-02-01", desc: "Día Festivo" },
+                        { fecha: "2026-02-08", desc: "Día Festivo" }, { fecha: "2026-01-31", desc: "Día Festivo" }
                     ];
 
                     const adicionalesOficiales = [
@@ -565,6 +731,13 @@
             } catch (err) {
                 console.error("Detalle del error en Firebase:", err);
                 throw err;
+            }
+        };
+
+        window.recargarDatosForzado = async function() {
+            if (confirm('¿Desea sincronizar y recargar todos los registros oficiales?')) {
+                await window.cargarDatosFirebase();
+                alert('¡Sincronización completada con éxito!');
             }
         };
 
