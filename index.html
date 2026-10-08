@@ -63,7 +63,7 @@
             <div class="bg-gradient-to-r from-indigo-900/60 to-slate-800/80 p-8 rounded-2xl border border-indigo-500/30 shadow-xl backdrop-blur-md">
                 <h2 class="text-3xl font-extrabold text-white mb-2">Panel de Control SDCI Distrito 03</h2>
                 <p class="text-slate-300 max-w-2xl">
-                    Sistema configurado con soporte para fechas DD/MM/AAAA, IDs numéricos de orden estricto (001, 010, 100) y nombres de archivo con símbolos y extensiones.
+                    Sistema con conexión estable a Firebase, soporte completo para fechas DD/MM/AAAA, IDs de 3 dígitos y nombres de archivo personalizados.
                 </p>
             </div>
 
@@ -290,7 +290,7 @@
 
     <!-- PIE DE PÁGINA -->
     <footer class="bg-slate-800 border-t border-slate-700 py-4 mt-auto text-center text-xs text-slate-400">
-        SDCI Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.27
+        SDCI Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.28
     </footer>
 
     <!-- MODAL DE ADMINISTRACIÓN Y CARGA MASIVA EXCEL -->
@@ -455,7 +455,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PRINCIPAL CON CONVERSIÓN INTELIGENTE DE FECHAS DD/MM/AAAA -->
+    <!-- SCRIPT PRINCIPAL CORREGIDO Y ESTABLE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -491,7 +491,6 @@
                 return `${y}-${m}-${d}`;
             }
             let s = String(val).trim();
-            // Si viene con formato DD/MM/AAAA (ej. 01/01/2025)
             if (s.includes('/')) {
                 const parts = s.split('/');
                 if (parts.length === 3) {
@@ -1063,7 +1062,7 @@
             const data = {
                 tipo: document.getElementById('cal-tipo').value,
                 fecha: document.getElementById('cal-fecha').value,
-                descripcion: document.getElementById('cal-desc'].value
+                descripcion: document.getElementById('cal-desc').value
             };
             await addDoc(collection(db, "calendario_config"), data);
             window.cerrarModalCalendario();
