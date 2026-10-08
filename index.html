@@ -273,7 +273,7 @@
 
     <!-- PIE DE PÁGINA -->
     <footer class="bg-slate-800 border-t border-slate-700 py-4 mt-auto text-center text-xs text-slate-400">
-        Contador de Impactos Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.10
+        Contador de Impactos Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.11
     </footer>
 
     <!-- MODAL NUEVO / EDITAR VIDEO -->
@@ -352,7 +352,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PRINCIPAL DE LÓGICA Y CÁLCULOS -->
+    <!-- SCRIPT PRINCIPAL UNIFICADO Y ROBUSTO -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -375,7 +375,8 @@
         window.dbCalendario = [];
         window.FECHA_ACTUAL = new Date().toISOString().split('T')[0];
 
-        function generarIdExcel(n) {
+        // FUNCIONES GLOBALES EXPUESTAS AL WINDOW
+        window.generarIdExcel = function(n) {
             let result = "";
             let num = n;
             while (num >= 0) {
@@ -383,10 +384,9 @@
                 num = Math.floor(num / 26) - 1;
             }
             return result;
-        }
-        window.generarIdExcel = generarIdExcel;
+        };
 
-        function duracionASegundos(dur) {
+        window.duracionASegundos = function(dur) {
             if (!dur) return 30;
             const partes = dur.split(':').map(Number);
             if (partes.length === 3) {
@@ -395,10 +395,9 @@
                 return partes[0] * 60 + partes[1];
             }
             return 30;
-        }
+        };
 
-        // FUNCIÓN UBICADA AL PRINCIPIO PARA EVITAR ERRORES DE REFERENCIA
-        function procesarCalculosAutomaticos() {
+        window.procesarCalculosAutomaticos = function() {
             const festivosSet = new Set(window.dbCalendario.filter(c => c.tipo === 'festivo').map(c => c.fecha));
             const adicionalesSet = new Set(window.dbCalendario.filter(c => c.tipo === 'adicional').map(c => c.fecha));
             const hoyStr = window.FECHA_ACTUAL;
@@ -444,10 +443,10 @@
                         diasTransmisionCount++;
                         if (curr <= hoy && curr <= cierre) {
                             let videosActivosHoy = window.dbVideos.filter(vid => fStr >= vid.inicio_transmision && fStr <= vid.cierre_transmision);
-                            let sumaSegundosHoy = videosActivosHoy.reduce((acc, vid) => acc + duracionASegundos(vid.duracion), 0);
+                            let sumaSegundosHoy = videosActivosHoy.reduce((acc, vid) => acc + window.duracionASegundos(vid.duracion), 0);
 
                             if (sumaSegundosHoy > 0) {
-                                let durSeg = duracionASegundos(v.duracion);
+                                let durSeg = window.duracionASegundos(v.duracion);
                                 let repDia = (3600 / sumaSegundosHoy) * 7 * (durSeg / 60);
                                 repeticionesAcumuladas += repDia;
                             }
@@ -462,9 +461,9 @@
             });
 
             window.dbVideos.sort((a, b) => a.id_video.localeCompare(b.id_video, undefined, { numeric: true, sensitivity: 'base' }));
-        }
+        };
 
-        async function cargarDatosFirebase() {
+        window.cargarDatosFirebase = async function() {
             try {
                 const querySnapshot = await getDocs(collection(db, "bd_videos"));
                 window.dbVideos = [];
@@ -482,7 +481,7 @@
 
                     for (let i = 0; i < datosBase.length; i++) {
                         let item = datosBase[i];
-                        item.id_video = generarIdExcel(i);
+                        item.id_video = window.generarIdExcel(i);
                         await addDoc(collection(db, "bd_videos"), item);
                     }
 
@@ -509,37 +508,16 @@
                     c2.forEach(d => window.dbCalendario.push({ idDoc: d.id, ...d.data() }));
                 }
 
-                procesarCalculosAutomaticos();
-                renderizarTodo();
+                window.procesarCalculosAutomaticos();
+                window.renderizarTodo();
             } catch (err) {
                 console.error("Detalle del error en Firebase:", err);
                 throw err;
             }
-        }
+        };
 
-        async function initApp() {
-            const statusDot = document.getElementById('status-dot');
-            const statusText = document.getElementById('status-text');
-            try {
-                await cargarDatosFirebase();
-                statusDot.classList.remove('bg-yellow-500', 'animate-pulse');
-                statusDot.classList.add('bg-emerald-500');
-                statusText.innerText = "Conectado a Firebase";
-            } catch (error) {
-                console.error("Error conectando a Firebase:", error);
-                statusDot.classList.remove('bg-yellow-500', 'animate-pulse');
-                statusDot.classList.add('bg-rose-500');
-                statusText.innerText = "Error de conexión";
-            }
-        }
-
-        window.cargarDatosFirebase = cargarDatosFirebase;
-        window.addEventListener('DOMContentLoaded', initApp);
-    </script>
-
-    <!-- CONTROLADORES DE INTERFAZ -->
-    <script>
-        function cambiarHoja(target) {
+        // CONTROLADORES DE INTERFAZ Y RENDERIZADO
+        window.cambiarHoja = function(target) {
             document.querySelectorAll('.sheet-view').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.nav-btn').forEach(el => {
                 el.classList.remove('bg-indigo-600', 'text-white', 'shadow');
@@ -551,21 +529,20 @@
                 btn.classList.remove('bg-slate-700', 'text-slate-300');
                 btn.classList.add('bg-indigo-600', 'text-white', 'shadow');
             }
-            renderizarTodo();
-        }
-        window.cambiarHoja = cambiarHoja;
+            window.renderizarTodo();
+        };
 
-        function renderizarTodo() {
-            procesarCalculosAutomaticos();
-            renderBDVideos();
-            renderReporteVersion();
-            renderCalendario();
-            renderFormulas();
-            renderTablaReporteMatriz();
-            renderListadoVigente();
-        }
+        window.renderizarTodo = function() {
+            window.procesarCalculosAutomaticos();
+            window.renderBDVideos();
+            window.renderReporteVersion();
+            window.renderCalendario();
+            window.renderFormulas();
+            window.renderTablaReporteMatriz();
+            window.renderListadoVigente();
+        };
 
-        function renderBDVideos() {
+        window.renderBDVideos = function() {
             const tbody = document.getElementById('tabla-bd-videos-body');
             tbody.innerHTML = '';
             window.dbVideos.forEach(v => {
@@ -592,9 +569,9 @@
                     </tr>
                 `;
             });
-        }
+        };
 
-        function renderReporteVersion() {
+        window.renderReporteVersion = function() {
             const tbody = document.getElementById('tabla-reporte-version-body');
             tbody.innerHTML = '';
             let totalGeneral = 0;
@@ -611,9 +588,9 @@
                 `;
             });
             document.getElementById('total-impactos-periodo').innerText = totalGeneral;
-        }
+        };
 
-        function renderCalendario() {
+        window.renderCalendario = function() {
             const tFestivos = document.getElementById('tabla-festivos-body');
             const tAdicionales = document.getElementById('tabla-adicionales-body');
             tFestivos.innerHTML = '';
@@ -625,9 +602,9 @@
                     tAdicionales.innerHTML += `<tr class="hover:bg-slate-750"><td class="p-2.5 font-mono text-emerald-300">${c.fecha}</td><td class="p-2.5">${c.descripcion}</td><td class="p-2.5 text-center"><button onclick="eliminarDia('${c.idDoc}')" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-trash"></i></button></td></tr>`;
                 }
             });
-        }
+        };
 
-        function renderFormulas() {
+        window.renderFormulas = function() {
             const tbody = document.getElementById('tabla-formulas-body');
             tbody.innerHTML = '';
             window.dbVideos.forEach(v => {
@@ -635,14 +612,14 @@
                     <tr class="hover:bg-slate-750">
                         <td class="p-3 font-medium text-white">${v.version || ''}</td>
                         <td class="p-3 font-mono">${v.duracion || '00:00:30'}</td>
-                        <td class="p-3 text-center font-mono text-indigo-300">${duracionASegundos(v.duracion)} seg</td>
+                        <td class="p-3 text-center font-mono text-indigo-300">${window.duracionASegundos(v.duracion)} seg</td>
                         <td class="p-3 text-center font-mono text-emerald-400">${Number(v.repeticiones || 0).toFixed(2)}</td>
                         <td class="p-3 text-center"><span class="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">${v.vigente}</span></td>
                     </tr>`;
             });
-        }
+        };
 
-        function renderTablaReporteMatriz() {
+        window.renderTablaReporteMatriz = function() {
             const thead = document.getElementById('tabla-reporte-matriz-head');
             const tbody = document.getElementById('tabla-reporte-matriz-body');
             thead.innerHTML = '';
@@ -660,9 +637,9 @@
                         <td class="p-3 text-center font-bold text-emerald-400">${Math.round(v.repeticiones || 0)}</td>
                     </tr>`;
             });
-        }
+        };
 
-        function renderListadoVigente() {
+        window.renderListadoVigente = function() {
             const tbody = document.getElementById('tabla-listadovigente-body');
             tbody.innerHTML = '';
             window.dbVideos.forEach(v => {
@@ -675,12 +652,12 @@
                         <td class="p-3 text-right font-bold text-emerald-400">${Math.round(v.repeticiones || 0)}</td>
                     </tr>`;
             });
-        }
+        };
 
         window.abrirModalVideo = function() {
             document.getElementById('form-video').reset();
             document.getElementById('video-doc-id').value = '';
-            const siguienteId = generarIdExcel(window.dbVideos.length);
+            const siguienteId = window.generarIdExcel(window.dbVideos.length);
             document.getElementById('video-id').value = siguienteId;
             document.getElementById('modal-video-titulo').innerText = `Registrar Nuevo Video (ID: ${siguienteId})`;
             document.getElementById('modal-video').classList.remove('hidden');
@@ -718,32 +695,31 @@
                 cierre_transmision: document.getElementById('video-cierre').value
             };
 
-            const { doc, updateDoc, addDoc, collection } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
             if (docId) {
-                await updateDoc(doc(window.db, "bd_videos", docId), data);
+                await updateDoc(doc(db, "bd_videos", docId), data);
             } else {
-                await addDoc(collection(window.db, "bd_videos"), data);
+                await addDoc(collection(db, "bd_videos"), data);
             }
-            cerrarModalVideo();
+            window.cerrarModalVideo();
             await window.cargarDatosFirebase();
         };
 
         window.eliminarVideo = async function(docId) {
             if (confirm('¿Estás seguro de eliminar este registro?')) {
-                const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
-                await deleteDoc(doc(window.db, "bd_videos", docId));
+                await deleteDoc(doc(db, "bd_videos", docId));
                 await window.cargarDatosFirebase();
             }
         };
 
         window.abrirModalCalendario = function() {
             document.getElementById('form-calendario').reset();
-            document.getElementById('modal-calendario').classList.add('hidden'); // hidden by default on open reset
             document.getElementById('modal-calendario').classList.remove('hidden');
         };
+
         window.cerrarModalCalendario = function() {
             document.getElementById('modal-calendario').classList.add('hidden');
         };
+
         window.guardarDiaEspecial = async function(e) {
             e.preventDefault();
             const data = {
@@ -751,18 +727,35 @@
                 fecha: document.getElementById('cal-fecha').value,
                 descripcion: document.getElementById('cal-desc').value
             };
-            const { addDoc, collection } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
-            await addDoc(collection(window.db, "calendario_config"), data);
-            cerrarModalCalendario();
+            await addDoc(collection(db, "calendario_config"), data);
+            window.cerrarModalCalendario();
             await window.cargarDatosFirebase();
         };
+
         window.eliminarDia = async function(docId) {
             if (confirm('¿Eliminar este día especial?')) {
-                const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
-                await deleteDoc(doc(window.db, "calendario_config", docId));
+                await deleteDoc(doc(db, "calendario_config", docId));
                 await window.cargarDatosFirebase();
             }
         };
+
+        async function initApp() {
+            const statusDot = document.getElementById('status-dot');
+            const statusText = document.getElementById('status-text');
+            try {
+                await window.cargarDatosFirebase();
+                statusDot.classList.remove('bg-yellow-500', 'animate-pulse');
+                statusDot.classList.add('bg-emerald-500');
+                statusText.innerText = "Conectado a Firebase";
+            } catch (error) {
+                console.error("Error conectando a Firebase:", error);
+                statusDot.classList.remove('bg-yellow-500', 'animate-pulse');
+                statusDot.classList.add('bg-rose-500');
+                statusText.innerText = "Error de conexión";
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
