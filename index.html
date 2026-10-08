@@ -365,7 +365,7 @@
 
     <!-- PIE DE PÁGINA ACTUALIZADO -->
     <footer class="bg-slate-800 border-t border-slate-700 py-4 mt-auto text-center text-xs text-slate-400">
-        Contador de Impactos Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.04
+        Contador de Impactos Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.05
     </footer>
 
     <!-- MODAL PARA NUEVO / EDITAR VIDEO -->
@@ -464,9 +464,8 @@
     <!-- SCRIPTS DE FIREBASE Y LÓGICA DE LA APLICACIÓN -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Credenciales exactas de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyA6jvnsXZwF2anOJo3VadfNvn7Fl6Z5efY",
             authDomain: "sistema-mac-reportes.firebaseapp.com",
@@ -507,28 +506,36 @@
                 window.dbVideos.push({ idDoc: docSnap.id, ...docSnap.data() });
             });
 
-            // Si Firestore está vacío, cargamos automáticamente los 160 registros oficiales del Excel
-            if (window.dbVideos.length === 0) {
+            // Si está vacío o solo tiene el registro inicial genérico, inyectamos los 160 registros completos
+            if (window.dbVideos.length <= 1) {
+                const batch = writeBatch(db);
+                // Primero limpiamos si hubiera registros viejos
+                querySnapshot.forEach(d => batch.delete(d.ref));
+                await batch.commit();
+
+                // Creamos la lista completa oficial con las letras y datos de tu Excel
                 const datosOficialesExcel = [
-                    { id_video: "E", version: "¿Por qué es necesaria una nueva Distritación Electoral_ 19 1_1.mp4", tematica: "Distritación", duracion: "00:00:39", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.6853, vigente: "FINALIZADO" },
-                    { id_video: "F", version: "Los criterios para conformar los nuevos distritos electorales19-6 1.mp4", tematica: "Distritación", duracion: "00:00:50", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.6853, vigente: "FINALIZADO" },
-                    { id_video: "G", version: "Para la distritación el INE realiza una consulta 19-6 1.mp4", tematica: "Distritación", duracion: "00:00:24", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.6853, vigente: "FINALIZADO" },
+                    { id_video: "E", version: "¿Por qué es necesaria una nueva Distritación Electoral?", tematica: "Distritación", duracion: "00:00:39", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.6853, vigente: "FINALIZADO" },
+                    { id_video: "F", version: "Los criterios para conformar los nuevos distritos electorales", tematica: "Distritación", duracion: "00:00:50", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.6853, vigente: "FINALIZADO" },
+                    { id_video: "G", version: "Para la distritación el INE realiza una consulta", tematica: "Distritación", duracion: "00:00:24", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.6853, vigente: "FINALIZADO" },
                     { id_video: "H", version: "Ventajas de los nuevos distritos electorales", tematica: "Distritación", duracion: "00:00:23", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.6853, vigente: "FINALIZADO" },
                     { id_video: "I", version: "Protocolo atención primer contacto", tematica: "Protocolo Atención Primer Contacto Vpmrg", duracion: "00:00:30", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.6853, vigente: "FINALIZADO" },
                     { id_video: "J", version: "190822 Protección de datos HQ V5", tematica: "Animación Sobre Datos Personales", duracion: "00:02:34", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.6853, vigente: "FINALIZADO" },
                     { id_video: "K", version: "Modulos-1.m4v", tematica: "Video Sobre Presupuesto", duracion: "00:00:39", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.6853, vigente: "FINALIZADO" },
-                    { id_video: "L", version: "CO_Seguridad y Validez INE en el Extranjero_1022_TV.mp4", tematica: "Co_Seguridad Y Validez Ine En El Extranjero", duracion: "00:00:30", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.6853, vigente: "FINALIZADO" },
-                    { id_video: "M", version: "El camino de la credencial ok.mp4", tematica: "El Camino De La Credencial Para Votar", duracion: "00:01:30", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.6853, vigente: "FINALIZADO" },
-                    { id_video: "N", version: "180823 Aplicacion verifica INE_SUBS Hq V7.mp4", tematica: "Aplicacion Verifica Ine", duracion: "00:01:52", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.6853, vigente: "FINALIZADO" },
+                    { id_video: "L", version: "CO_Seguridad y Validez INE en el Extranjero", tematica: "Co_Seguridad Y Validez Ine En El Extranjero", duracion: "00:00:30", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.6853, vigente: "FINALIZADO" },
+                    { id_video: "M", version: "El camino de la credencial", tematica: "El Camino De La Credencial Para Votar", duracion: "00:01:30", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.6853, vigente: "FINALIZADO" },
+                    { id_video: "N", version: "Aplicacion verifica INE", tematica: "Aplicacion Verifica Ine", duracion: "00:01:52", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31", festivos: 13, dias_transmision: 248, repeticiones: 4646.6853, vigente: "FINALIZADO" },
                     { id_video: "ET", version: "Juventudes y Democracia", tematica: "Educacion Civica", duracion: "00:01:07", inicio_transmision: "2026-08-21", cierre_transmision: "2026-10-07", festivos: 0, dias_transmision: 34, repeticiones: 1623.4206, vigente: "VIGENTE" },
                     { id_video: "EW", version: "C5_SB_INICIA PEF 2026 2027 PEC RE_0626_TV", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "2026-08-21", cierre_transmision: "2026-10-07", festivos: 0, dias_transmision: 34, repeticiones: 1623.4206, vigente: "VIGENTE" }
                 ];
+
                 for (let item of datosOficialesExcel) {
                     await addDoc(collection(db, "bd_videos"), item);
                 }
-                const q2 = await getDocs(collection(db, "bd_videos"));
+
+                const qReload = await getDocs(collection(db, "bd_videos"));
                 window.dbVideos = [];
-                q2.forEach(d => window.dbVideos.push({ idDoc: d.id, ...d.data() }));
+                qReload.forEach(d => window.dbVideos.push({ idDoc: d.id, ...d.data() }));
             }
 
             const calSnap = await getDocs(collection(db, "calendario_config"));
@@ -537,12 +544,9 @@
 
             if (window.dbCalendario.length === 0) {
                 const calOficiales = [
-                    { tipo: "festivo", fecha: "2025-01-01", descripcion: "Festivo Oficial 1" },
-                    { tipo: "festivo", fecha: "2025-03-17", descripcion: "Festivo Oficial 1" },
-                    { tipo: "festivo", fecha: "2025-02-02", descripcion: "Festivo Oficial 1" },
-                    { tipo: "adicional", fecha: "2025-01-04", descripcion: "sábado" },
-                    { tipo: "adicional", fecha: "2025-01-11", descripcion: "sábado" },
-                    { tipo: "adicional", fecha: "2025-01-12", descripcion: "domingo" }
+                    { tipo: "festivo", fecha: "2025-01-01", descripcion: "Festivo Oficial" },
+                    { tipo: "festivo", fecha: "2025-03-17", descripcion: "Natalicio de Benito Juárez" },
+                    { tipo: "adicional", fecha: "2025-01-04", descripcion: "sábado" }
                 ];
                 for (let item of calOficiales) {
                     await addDoc(collection(db, "calendario_config"), item);
