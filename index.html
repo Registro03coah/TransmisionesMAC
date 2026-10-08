@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome para iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SheetJS (xlsx) para leer archivos de Excel directamente en el navegador -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
 
@@ -23,7 +25,7 @@
             </div>
 
             <!-- MENÚ DE PESTAÑAS -->
-            <nav id="nav-tabs" class="flex flex-wrap gap-1 sm:gap-2">
+            <nav id="nav-tabs" class="flex flex-wrap gap-1 sm:gap-2 items-center">
                 <button onclick="cambiarHoja('inicio')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium transition bg-indigo-600 text-white shadow" data-target="inicio">
                     <i class="fa-solid fa-house mr-1.5"></i> Inicio
                 </button>
@@ -38,6 +40,10 @@
                 </button>
                 <button onclick="cambiarHoja('listadovigente')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium transition bg-slate-700 hover:bg-slate-600 text-slate-300" data-target="listadovigente">
                     listadovigente
+                </button>
+                <!-- NUEVO BOTÓN DE ADMINISTRACIÓN MASIVA Y BORRADO -->
+                <button onclick="abrirModalAdminBD()" class="px-3 py-1.5 rounded-lg text-sm font-semibold transition bg-rose-600/30 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/40 shadow flex items-center">
+                    <i class="fa-solid fa-database mr-1.5 text-rose-400"></i> Admin / Carga Excel
                 </button>
             </nav>
 
@@ -57,7 +63,7 @@
             <div class="bg-gradient-to-r from-indigo-900/60 to-slate-800/80 p-8 rounded-2xl border border-indigo-500/30 shadow-xl backdrop-blur-md">
                 <h2 class="text-3xl font-extrabold text-white mb-2">Panel de Control SDCI Distrito 03</h2>
                 <p class="text-slate-300 max-w-2xl">
-                    Catálogo oficial con nombres exactos de versiones, ordenamiento personalizable por columna y fórmulas independientes de impacto.
+                    Sistema con gestión avanzada, filtrado por columnas, reportes por periodo y herramientas de carga masiva por Excel.
                 </p>
             </div>
 
@@ -105,14 +111,14 @@
             </div>
         </section>
 
-        <!-- 2. HOJA BD_VIDEOS CON BUSCADOR Y ORDENAMIENTO POR COLUMNA -->
+        <!-- 2. HOJA BD_VIDEOS -->
         <section id="sheet-BD_Videos" class="sheet-view hidden space-y-6">
             <div class="flex flex-wrap justify-between items-center gap-4 bg-slate-800 p-4 rounded-xl border border-slate-700">
                 <div>
                     <h2 class="text-xl font-bold text-white flex items-center">
-                        <i class="fa-solid fa-database text-indigo-400 mr-2"></i> BD_Videos (Catálogo Oficial Exacto)
+                        <i class="fa-solid fa-database text-indigo-400 mr-2"></i> BD_Videos (Catálogo Oficial)
                     </h2>
-                    <p class="text-xs text-slate-400">Haz clic en los encabezados de las columnas o usa el selector para ordenar a tu gusto.</p>
+                    <p class="text-xs text-slate-400">Haz clic en los encabezados o usa el selector para ordenar.</p>
                 </div>
                 <div class="flex flex-wrap items-center gap-3">
                     <div class="flex items-center bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5">
@@ -120,7 +126,6 @@
                         <input type="text" id="input-buscar-video" placeholder="Buscar versión o temática..." oninput="filtrarBDVideos()" class="bg-transparent border-none text-sm text-white focus:outline-none w-44 sm:w-56">
                     </div>
 
-                    <!-- SELECTOR DE ORDENAMIENTO RÁPIDO -->
                     <div class="flex items-center bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5">
                         <span class="text-xs text-slate-400 mr-2"><i class="fa-solid fa-arrow-down-wide-short"></i> Ordenar:</span>
                         <select id="select-orden-bd" onchange="cambiarCriterioOrden(this.value)" class="bg-transparent text-sm text-indigo-400 font-semibold focus:outline-none cursor-pointer">
@@ -171,7 +176,7 @@
             </div>
         </section>
 
-        <!-- 3. HOJA REPORTE DE IMPACTOS POR VERSIÓN -->
+        <!-- 3. HOJA REPORTE -->
         <section id="sheet-Reporte" class="sheet-view hidden space-y-6">
             <div class="bg-slate-800 p-6 rounded-xl border border-orange-500 shadow-xl space-y-4">
                 <h2 class="text-xl font-bold text-white flex items-center">
@@ -225,7 +230,7 @@
                         <h2 class="text-xl font-bold text-white flex items-center">
                             <i class="fa-solid fa-calendar-days text-amber-400 mr-2"></i> Módulo Independiente: Días Festivos y Laborales
                         </h2>
-                        <p class="text-xs text-slate-400">Días inhábiles y adicionales laborados con formato DD/MM/AAAA.</p>
+                        <p class="text-xs text-slate-400">Días inhábiles y adicionales laborados.</p>
                     </div>
                     <button onclick="abrirModalCalendario()" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center shadow">
                         <i class="fa-solid fa-plus mr-2"></i> Agregar Día Especial
@@ -285,8 +290,97 @@
 
     <!-- PIE DE PÁGINA -->
     <footer class="bg-slate-800 border-t border-slate-700 py-4 mt-auto text-center text-xs text-slate-400">
-        SDCI Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.24
+        SDCI Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.25
     </footer>
+
+    <!-- MODAL DE ADMINISTRACIÓN Y CARGA MASIVA EXCEL -->
+    <div id="modal-admin-bd" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-4xl w-full p-6 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-4">
+                <h3 class="text-xl font-extrabold text-white flex items-center">
+                    <i class="fa-solid fa-database text-rose-400 mr-2"></i> Panel de Administración y Carga Masiva (Excel / CSV)
+                </h3>
+                <button onclick="cerrarModalAdminBD()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+
+            <!-- BLOQUE 1: BD_VIDEOS -->
+            <div class="bg-slate-900/80 p-5 rounded-xl border border-slate-700 space-y-4">
+                <div class="flex flex-wrap justify-between items-center gap-2">
+                    <div>
+                        <h4 class="font-bold text-indigo-400 text-base">1. Gestión de Catálogo: BD_Videos</h4>
+                        <p class="text-xs text-slate-400">Borra todos los videos actuales o sube un archivo Excel (.xlsx / .csv) con la nueva lista.</p>
+                    </div>
+                    <button onclick="borrarColeccion('bd_videos')" class="bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow transition">
+                        <i class="fa-solid fa-trash mr-1.5"></i> Borrar Tabla BD_Videos
+                    </button>
+                </div>
+                <div class="bg-slate-800 p-3 rounded-lg border border-slate-700 text-xs space-y-1 text-slate-300">
+                    <span class="font-bold text-amber-300"><i class="fa-solid fa-circle-info mr-1"></i> Formato requerido para columnas de Excel (BD_Videos):</span>
+                    <p>El archivo debe contener exactamente las siguientes cabeceras en la primera fila:</p>
+                    <code class="block bg-slate-950 p-2 rounded text-emerald-400 font-mono">id_video | version | tematica | duracion | inicio_transmision | cierre_transmision</code>
+                    <p class="text-slate-400">Ejemplo de fechas: <code>2026-03-01</code> | Ejemplo de duración: <code>00:00:43</code></p>
+                </div>
+                <div class="flex items-center gap-3 pt-2">
+                    <input type="file" id="file-excel-videos" accept=".xlsx, .xls, .csv" class="block w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer">
+                    <button onclick="subirExcelBDVideos()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition shadow whitespace-nowrap">
+                        <i class="fa-solid fa-upload mr-1.5"></i> Cargar Excel
+                    </button>
+                </div>
+            </div>
+
+            <!-- BLOQUE 2: DÍAS FESTIVOS -->
+            <div class="bg-slate-900/80 p-5 rounded-xl border border-slate-700 space-y-4">
+                <div class="flex flex-wrap justify-between items-center gap-2">
+                    <div>
+                        <h4 class="font-bold text-amber-400 text-base">2. Gestión de Días Festivos (Inhábiles)</h4>
+                        <p class="text-xs text-slate-400">Borra todos los días festivos registrados o súbelos masivamente por Excel.</p>
+                    </div>
+                    <button onclick="borrarColeccionFestivos('festivo')" class="bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow transition">
+                        <i class="fa-solid fa-trash mr-1.5"></i> Borrar Días Festivos
+                    </button>
+                </div>
+                <div class="bg-slate-800 p-3 rounded-lg border border-slate-700 text-xs space-y-1 text-slate-300">
+                    <span class="font-bold text-amber-300"><i class="fa-solid fa-circle-info mr-1"></i> Formato requerido para columnas de Excel (Festivos):</span>
+                    <code class="block bg-slate-950 p-2 rounded text-emerald-400 font-mono">fecha | descripcion</code>
+                    <p class="text-slate-400">Ejemplo: <code>2025-01-01</code> | <code>Año Nuevo</code></p>
+                </div>
+                <div class="flex items-center gap-3 pt-2">
+                    <input type="file" id="file-excel-festivos" accept=".xlsx, .xls, .csv" class="block w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-600 file:text-white hover:file:bg-amber-500 cursor-pointer">
+                    <button onclick="subirExcelFestivos('festivo')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition shadow whitespace-nowrap">
+                        <i class="fa-solid fa-upload mr-1.5"></i> Cargar Festivos
+                    </button>
+                </div>
+            </div>
+
+            <!-- BLOQUE 3: DÍAS ADICIONALES -->
+            <div class="bg-slate-900/80 p-5 rounded-xl border border-slate-700 space-y-4">
+                <div class="flex flex-wrap justify-between items-center gap-2">
+                    <div>
+                        <h4 class="font-bold text-emerald-400 text-base">3. Gestión de Días Adicionales Laborados</h4>
+                        <p class="text-xs text-slate-400">Borra todos los días adicionales o súbelos masivamente mediante Excel.</p>
+                    </div>
+                    <button onclick="borrarColeccionFestivos('adicional')" class="bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow transition">
+                        <i class="fa-solid fa-trash mr-1.5"></i> Borrar Días Adicionales
+                    </button>
+                </div>
+                <div class="bg-slate-800 p-3 rounded-lg border border-slate-700 text-xs space-y-1 text-slate-300">
+                    <span class="font-bold text-amber-300"><i class="fa-solid fa-circle-info mr-1"></i> Formato requerido para columnas de Excel (Adicionales):</span>
+                    <code class="block bg-slate-950 p-2 rounded text-emerald-400 font-mono">fecha | descripcion</code>
+                    <p class="text-slate-400">Ejemplo: <code>2026-03-21</code> | <code>Sábado laborable operativo</code></p>
+                </div>
+                <div class="flex items-center gap-3 pt-2">
+                    <input type="file" id="file-excel-adicionales" accept=".xlsx, .xls, .csv" class="block w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-500 cursor-pointer">
+                    <button onclick="subirExcelFestivos('adicional')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition shadow whitespace-nowrap">
+                        <i class="fa-solid fa-upload mr-1.5"></i> Cargar Adicionales
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-4 border-t border-slate-700">
+                <button onclick="cerrarModalAdminBD()" class="px-5 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-sm font-semibold shadow">Cerrar Panel</button>
+            </div>
+        </div>
+    </div>
 
     <!-- MODAL NUEVO / EDITAR VIDEO -->
     <div id="modal-video" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
@@ -364,7 +458,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PRINCIPAL CON ORDENAMIENTO PERSONALIZABLE Y LISTA OFICIAL EXACTA -->
+    <!-- SCRIPT PRINCIPAL CON GESTIÓN DE EXCEL Y BORRADO MASIVO -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -410,7 +504,7 @@
 
         window.duracionASegundos = function(dur) {
             if (!dur) return 30;
-            const partes = dur.split(':').map(Number);
+            const partes = String(dur).split(':').map(Number);
             if (partes.length === 3) {
                 return partes[0] * 3600 + partes[1] * 60 + partes[2];
             } else if (partes.length === 2) {
@@ -491,7 +585,6 @@
                 v.repeticiones = isNaN(repeticionesAcumuladas) ? 0 : repeticionesAcumuladas;
             });
 
-            // Ordenamiento dinámico
             window.dbVideos.sort((a, b) => {
                 let valA = a[window.criterioOrdenActual] || "";
                 let valB = b[window.criterioOrdenActual] || "";
@@ -550,213 +643,9 @@
                     window.dbVideos.push({ idDoc: docSnap.id, ...docSnap.data() });
                 });
 
-                if (window.dbVideos.length < 50) {
-                    // Lista oficial exacta proporcionada por el usuario
-                    const listaOficialExacta = [
-                        { id_video: "E", version: "¿Por qué es necesaria una nueva Distritación Electoral_ 19 1_1.mp4", tematica: "Distritación", duracion: "00:00:39", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
-                        { id_video: "F", version: "Los criterios para conformar los nuevos distritos electorales19-6 1.mp4", tematica: "Distritación", duracion: "00:00:50", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
-                        { id_video: "G", version: "Para la distritación el INE realiza una consulta 19-6 1.mp4", tematica: "Distritación", duracion: "00:01:07", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
-                        { id_video: "H", version: "Ventajas de los nuevos distritos electorales", tematica: "Distritación", duracion: "00:00:43", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
-                        { id_video: "I", version: "Protocolo atención primer contacto", tematica: "Protocolo Atención Primer Contacto Vpmrg", duracion: "00:00:43", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
-                        { id_video: "J", version: "190822 Protección de datos HQ V5", tematica: "Animación Sobre Datos Personales", duracion: "00:00:43", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
-                        { id_video: "K", version: "Modulos-1.m4v", tematica: "Video Sobre Presupuesto", duracion: "00:00:43", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
-                        { id_video: "L", version: "CO_Seguridad y Validez INE en el Extranjero_1022_TV.mp4", tematica: "Co_Seguridad Y Validez Ine En El Extranjero", duracion: "00:00:43", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
-                        { id_video: "M", version: "El camino de la credencial ok.mp4", tematica: "El Camino De La Credencial Para Votar", duracion: "00:00:43", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
-                        { id_video: "N", version: "180823 Aplicacion verifica INE_SUBS Hq V7.mp4", tematica: "Aplicacion Verifica Ine", duracion: "00:00:43", inicio_transmision: "2025-01-01", cierre_transmision: "2025-12-31" },
-                        { id_video: "O", version: "SUBHistoria CPV-v5.mp4", tematica: "Aplicacion Verifica Ine", duracion: "00:00:30", inicio_transmision: "2025-01-01", cierre_transmision: "2025-02-28" },
-                        { id_video: "P", version: "041224 Citas MAC (completa) V7.", tematica: "MÓDULO Y GÉNERO", duracion: "00:00:30", inicio_transmision: "2025-01-01", cierre_transmision: "2025-02-28" },
-                        { id_video: "Q", version: "041224 Citas MAC (corta) V7.", tematica: "MÓDULO Y GÉNERO", duracion: "00:00:30", inicio_transmision: "2025-01-01", cierre_transmision: "2025-02-28" },
-                        { id_video: "R", version: "2Hq Testigos v2_sinCNCS.", tematica: "MÓDULO Y GÉNERO", duracion: "00:00:30", inicio_transmision: "2025-01-01", cierre_transmision: "2025-02-28" },
-                        { id_video: "S", version: "HQ Acta de nacimiento ok.", tematica: "MÓDULO Y GÉNERO", duracion: "00:00:30", inicio_transmision: "2025-01-01", cierre_transmision: "2025-02-28" },
-                        { id_video: "T", version: "CO_ARTÍCULO141 ESE_1024_TV", tematica: "SPOTS DE TELEVISIÓN Y CÁPSULA", duracion: "00:00:43", inicio_transmision: "2025-01-01", cierre_transmision: "2025-02-28" },
-                        { id_video: "U", version: "CO_FL CAMBIO DE DOMICILIO PJF RE_1224_TV", tematica: "SPOTS DE TELEVISIÓN Y CÁPSULA", duracion: "00:00:43", inicio_transmision: "2025-01-01", cierre_transmision: "2025-02-28" },
-                        { id_video: "V", version: "CO_FL INSCRIPCIÓN PADRÓN PJF RE_1224_TV", tematica: "SPOTS DE TELEVISIÓN Y CÁPSULA", duracion: "00:00:43", inicio_transmision: "2025-01-01", cierre_transmision: "2025-02-28" },
-                        { id_video: "W", version: "CO_FL TRÁMITES REGISTRALES PJF RE_1224_TV", tematica: "SPOTS DE TELEVISIÓN Y CÁPSULA", duracion: "00:00:43", inicio_transmision: "2025-01-01", cierre_transmision: "2025-02-28" },
-                        { id_video: "X", version: "CO RENOVACIÓN INE PJF RE_1224_TV", tematica: "SPOTS DE TELEVISIÓN Y CÁPSULA", duracion: "00:00:43", inicio_transmision: "2025-01-01", cierre_transmision: "2025-02-28" },
-                        { id_video: "Y", version: "Cápsula_Actualiza_CPV_MODULOS", tematica: "PEEPJ 24-25", duracion: "00:00:43", inicio_transmision: "2025-01-17", cierre_transmision: "2025-03-05" },
-                        { id_video: "Z", version: "Cápsula_Trámite_CPV_MODULOS", tematica: "PEEPJ 24-25", duracion: "00:00:43", inicio_transmision: "2025-01-17", cierre_transmision: "2025-03-05" },
-                        { id_video: "AA", version: "Observadores completa ALTA INE", tematica: "PEEPJ 24-25", duracion: "00:00:43", inicio_transmision: "2025-01-17", cierre_transmision: "2025-03-05" },
-                        { id_video: "AB", version: "Cápsula_Poder_Judicial_SUB_ALTA", tematica: "PEEPJ 24-25", duracion: "00:00:43", inicio_transmision: "2025-01-22", cierre_transmision: "2025-03-05" },
-                        { id_video: "AC", version: "CARGOS A ELEGIR PJF", tematica: "PEEPJ 24-25", duracion: "00:00:43", inicio_transmision: "2025-01-27", cierre_transmision: "2025-03-05" },
-                        { id_video: "AD", version: "ELECCIÓN PJF", tematica: "PEEPJ 24-26", duracion: "00:00:43", inicio_transmision: "2025-02-03", cierre_transmision: "2025-03-05" },
-                        { id_video: "AE", version: "Cápsula_Voto_Anticipado_MODULOS_ALTA.", tematica: "PEEPJ 24-25", duracion: "00:00:43", inicio_transmision: "2025-02-03", cierre_transmision: "2025-03-05" },
-                        { id_video: "AF", version: "AMPLIACIÓN DE VIGENCIA INE ELECCIÓN PODER JUDICIAL", tematica: "PEEPJ 24-25", duracion: "00:00:43", inicio_transmision: "2025-02-10", cierre_transmision: "2025-03-05" },
-                        { id_video: "AG", version: "050225 Reimpresión CPV V3", tematica: "PEEPJ 24-25", duracion: "00:00:43", inicio_transmision: "2025-02-10", cierre_transmision: "2025-03-05" },
-                        { id_video: "AH", version: "Cápsula Recoge_CPV_Módulos", tematica: "PEEPJ 24-25", duracion: "00:00:43", inicio_transmision: "2025-03-03", cierre_transmision: "2025-04-06" },
-                        { id_video: "AI", version: "0DT 18 Fecha límite para reimpresión de tu INE", tematica: "PEEPJ 24-25", duracion: "00:00:43", inicio_transmision: "2025-03-10", cierre_transmision: "2025-04-06" },
-                        { id_video: "AJ", version: "C2_SAD_REVISIÓN LNE PEL 2024 2025 RE_0125", tematica: "PEEPJ 24-25", duracion: "00:00:43", inicio_transmision: "2025-03-10", cierre_transmision: "2025-04-06" },
-                        { id_video: "AK", version: "ABRELE AL CAEPJF", tematica: "Proceso Electoral Federal", duracion: "00:00:43", inicio_transmision: "2025-03-17", cierre_transmision: "2025-04-06" },
-                        { id_video: "AL", version: "CADENA DE CONFIANZA PJF", tematica: "Educación Cívica", duracion: "00:00:43", inicio_transmision: "2025-03-17", cierre_transmision: "2025-04-06" },
-                        { id_video: "AM", version: "CONVOCATORIA OBSERVADORES PJF", tematica: "Observadores Electorales", duracion: "00:00:43", inicio_transmision: "2025-03-24", cierre_transmision: "2025-04-06" },
-                        { id_video: "AN", version: "QUE ES LA VPMRG PJF", tematica: "Proceso Electoral Federal", duracion: "00:00:43", inicio_transmision: "2025-03-24", cierre_transmision: "2025-04-06" },
-                        { id_video: "AO", version: "Boletas genérico", tematica: "Proceso Electoral Federal", duracion: "00:00:43", inicio_transmision: "2025-03-31", cierre_transmision: "2025-04-06" },
-                        { id_video: "AP", version: "Identifica al CAE", tematica: "Proceso Electoral Federal", duracion: "00:00:43", inicio_transmision: "2025-04-01", cierre_transmision: "2025-05-04" },
-                        { id_video: "AQ", version: "Padrón Mujeres", tematica: "Violencia Política en Materia de Género", duracion: "00:00:43", inicio_transmision: "2025-04-01", cierre_transmision: "2025-05-04" },
-                        { id_video: "AR", version: "C1_SA_ENCIVICA 2024_2026 ESE_0225_TV", tematica: "Educación Cívica", duracion: "00:00:43", inicio_transmision: "2025-04-04", cierre_transmision: "2025-05-04" },
-                        { id_video: "AS", version: "C5_SA_NUEVAS APN ESE_0225_TV", tematica: "Proceso Electoral Federal", duracion: "00:00:43", inicio_transmision: "2025-04-04", cierre_transmision: "2025-05-04" },
-                        { id_video: "AT", version: "C1_CONOCELES PRACTICA Y UBICA PJF_0325_TV", tematica: "Proceso Electoral Federal", duracion: "00:00:43", inicio_transmision: "2025-04-07", cierre_transmision: "2025-05-04" },
-                        { id_video: "AU", version: "Suprema Corte", tematica: "Proceso Electoral Federal", duracion: "00:00:43", inicio_transmision: "2025-04-07", cierre_transmision: "2025-05-04" },
-                        { id_video: "AV", version: "Tribunal de diciplina judicial", tematica: "Proceso Electoral Federal", duracion: "00:00:43", inicio_transmision: "2025-04-09", cierre_transmision: "2025-05-04" },
-                        { id_video: "AW", version: "Sala Superior del Tribunal Electoral PJF", tematica: "Proceso Electoral Federal", duracion: "00:00:43", inicio_transmision: "2025-04-09", cierre_transmision: "2025-05-04" },
-                        { id_video: "AX", version: "Sala Regional", tematica: "Proceso Electoral Federal", duracion: "00:00:43", inicio_transmision: "2025-04-14", cierre_transmision: "2025-05-04" },
-                        { id_video: "AY", version: "De Circuito", tematica: "Proceso Electoral Federal", duracion: "00:00:43", inicio_transmision: "2025-04-14", cierre_transmision: "2025-05-04" },
-                        { id_video: "AZ", version: "Juezas y jueces de distrito", tematica: "Proceso Electoral Federal", duracion: "00:00:43", inicio_transmision: "2025-04-21", cierre_transmision: "2025-05-04" },
-                        { id_video: "BA", version: "Micrositio PEEPJF", tematica: "Proceso Electoral Federal", duracion: "00:00:43", inicio_transmision: "2025-05-04", cierre_transmision: "2025-06-05" },
-                        { id_video: "BB", version: "Conoceles", tematica: "Proceso Electoral Federal", duracion: "00:00:43", inicio_transmision: "2025-05-04", cierre_transmision: "2025-06-05" },
-                        { id_video: "BC", version: "CPU", tematica: "Proceso Electoral Federal", duracion: "00:00:43", inicio_transmision: "2025-05-04", cierre_transmision: "2025-06-05" },
-                        { id_video: "BD", version: "CO_LLAMADO AL VOTO CTDJ PJF_0425_TV", tematica: "Proceso Electoral Federal", duracion: "00:00:43", inicio_transmision: "2025-05-04", cierre_transmision: "2025-06-05" },
-                        { id_video: "BE", version: "CO_LLMADO AL VOTO CMSS PJF_0425_TV", tematica: "Proceso Electoral Federal", duracion: "00:00:43", inicio_transmision: "2025-05-04", cierre_transmision: "2025-06-05" },
-                        { id_video: "BF", version: "CO_LLAMADO AL VOTO CMSR PJF_0425_TV", tematica: "Proceso Electoral Federal", duracion: "00:00:43", inicio_transmision: "2025-05-04", cierre_transmision: "2025-06-05" },
-                        { id_video: "BG", version: "CO_LLAMADO AL VOTO CMC PJF_0425_TV", tematica: "Proceso Electoral Federal", duracion: "00:00:43", inicio_transmision: "2025-05-04", cierre_transmision: "2025-06-05" },
-                        { id_video: "BH", version: "CO_LLAMADO AL VOTO CJD PJF_0425_TV", tematica: "Proceso Electoral Federal", duracion: "00:00:43", inicio_transmision: "2025-05-04", cierre_transmision: "2025-06-05" },
-                        { id_video: "BI", version: "C1_SC_TIPOS DE BOLETAS PJF_0325_TV", tematica: "Proceso Electoral Federal", duracion: "00:00:43", inicio_transmision: "2025-05-05", cierre_transmision: "2025-06-05" },
-                        { id_video: "BJ", version: "C1_SD_RECONOCIMIENTO PJF_0425_TV", tematica: "Proceso Electoral Federal", duracion: "00:00:43", inicio_transmision: "2025-05-05", cierre_transmision: "2025-06-05" },
-                        { id_video: "BK", version: "C4_SA_QUE ES LA VPMRG ESE_0125_TV", tematica: "Violencia Política en Materia de Género", duracion: "00:00:43", inicio_transmision: "2025-05-05", cierre_transmision: "2025-06-05" },
-                        { id_video: "BL", version: "C2_SE_ARTICULO 141 ESE RE_0525_TV", tematica: "Credencialización", duracion: "00:00:43", inicio_transmision: "2025-05-05", cierre_transmision: "2025-06-05" },
-                        { id_video: "BM", version: "C2_SB_ENTREGA DE CREDENCIALES ESE RE_0525_TV", tematica: "Credencialización", duracion: "00:00:43", inicio_transmision: "2025-07-01", cierre_transmision: "2025-08-31" },
-                        { id_video: "BN", version: "Estamos de vuelta", tematica: "Trámites en Módulo", duracion: "00:00:43", inicio_transmision: "2025-07-01", cierre_transmision: "2025-08-31" },
-                        { id_video: "BO", version: "Gracias", tematica: "Otros", duracion: "00:00:43", inicio_transmision: "2025-07-01", cierre_transmision: "2025-08-31" },
-                        { id_video: "BP", version: "CO_RESULTADOS ELECCION PJF_0625_TV", tematica: "Proceso Electoral Federal", duracion: "00:00:43", inicio_transmision: "2025-08-01", cierre_transmision: "2025-09-15" },
-                        { id_video: "BQ", version: "CO_EL INE EN LA ELECCION PJF_0625_TV", tematica: "Proceso Electoral Federal", duracion: "00:00:43", inicio_transmision: "2025-08-01", cierre_transmision: "2025-09-15" },
-                        { id_video: "BR", version: "C3_RESULTADOS CIJ 2024 ESE_0625_TV", tematica: "Educación Cívica", duracion: "00:00:43", inicio_transmision: "2025-08-01", cierre_transmision: "2025-09-15" },
-                        { id_video: "BS", version: "COMPROBANTE DE DOMICILIO", tematica: "Credencialización", duracion: "00:00:43", inicio_transmision: "2025-09-01", cierre_transmision: "2025-10-15" },
-                        { id_video: "BT", version: "TRAMITES REGISTRALES", tematica: "Credencialización", duracion: "00:00:43", inicio_transmision: "2025-09-01", cierre_transmision: "2025-10-15" },
-                        { id_video: "BU", version: "RENOVACION INE", tematica: "Credencialización", duracion: "00:00:43", inicio_transmision: "2025-09-01", cierre_transmision: "2025-10-15" },
-                        { id_video: "BV", version: "CPV personas trans", tematica: "Género", duracion: "00:00:43", inicio_transmision: "2025-09-01", cierre_transmision: "2025-10-15" },
-                        { id_video: "BW", version: "Trámites en Módulo", tematica: "Tramitar tu CPV es rápido y sencillo", duracion: "00:00:43", inicio_transmision: "2025-09-01", cierre_transmision: "2025-10-15" },
-                        { id_video: "BX", version: "Consulta Infantil y Juvenil", tematica: "resultados CIJ 2024", duracion: "00:00:43", inicio_transmision: "2025-10-01", cierre_transmision: "2025-11-15" },
-                        { id_video: "BY", version: "Credencialización", tematica: "El INE va a tu domicilio", duracion: "00:00:43", inicio_transmision: "2025-10-01", cierre_transmision: "2025-11-15" },
-                        { id_video: "BZ", version: "Género", tematica: "CPV personas no binarias", duracion: "00:00:43", inicio_transmision: "2025-10-01", cierre_transmision: "2025-11-15" },
-                        { id_video: "CA", version: "Credencializacion en el extranjero", tematica: "Voto en el Extranjero", duracion: "00:00:43", inicio_transmision: "2025-10-01", cierre_transmision: "2025-11-15" },
-                        { id_video: "CB", version: "2VMRE credencialización", tematica: "Voto en el Extranjero", duracion: "00:00:43", inicio_transmision: "2025-10-01", cierre_transmision: "2025-11-15" },
-                        { id_video: "CC", version: "Violencia Política en Materia de Género", tematica: "Acciones afirmativas", duracion: "00:00:43", inicio_transmision: "2025-10-01", cierre_transmision: "2025-11-15" },
-                        { id_video: "CD", version: "Consulta Infantil y Juvenil", tematica: "Cap Resultados CIJ módulos", duracion: "00:00:43", inicio_transmision: "2025-11-01", cierre_transmision: "2025-12-15" },
-                        { id_video: "CE", version: "Credencialización", tematica: "evolución CPV", duracion: "00:00:43", inicio_transmision: "2025-11-01", cierre_transmision: "2025-12-15" },
-                        { id_video: "CF", version: "C1_SD_RECONOCIMIENTO PJF V2_0725_TV", tematica: "Proceso Electoral del Poder Judicial", duracion: "00:00:43", inicio_transmision: "2025-11-01", cierre_transmision: "2025-12-15" },
-                        { id_video: "CG", version: "Participacion mexicanas y mexicanos residentes en el extragero", tematica: "Voto en el Extranjero", duracion: "00:00:43", inicio_transmision: "2025-11-01", cierre_transmision: "2025-12-15" },
-                        { id_video: "CH", version: "credencializacin en el extranjero_animacion", tematica: "Voto en el Extranjero", duracion: "00:00:43", inicio_transmision: "2025-10-15", cierre_transmision: "2025-12-31" },
-                        { id_video: "CI", version: "aAccion afirmativa personas indigenas", tematica: "Inclusión y Discapacidad", duracion: "00:00:43", inicio_transmision: "2025-10-15", cierre_transmision: "2025-12-31" },
-                        { id_video: "CJ", version: "Accion afirmativa personas afrodescendientes", tematica: "Inclusión y Discapacidad", duracion: "00:00:43", inicio_transmision: "2025-10-15", cierre_transmision: "2025-12-31" },
-                        { id_video: "CK", version: "Atencion a Grupos Vulnerables en MAC V1_ESE", tematica: "Inclusión y Discapacidad", duracion: "00:00:43", inicio_transmision: "2025-10-15", cierre_transmision: "2025-12-31" },
-                        { id_video: "CL", version: "Atencion a Grupos Vulnerables en MAC V2_ESE", tematica: "Inclusión y Discapacidad", duracion: "00:00:43", inicio_transmision: "2025-10-15", cierre_transmision: "2025-12-31" },
-                        { id_video: "CM", version: "Posicionamiento INE_MRE_VFM_ESE", tematica: "Voto en el Extranjero", duracion: "00:00:43", inicio_transmision: "2025-10-15", cierre_transmision: "2025-12-31" },
-                        { id_video: "CN", version: "220825 Coahuila", tematica: "Consulta infantil y juvenil", duracion: "00:00:43", inicio_transmision: "2025-10-24", cierre_transmision: "2025-12-31" },
-                        { id_video: "CO", version: "C1_SA_CONVOCATORIA OBSERVADORES PEL_0925_TV", tematica: "Cápsulas FCM ODT 018 Conv Obs Electorales", duracion: "00:00:43", inicio_transmision: "2025-10-24", cierre_transmision: "2025-12-31" },
-                        { id_video: "CP", version: "DIGITAL_CONVOCATORIA OBSERVADORES_0925_V1_16_9", tematica: "Cápsulas FCM ODT 018 Conv Obs Electorales", duracion: "00:00:43", inicio_transmision: "2025-10-24", cierre_transmision: "2025-12-31" },
-                        { id_video: "CQ", version: "DIGITAL_CONVOCATORIA OBSERVADORES_0925_V2_16_9", tematica: "Cápsulas FCM ODT 018 Conv Obs Electorales", duracion: "00:00:43", inicio_transmision: "2025-10-24", cierre_transmision: "2025-12-31" },
-                        { id_video: "CR", version: "C3_SB_SEGUIMIENTO RESULTADOS CIJ 2024_", tematica: "Consulta Infantil y Juvenil", duracion: "00:00:43", inicio_transmision: "2025-11-01", cierre_transmision: "2025-12-31" },
-                        { id_video: "CS", version: "C3_SB_RESULTADOS CIJ 2924 V2 ESE_0825", tematica: "Consulta Infantil y Juvenil", duracion: "00:00:43", inicio_transmision: "2025-11-01", cierre_transmision: "2025-12-31" },
-                        { id_video: "CT", version: "Acciones afirmativas personas adultas mayores", tematica: "Inclusión y Discapacidad", duracion: "00:00:43", inicio_transmision: "2025-11-01", cierre_transmision: "2025-12-31" },
-                        { id_video: "CU", version: "CO_L1 FUNCIONES CMSC ELECTOS PJF_0925_TV", tematica: "Proceso Electoral del Poder Judicial", duracion: "00:00:43", inicio_transmision: "2025-11-07", cierre_transmision: "2025-12-31" },
-                        { id_video: "CV", version: "CO_L1 FUNCIONES CMSS ELECTOS PJF_0925_TV", tematica: "Proceso Electoral del Poder Judicial", duracion: "00:00:43", inicio_transmision: "2025-11-07", cierre_transmision: "2025-12-31" },
-                        { id_video: "CW", version: "CO_L1 FUNCIONES CMSR ELECTOS PJF_0925_TV", tematica: "Proceso Electoral del Poder Judicial", duracion: "00:00:43", inicio_transmision: "2025-11-07", cierre_transmision: "2025-12-31" },
-                        { id_video: "CX", version: "CO_L1 FUNCIONES CTDJ ELECTOS PJF_0925_TV", tematica: "Proceso Electoral del Poder Judicial", duracion: "00:00:43", inicio_transmision: "2025-11-07", cierre_transmision: "2025-12-31" },
-                        { id_video: "CY", version: "CO_L1 FUNCIONES CMC ELECTOS PJF_0925_TV", tematica: "Proceso Electoral del Poder Judicial", duracion: "00:00:43", inicio_transmision: "2025-11-07", cierre_transmision: "2025-12-31" },
-                        { id_video: "CZ", version: "CO_L1 FUNCIONES CJD ELECTOS PJF_0925_TV", tematica: "Proceso Electoral del Poder Judicial", duracion: "00:00:43", inicio_transmision: "2025-11-07", cierre_transmision: "2025-12-31" },
-                        { id_video: "DA", version: "CO_L2 DURACION CARGOS ELECTOS PJF_0925 V1_TV", tematica: "Proceso Electoral del Poder Judicial", duracion: "00:00:43", inicio_transmision: "2025-11-07", cierre_transmision: "2025-12-31" },
-                        { id_video: "DB", version: "CO_L2 DURACION CARGOS ELECTOS PJF_0925 V2_TV", tematica: "Proceso Electoral del Poder Judicial", duracion: "00:00:43", inicio_transmision: "2025-11-07", cierre_transmision: "2025-12-31" },
-                        { id_video: "DC", version: "CO_L2 DURACION CARGOS ELECTOS PJF_0925 V3_TV", tematica: "Proceso Electoral del Poder Judicial", duracion: "00:00:43", inicio_transmision: "2025-11-07", cierre_transmision: "2025-12-31" },
-                        { id_video: "DD", version: "CO_L3 PARIDAD PJF_1025_TV", tematica: "Proceso Electoral del Poder Judicial", duracion: "00:00:43", inicio_transmision: "2025-11-07", cierre_transmision: "2025-12-31" },
-                        { id_video: "DE", version: "CO_L4 COMPUTOS PJF_1025_TV", tematica: "Proceso Electoral del Poder Judicial", duracion: "00:00:43", inicio_transmision: "2025-11-10", cierre_transmision: "2025-12-31" },
-                        { id_video: "DF", version: "DIGITAL_RED_CIVITAS_ESE_1025_T1_V1", tematica: "Voto en el Extranjero", duracion: "00:00:43", inicio_transmision: "2025-11-10", cierre_transmision: "2025-12-31" },
-                        { id_video: "DG", version: "DIGITAL_RED_CIVITAS_ESE_1025_T2_V2", tematica: "Voto en el Extranjero", duracion: "00:00:43", inicio_transmision: "2026-01-19", cierre_transmision: "2026-03-05" },
-                        { id_video: "DH", version: "C1_SA_CONVOCATORIA SE CAE PEL_1025", tematica: "Oficio INE / COC / DOS / 1427 / 2025", duracion: "00:00:43", inicio_transmision: "2026-01-19", cierre_transmision: "2026-03-05" },
-                        { id_video: "DI", version: "C2_SA_FL TRAMITES REGISTRALES PEL_1025", tematica: "Oficio INE / COC / DOS / 1427 / 2025", duracion: "00:00:43", inicio_transmision: "2026-01-19", cierre_transmision: "2026-03-05" },
-                        { id_video: "DJ", version: "Actualizacion_de_domicilio_ESE_2025", tematica: "Credencialización", duracion: "00:00:43", inicio_transmision: "2026-01-19", cierre_transmision: "2026-03-05" },
-                        { id_video: "DK", version: "Nuevo sistema de citas", tematica: "Trámites en Módulo", duracion: "00:00:43", inicio_transmision: "2026-01-19", cierre_transmision: "2026-03-05" },
-                        { id_video: "DL", version: "Medidas de seguridad CPV", tematica: "Credencialización", duracion: "00:00:43", inicio_transmision: "2026-01-19", cierre_transmision: "2026-03-05" },
-                        { id_video: "DM", version: "Mecanismos de entrega VMRE", tematica: "Voto en el Extranjero", duracion: "00:00:43", inicio_transmision: "2026-02-02", cierre_transmision: "2026-03-05" },
-                        { id_video: "DN", version: "Informe Acciones Afirmativas CNCS personas en el extranjero", tematica: "Voto en el Extranjero", duracion: "00:00:43", inicio_transmision: "2026-02-02", cierre_transmision: "2026-03-05" },
-                        { id_video: "DO", version: "C1_SA_CONVOCATORIA OBSERVADORES PEL_0925_TV", tematica: "Cápsulas FCM ODT 018 Conv Obs Electorales", duracion: "00:00:43", inicio_transmision: "2026-02-02", cierre_transmision: "2026-03-05" },
-                        { id_video: "DP", version: "DIGITAL_CONVOCATORIA OBSERVADORES_0925_V1_16_9", tematica: "Cápsulas FCM ODT 018 Conv Obs Electorales", duracion: "00:00:43", inicio_transmision: "2026-02-02", cierre_transmision: "2026-03-05" },
-                        { id_video: "DQ", version: "C2_SB_INSCRIPCION AL PADRON ESE_1025", tematica: "Credencialización", duracion: "00:00:43", inicio_transmision: "2026-02-04", cierre_transmision: "2026-06-30" },
-                        { id_video: "DR", version: "C5_SA_MI INE CM ESE_1025_TV", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "2026-02-04", cierre_transmision: "2026-06-30" },
-                        { id_video: "DS", version: "C5_SA_HISTORIA MI INE ESE V2_1025_TV", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "2026-02-04", cierre_transmision: "2026-06-30" },
-                        { id_video: "DT", version: "Inscripcion al padron_Concepto de marca", tematica: "Credencialización", duracion: "00:00:43", inicio_transmision: "2026-02-04", cierre_transmision: "2026-06-30" },
-                        { id_video: "DU", version: "La_Historia_de_mi_INE", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "2026-02-04", cierre_transmision: "2026-06-30" },
-                        { id_video: "DV", version: "Mi_INE_Concepto_de_Marca", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "2026-02-04", cierre_transmision: "2026-06-30" },
-                        { id_video: "DW", version: "C2_SB_ACTUALIZACION DOMICILIO ESE_0126_TV", tematica: "Credencialización", duracion: "00:00:43", inicio_transmision: "2026-02-04", cierre_transmision: "2026-06-30" },
-                        { id_video: "DX", version: "C2_SE_ARTICULO 141 ESE_0226_TV", tematica: "Credencializacion", duracion: "00:00:43", inicio_transmision: "2026-02-04", cierre_transmision: "2026-06-30" },
-                        { id_video: "DY", version: "Capsula_Art_141", tematica: "Inclusion y Discapacidad", duracion: "00:00:43", inicio_transmision: "2026-02-04", cierre_transmision: "2026-06-30" },
-                        { id_video: "DZ", version: "Tres documentos", tematica: "Tramites en módulos", duracion: "00:00:43", inicio_transmision: "2026-02-17", cierre_transmision: "2026-06-24" },
-                        { id_video: "EA", version: "Etapas concurso Publico 2026 SPEN", tematica: "Concurso Publico 2026 SPEN", duracion: "00:00:43", inicio_transmision: "2026-02-17", cierre_transmision: "2026-06-24" },
-                        { id_video: "EB", version: "Registro concurso Publico 2026 SPEN", tematica: "Concurso Publico 2026 SPEN", duracion: "00:00:43", inicio_transmision: "2026-02-24", cierre_transmision: "2026-06-24" },
-                        { id_video: "EC", version: "Que es el SPEN", tematica: "Concurso Publico 2026 SPEN", duracion: "00:00:43", inicio_transmision: "2026-02-24", cierre_transmision: "2026-06-24" },
-                        { id_video: "ED", version: "Proyecto Certeza", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "2026-02-24", cierre_transmision: "2026-06-24" },
-                        { id_video: "EE", version: "Reportaje Modulos de Atencion Ciudadana", tematica: "Trámites en Módulo", duracion: "00:00:43", inicio_transmision: "2026-02-24", cierre_transmision: "2026-06-24" },
-                        { id_video: "EF", version: "UBICA TU CASILLA", tematica: "PROCESO ELECTORAL", duracion: "00:00:43", inicio_transmision: "2026-03-02", cierre_transmision: "2026-06-24" },
-                        { id_video: "EG", version: "100 millones CPV", tematica: "Credencialización", duracion: "00:00:43", inicio_transmision: "2026-03-15", cierre_transmision: "2026-06-15" },
-                        { id_video: "EH", version: "Importancia CPV VMRE", tematica: "Voto en el Extranjero", duracion: "00:00:43", inicio_transmision: "2026-03-15", cierre_transmision: "2026-06-15" },
-                        { id_video: "EI", version: "Atencion Grupos Vulnerables", tematica: "Inclusión y Discapacidad", duracion: "00:00:43", inicio_transmision: "2026-03-15", cierre_transmision: "2026-06-15" },
-                        { id_video: "EJ", version: "Certificacion ISO", tematica: "Valor Institucional", duracion: "00:00:43", inicio_transmision: "2026-03-15", cierre_transmision: "2026-06-15" },
-                        { id_video: "EK", version: "Importancia de la Credencial para Votar", tematica: "Credencialización", duracion: "00:00:43", inicio_transmision: "2026-03-15", cierre_transmision: "2026-06-15" },
-                        { id_video: "EL", version: "Servicio en Modulos de Atencion Ciudadana", tematica: "Trámites en Módulo", duracion: "00:00:43", inicio_transmision: "2026-04-22", cierre_transmision: "2026-09-22" },
-                        { id_video: "EM", version: "Atencion Resultados Consulta Infantil y Juvenil 2024 C3", tematica: "Consulta Infantil y Juvenil", duracion: "00:00:43", inicio_transmision: "2026-04-22", cierre_transmision: "2026-09-22" },
-                        { id_video: "EN", version: "Atencion Resultados Consulta Infantil y Juvenil 2024 C2", tematica: "Consulta Infantil y Juvenil", duracion: "00:00:43", inicio_transmision: "2026-04-22", cierre_transmision: "2026-09-22" },
-                        { id_video: "EO", version: "Atencin Resultados Consulta Infantil y Juvenil 2024 C1", tematica: "Consulta Infantil y Juvenil", duracion: "00:00:43", inicio_transmision: "2026-04-10", cierre_transmision: "2026-04-19" },
-                        { id_video: "EP", version: "C3_SA_ATENCION RESULTADOS CIJ 2024 ESE_0326_TV", tematica: "Consulta Infantil y Juvenil", duracion: "00:00:43", inicio_transmision: "2026-04-10", cierre_transmision: "2026-04-19" },
-                        { id_video: "EQ", version: "Proteccion Datos Personales", tematica: "CPV Datos Personales", duracion: "00:00:43", inicio_transmision: "2026-04-10", cierre_transmision: "2026-04-19" },
-                        { id_video: "ER", version: "Atencion personas No Binarias", tematica: "Inclusión y Discapacidad", duracion: "00:00:43", inicio_transmision: "2026-05-03", cierre_transmision: "2026-05-03" },
-                        { id_video: "ES", version: "Juventudes y Democracia", duracion: "Educacion Civica", duracion_real: "00:01:07", inicio_transmision: "2026-05-04", cierre_transmision: "2026-05-04" },
-                        { id_video: "ET", version: "Juventudes y Democracia", tematica: "Educacion Civica", duracion: "00:01:07", inicio_transmision: "2026-05-21", cierre_transmision: "2026-10-08" },
-                        { id_video: "EU", version: "C2_SA_FL CREDENCIALIZACION MRE PEC_0626_TV Credencialización", tematica: "Credencialización", duracion: "00:00:30", inicio_transmision: "2026-05-21", cierre_transmision: "2026-10-08" },
-                        { id_video: "EV", version: "C1_SA_REGISTRO LNE VMRE PEC_0626_TV", tematica: "Promoción de la participación ciudadana", duracion: "00:00:30", inicio_transmision: "2026-05-21", cierre_transmision: "2026-10-08" },
-                        { id_video: "EW", version: "C5_SB_INICIA PEF 2026 2027 PEC RE_0626_TV", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "2026-05-21", cierre_transmision: "2026-10-08" },
-                        { id_video: "EX", version: "C3_SB_ABC PROCESOS ELECTORALES ESE ...", tematica: "Fortalecimiento de la educación cívica", duracion: "00:00:30", inicio_transmision: "2026-07-09", cierre_transmision: "2026-12-01" },
-                        { id_video: "EY", version: "JLE_Tu voto cuenta 2026", tematica: "Educacion Civica", duracion: "00:01:07", inicio_transmision: "2026-08-01", cierre_transmision: "2026-12-01" },
-                        { id_video: "EZ", version: "Nueva CPV", tematica: "Credencializacion", duracion: "00:00:30", inicio_transmision: "2026-08-01", cierre_transmision: "2026-12-01" },
-                        { id_video: "FA", version: "CPV PPL_Familiares", tematica: "Credencializacion", duracion: "00:00:30", inicio_transmision: "2026-08-01", cierre_transmision: "2026-12-01" },
-                        { id_video: "FB", version: "CPV PPL_Abogados", tematica: "Credencializacion", duracion: "00:00:30", inicio_transmision: "2026-08-01", cierre_transmision: "2026-12-01" },
-                        { id_video: "FC", version: "C5_SA_MI INE CM ESE_1025_TV", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "2026-07-03", cierre_transmision: "2026-09-17" },
-                        { id_video: "FD", version: "C3_SA_ENCIVICA 2024 2026 ESE_0426_TV", tematica: "Educación Cívica", duracion: "00:00:30", inicio_transmision: "2026-07-03", cierre_transmision: "2026-09-17" },
-                        { id_video: "FE", version: "C4_SA_PREVENCION VPMRG ESE_0326_TV", tematica: "Violencia Política en Materia de Género", duracion: "00:00:30", inicio_transmision: "2026-03-10", cierre_transmision: "2026-08-14" },
-                        { id_video: "FF", version: "C2_SA_FL CREDENCIALIZACION MRE PEC_RE_0826_TV", tematica: "Credencialización", duracion: "00:00:30", inicio_transmision: "2026-07-03", cierre_transmision: "2026-09-17" },
-                        { id_video: "FG", version: "C1_SA_REGISTRO LNE VMRE PEC RE_0826_TV", tematica: "Promoción de la participación ciudadana", duracion: "00:00:30", inicio_transmision: "2026-03-10", cierre_transmision: "2026-08-14" },
-                        { id_video: "FH", version: "C5_SB_INICIA PEF 2026 2027 PEC RE_0826_TV", tematica: "Valor Institucional", duracion: "00:00:30", inicio_transmision: "2026-03-10", cierre_transmision: "2026-08-14" }
-                    ];
-
-                    const batch = writeBatch(db);
-                    listaOficialExacta.forEach(item => {
-                        const ref = doc(collection(db, "bd_videos"));
-                        batch.set(ref, {
-                            id_video: item.id_video,
-                            version: item.version,
-                            tematica: item.tematica || "General",
-                            duracion: item.duracion || "00:00:43",
-                            inicio_transmision: item.inicio_transmision,
-                            cierre_transmision: item.cierre_transmision
-                        });
-                    });
-                    await batch.commit();
-
-                    const qReload = await getDocs(collection(db, "bd_videos"));
-                    window.dbVideos = [];
-                    qReload.forEach(d => window.dbVideos.push({ idDoc: d.id, ...d.data() }));
-                }
-
                 const calSnap = await getDocs(collection(db, "calendario_config"));
                 window.dbCalendario = [];
                 calSnap.forEach(d => window.dbCalendario.push({ idDoc: d.id, ...d.data() }));
-
-                if (window.dbCalendario.length < 15) {
-                    const festivosOficiales = [
-                        { fecha: "2025-01-01", desc: "Año Nuevo" },
-                        { fecha: "2025-05-01", desc: "Día del Trabajo" },
-                        { fecha: "2025-09-16", desc: "Independencia" },
-                        { fecha: "2025-12-25", desc: "Navidad" },
-                        { fecha: "2026-01-01", desc: "Año Nuevo" }
-                    ];
-                    const batchCal = writeBatch(db);
-                    festivosOficiales.forEach(f => {
-                        const ref = doc(collection(db, "calendario_config"));
-                        batchCal.set(ref, { tipo: "festivo", fecha: f.fecha, descripcion: f.desc });
-                    });
-                    await batchCal.commit();
-
-                    const c2 = await getDocs(collection(db, "calendario_config"));
-                    window.dbCalendario = [];
-                    c2.forEach(d => window.dbCalendario.push({ idDoc: d.id, ...d.data() }));
-                }
 
                 window.procesarCalculosBDVideos();
                 window.renderizarTodo();
@@ -766,19 +655,158 @@
         };
 
         window.recargarDatosForzado = async function() {
-            if (confirm('¿Desea restablecer y sincronizar la lista oficial exacta?')) {
+            await window.cargarDatosFirebase();
+            alert('¡Datos actualizados desde Firebase!');
+        };
+
+        // --- FUNCIONES DE BORRADO MASIVO INDEPENDIENTE ---
+        window.borrarColeccion = async function(nombreColeccion) {
+            if (confirm(`¿ESTÁS SEGURO? Esto borrará TODOS los registros de la colección '${nombreColeccion}' en Firebase.`)) {
                 try {
-                    const snap = await getDocs(collection(db, "bd_videos"));
-                    const batchDel = writeBatch(db);
-                    snap.forEach(d => batchDel.delete(d.ref));
-                    await batchDel.commit();
-                } catch(e){}
-                await window.cargarDatosFirebase();
-                alert('¡Catálogo oficial recargado con éxito!');
+                    const snap = await getDocs(collection(db, nombreColeccion));
+                    const batch = writeBatch(db);
+                    snap.forEach(d => batch.delete(d.ref));
+                    await batch.commit();
+                    alert(`¡Colección '${nombreColeccion}' borrada exitosamente!`);
+                    await window.cargarDatosFirebase();
+                } catch (err) {
+                    console.error("Error borrando colección:", err);
+                    alert("Ocurrió un error al intentar borrar.");
+                }
             }
         };
 
-        // Función para cambiar orden al hacer clic en columnas o selector
+        window.borrarColeccionFestivos = async function(tipoFiltro) {
+            if (confirm(`¿Estás seguro de borrar todos los días de tipo '${tipoFiltro}'?`)) {
+                try {
+                    const snap = await getDocs(collection(db, "calendario_config"));
+                    const batch = writeBatch(db);
+                    let count = 0;
+                    snap.forEach(d => {
+                        if (d.data().tipo === tipoFiltro) {
+                            batch.delete(d.ref);
+                            count++;
+                        }
+                    });
+                    if (count > 0) {
+                        await batch.commit();
+                        alert(`Se borraron ${count} registros de ${tipoFiltro}.`);
+                        await window.cargarDatosFirebase();
+                    } else {
+                        alert("No se encontraron registros de ese tipo.");
+                    }
+                } catch(err) {
+                    console.error(err);
+                }
+            }
+        };
+
+        // --- CARGA MASIVA DE EXCEL A FIREBASE ---
+        window.subirExcelBDVideos = function() {
+            const input = document.getElementById('file-excel-videos');
+            if (!input.files || input.files.length === 0) {
+                alert("Por favor selecciona un archivo Excel o CSV.");
+                return;
+            }
+            const file = input.files[0];
+            const reader = new FileReader();
+
+            reader.onload = async function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const json = XLSX.utils.sheet_to_json(worksheet);
+
+                    if (json.length === 0) {
+                        alert("El archivo está vacío o no tiene el formato correcto.");
+                        return;
+                    }
+
+                    const batch = writeBatch(db);
+                    let count = 0;
+                    json.forEach(row => {
+                        // Mapeo flexible de columnas
+                        const ref = doc(collection(db, "bd_videos"));
+                        batch.set(ref, {
+                            id_video: String(row.id_video || row.ID || row.id || ""),
+                            version: String(row.version || row.Nombre || row.Nombre_Version || row.Versión || ""),
+                            tematica: String(row.tematica || row.Temática || row.Tematica || "General"),
+                            duracion: String(row.duracion || row.Duración || row.Duracion || "00:00:43"),
+                            inicio_transmision: String(row.inicio_transmision || row.Inicio || row.inicio || "2026-01-01"),
+                            cierre_transmision: String(row.cierre_transmision || row.Cierre || row.cierre || "2026-12-31")
+                        });
+                        count++;
+                    });
+
+                    await batch.commit();
+                    alert(`¡Se cargaron exitosamente ${count} videos a BD_Videos!`);
+                    document.getElementById('file-excel-videos').value = '';
+                    await window.cargarDatosFirebase();
+                } catch(err) {
+                    console.error(err);
+                    alert("Error al procesar el archivo Excel. Verifica las cabeceras.");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        };
+
+        window.subirExcelFestivos = function(tipoDestino) {
+            const inputId = tipoDestino === 'festivo' ? 'file-excel-festivos' : 'file-excel-adicionales';
+            const input = document.getElementById(inputId);
+            if (!input.files || input.files.length === 0) {
+                alert("Por favor selecciona un archivo.");
+                return;
+            }
+            const file = input.files[0];
+            const reader = new FileReader();
+
+            reader.onload = async function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(worksheet);
+
+                    if (json.length === 0) {
+                        alert("El archivo está vacío.");
+                        return;
+                    }
+
+                    const batch = writeBatch(db);
+                    let count = 0;
+                    json.forEach(row => {
+                        const ref = doc(collection(db, "calendario_config"));
+                        batch.set(ref, {
+                            tipo: tipoDestino,
+                            fecha: String(row.fecha || row.Fecha || ""),
+                            descripcion: String(row.descripcion || row.Descripción || row.Desc || "")
+                        });
+                        count++;
+                    });
+
+                    await batch.commit();
+                    alert(`¡Se cargaron ${count} registros de tipo '${tipoDestino}' con éxito!`);
+                    input.value = '';
+                    await window.cargarDatosFirebase();
+                } catch(err) {
+                    console.error(err);
+                    alert("Error procesando el archivo.");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        };
+
+        // --- CONTROL DE MODAL ADMIN ---
+        window.abrirModalAdminBD = function() {
+            document.getElementById('modal-admin-bd').classList.remove('hidden');
+        };
+
+        window.cerrarModalAdminBD = function() {
+            document.getElementById('modal-admin-bd').classList.add('hidden');
+        };
+
         window.ordenarColumnaBD = function(columna) {
             if (window.criterioOrdenActual === columna) {
                 window.ordenAscendente = !window.ordenAscendente;
@@ -799,8 +827,10 @@
         window.cambiarHoja = function(target) {
             document.querySelectorAll('.sheet-view').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.nav-btn').forEach(el => {
-                el.classList.remove('bg-indigo-600', 'text-white', 'shadow');
-                el.classList.add('bg-slate-700', 'text-slate-300');
+                if(!el.classList.contains('bg-rose-600/30')) {
+                    el.classList.remove('bg-indigo-600', 'text-white', 'shadow');
+                    el.classList.add('bg-slate-700', 'text-slate-300');
+                }
             });
             document.getElementById(`sheet-${target}`).classList.remove('hidden');
             const btn = document.querySelector(`.nav-btn[data-target="${target}"]`);
