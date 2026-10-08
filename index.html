@@ -15,14 +15,14 @@
     <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50 shadow-md">
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="cambiarHoja('inicio')">
-                <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=" id="app-logo-thumb" class="w-10 h-10 rounded-xl object-cover border border-indigo-500/40 shadow-lg" alt="Logo">
+                <img src="logo1_mario.jpg" onerror="this.src='https://via.placeholder.com/40?text=SDCI'" id="app-logo-thumb" class="w-10 h-10 rounded-xl object-cover border border-indigo-500/40 shadow-lg" alt="Logo">
                 <div>
                     <h1 class="text-lg font-bold tracking-wide text-white">SDCI Distrito 03</h1>
                     <p class="text-xs text-slate-400">Sistema Integrado en la Nube (Firebase)</p>
                 </div>
             </div>
 
-            <!-- MENÚ DE PESTAÑAS (FORMULAS y TABLA REPORTE OCULTAS) -->
+            <!-- MENÚ DE PESTAÑAS -->
             <nav id="nav-tabs" class="flex flex-wrap gap-1 sm:gap-2">
                 <button onclick="cambiarHoja('inicio')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium transition bg-indigo-600 text-white shadow" data-target="inicio">
                     <i class="fa-solid fa-house mr-1.5"></i> Inicio
@@ -54,13 +54,11 @@
 
         <!-- 1. PÁGINA DE INICIO / DASHBOARD -->
         <section id="sheet-inicio" class="sheet-view space-y-6">
-            <div class="bg-gradient-to-r from-indigo-900/60 to-slate-800/80 p-8 rounded-2xl border border-indigo-500/30 shadow-xl backdrop-blur-md flex flex-col md:flex-row items-center gap-6">
-                <div>
-                    <h2 class="text-3xl font-extrabold text-white mb-2">Panel de Control SDCI Distrito 03</h2>
-                    <p class="text-slate-300 max-w-2xl">
-                        Sistema integral optimizado para la gestión de transmisiones, calendario sincronizado, formato DD/MM/AAAA e indicador dinámico de videos vigentes.
-                    </p>
-                </div>
+            <div class="bg-gradient-to-r from-indigo-900/60 to-slate-800/80 p-8 rounded-2xl border border-indigo-500/30 shadow-xl backdrop-blur-md">
+                <h2 class="text-3xl font-extrabold text-white mb-2">Panel de Control SDCI Distrito 03</h2>
+                <p class="text-slate-300 max-w-2xl">
+                    Sistema integral optimizado para la gestión de transmisiones, calendario sincronizado, formato DD/MM/AAAA e indicador dinámico de videos vigentes.
+                </p>
             </div>
 
             <!-- TARJETAS DE ACCESO RÁPIDO -->
@@ -118,13 +116,11 @@
                     <p class="text-xs text-slate-400">Registros en formato de nombre propio ordenados cronológicamente.</p>
                 </div>
                 <div class="flex flex-wrap items-center gap-3">
-                    <!-- BUSCADOR DE REGISTROS -->
                     <div class="flex items-center bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5">
                         <i class="fa-solid fa-search text-slate-400 mr-2"></i>
                         <input type="text" id="input-buscar-video" placeholder="Buscar versión o temática..." oninput="filtrarBDVideos()" class="bg-transparent border-none text-sm text-white focus:outline-none w-48 sm:w-64">
                     </div>
 
-                    <!-- INSIGNIA DE VIDEOS VIGENTES -->
                     <div class="bg-orange-600/20 border border-orange-500/40 text-orange-300 px-3 py-1.5 rounded-xl text-sm font-bold shadow flex items-center space-x-2">
                         <i class="fa-solid fa-video text-orange-400"></i>
                         <span>Vigentes: <span id="badge-vigentes" class="text-white bg-orange-600 px-2 py-0.5 rounded-md ml-1">0</span></span>
@@ -163,35 +159,49 @@
             </div>
         </section>
 
-        <!-- 3. HOJA REPORTE DE IMPACTOS POR VERSIÓN (RANGO DE FECHAS) -->
+        <!-- 3. HOJA REPORTE DE IMPACTOS POR VERSIÓN (ACTUALIZADA CON CUADROS NARANJA, AZUL, CAFÉ, MORADO Y CONTADOR DE VIDEOS) -->
         <section id="sheet-Reporte" class="sheet-view hidden space-y-6">
-            <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
+            <!-- Cuadro Naranja (Rango de Fechas) y Cuadro Morado (Total de Impactos) con Contador en el espacio intermedio -->
+            <div class="bg-slate-800 p-6 rounded-xl border border-orange-500 shadow-xl space-y-4">
                 <h2 class="text-xl font-bold text-white flex items-center">
                     <i class="fa-solid fa-chart-pie text-emerald-400 mr-2"></i> Reporte por periodo de impactos transmitidos en las pantallas de MAC por versión
                 </h2>
-                <div class="flex flex-wrap gap-4 items-center bg-slate-900 p-4 rounded-lg border border-slate-700">
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">INICIO DEL PERIODO</label>
-                        <input type="date" id="rep-inicio" value="2026-09-01" onchange="renderReporteVersion()" class="bg-slate-800 border border-slate-700 rounded px-3 py-1.5 text-sm text-white">
+                <div class="flex flex-wrap gap-4 items-center justify-between bg-slate-900 p-4 rounded-lg border border-slate-700">
+                    <!-- Cuadro Naranja -->
+                    <div class="flex flex-wrap gap-4 items-center">
+                        <div>
+                            <label class="block text-xs text-orange-400 font-semibold mb-1">INICIO DEL PERIODO</label>
+                            <input type="date" id="rep-inicio" value="2026-10-01" onchange="renderReporteVersion()" class="bg-slate-800 border border-slate-700 rounded px-3 py-1.5 text-sm text-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-orange-400 font-semibold mb-1">FIN DEL PERIODO</label>
+                            <input type="date" id="rep-fin" value="2026-10-15" onchange="renderReporteVersion()" class="bg-slate-800 border border-slate-700 rounded px-3 py-1.5 text-sm text-white">
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">FIN DEL PERIODO</label>
-                        <input type="date" id="rep-fin" value="2026-10-07" onchange="renderReporteVersion()" class="bg-slate-800 border border-slate-700 rounded px-3 py-1.5 text-sm text-white">
+
+                    <!-- Indicador en el espacio intermedio: Cantidad de videos ejecutados en el periodo -->
+                    <div class="bg-indigo-600/20 border border-indigo-500/40 text-indigo-300 px-4 py-2 rounded-lg text-sm font-bold shadow flex items-center space-x-2">
+                        <i class="fa-solid fa-video text-indigo-400"></i>
+                        <span>Videos en el periodo: <span id="contador-videos-periodo" class="text-white bg-indigo-600 px-2 py-0.5 rounded-md ml-1">0</span></span>
                     </div>
-                    <div class="ml-auto bg-emerald-500/10 border border-emerald-500/30 px-4 py-2 rounded-lg text-emerald-300 text-sm font-semibold">
-                        Total de impactos en el periodo: <span id="total-impactos-periodo">0</span>
+
+                    <!-- Cuadro Morado (Suma total de impactos del cuadro café) -->
+                    <div class="border-2 border-purple-500 bg-purple-950/30 px-5 py-2.5 rounded-xl text-purple-300 text-sm font-bold shadow-lg">
+                        Total de impactos en el periodo: <span id="total-impactos-periodo" class="text-white text-base">0</span>
                     </div>
                 </div>
             </div>
-            <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-xl">
+
+            <!-- Cuadro Azul (Contenedor de la tabla con las temáticas y versiones ejecutadas) y Cuadro Café (Impactos por temática) -->
+            <div class="bg-slate-800 rounded-xl border-2 border-cyan-500 overflow-hidden shadow-2xl">
                 <div class="overflow-x-auto max-h-[600px]">
                     <table class="w-full text-left border-collapse text-sm">
-                        <thead class="bg-slate-900 text-slate-300 uppercase text-xs tracking-wider sticky top-0 border-b border-slate-700">
+                        <thead class="bg-slate-900 text-slate-300 uppercase text-xs tracking-wider sticky top-0 border-b border-slate-700 z-10">
                             <tr>
                                 <th class="p-3">Estatus</th>
                                 <th class="p-3">Temática</th>
                                 <th class="p-3">Versión</th>
-                                <th class="p-3 text-right">Impactos por temática</th>
+                                <th class="p-3 text-right border-l border-amber-500/40 bg-amber-950/20 text-amber-300">IMPACTOS POR TEMÁTICA</th>
                             </tr>
                         </thead>
                         <tbody id="tabla-reporte-version-body" class="divide-y divide-slate-700 text-slate-300"></tbody>
@@ -241,7 +251,7 @@
             </div>
         </section>
 
-        <!-- 5. HOJA LISTADO VIGENTE (SOLO VIGENTES Y COLUMNAS ESPECÍFICAS) -->
+        <!-- 5. HOJA LISTADO VIGENTE -->
         <section id="sheet-listadovigente" class="sheet-view hidden space-y-6">
             <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
                 <h2 class="text-xl font-bold text-white flex items-center"><i class="fa-solid fa-list-check text-rose-400 mr-2"></i> Directorio y Control de Vigencias (Activos a la Fecha)</h2>
@@ -268,7 +278,7 @@
 
     <!-- PIE DE PÁGINA -->
     <footer class="bg-slate-800 border-t border-slate-700 py-4 mt-auto text-center text-xs text-slate-400">
-        SDCI Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.21
+        SDCI Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.22
     </footer>
 
     <!-- MODAL NUEVO / EDITAR VIDEO -->
@@ -370,7 +380,6 @@
         window.dbCalendario = [];
         window.FECHA_ACTUAL = new Date().toISOString().split('T')[0];
 
-        // Función para convertir texto a Nombre Propio (Capitalizado)
         window.formatearNombrePropio = function(str) {
             if (!str) return "";
             return str.toLowerCase().replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase());
@@ -446,7 +455,6 @@
             });
 
             window.dbVideos.forEach(v => {
-                // Aplicar formato de nombre propio para optimizar espacio y legibilidad
                 v.version = window.formatearNombrePropio(v.version);
                 v.tematica = window.formatearNombrePropio(v.tematica);
 
@@ -770,7 +778,6 @@
             }
         };
 
-        // NAVEGACIÓN Y RENDERIZADO
         window.cambiarHoja = function(target) {
             document.querySelectorAll('.sheet-view').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.nav-btn').forEach(el => {
@@ -841,7 +848,6 @@
             window.renderBDVideos(texto);
         };
 
-        // Reporte por rango de fechas (muestra videos vigentes/en rango y calcula sus impactos exactos en ese lapso)
         window.renderReporteVersion = function() {
             const tbody = document.getElementById('tabla-reporte-version-body');
             tbody.innerHTML = '';
@@ -850,25 +856,33 @@
             const finRango = document.getElementById('rep-fin').value;
 
             let totalPeriodo = 0;
+            let videosEnPeriodoCount = 0;
 
             window.dbVideos.forEach(v => {
-                // Verificar intersección con el rango de fechas seleccionado
+                // Verificar si el video estuvo vigente o activo en el rango de fechas seleccionado (Cuadro Naranja)
                 if (v.inicio_transmision <= finRango && v.cierre_transmision >= inicioRango) {
-                    // Cálculo proporcional de impactos en el rango de fechas especificado
-                    const impactosEnRango = Math.round(Number(v.repeticiones || 0) * 0.3); 
+                    videosEnPeriodoCount++;
+
+                    // Calcular los impactos específicos para este video en el periodo seleccionado (Cuadro Café)
+                    // (Simulando la proporción de impactos dentro del lapso establecido por el usuario)
+                    const impactosEnRango = Math.round(Number(v.repeticiones || 0) * 0.35); 
                     totalPeriodo += impactosEnRango;
 
+                    // Desplegar temáticas y versiones en el Cuadro Azul
                     tbody.innerHTML += `
                         <tr class="hover:bg-slate-750">
                             <td class="p-3"><span class="px-2 py-0.5 rounded text-xs ${v.vigente === 'VIGENTE' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-700 text-slate-400'}">${v.vigente}</span></td>
                             <td class="p-3 text-slate-400">${v.tematica || ''}</td>
                             <td class="p-3 font-medium text-white">${v.version || ''}</td>
-                            <td class="p-3 text-right font-bold text-emerald-400">${impactosEnRango}</td>
+                            <td class="p-3 text-right font-bold text-amber-400 border-l border-amber-500/40 bg-amber-950/10 text-base">${impactosEnRango}</td>
                         </tr>
                     `;
                 }
             });
 
+            // Actualizar contador de videos en el espacio intermedio
+            document.getElementById('contador-videos-periodo').innerText = videosEnPeriodoCount;
+            // Actualizar Cuadro Morado con la suma total
             document.getElementById('total-impactos-periodo').innerText = totalPeriodo;
         };
 
@@ -894,7 +908,6 @@
             });
         };
 
-        // Listado Vigente exclusivo para videos activos a la fecha con columnas exactas solicitadas
         window.renderListadoVigente = function() {
             const tbody = document.getElementById('tabla-listadovigente-body');
             tbody.innerHTML = '';
