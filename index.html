@@ -71,33 +71,34 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <!-- Tarjeta 1 -->
-                <div class="bg-slate-800/80 backdrop-blur-sm p-6 rounded-2xl border border-indigo-500/30 shadow-lg relative overflow-hidden">
-                    <div class="absolute right-0 top-0 opacity-10 text-indigo-500 text-7xl -mr-4 -mt-4"><i class="fa-solid fa-film"></i></div>
+                <!-- Tarjeta 1 (Click a BD_Videos) -->
+                <div onclick="cambiarHoja('BD_Videos')" class="bg-slate-800/80 backdrop-blur-sm p-6 rounded-2xl border border-indigo-500/30 shadow-lg relative overflow-hidden cursor-pointer hover:-translate-y-1 hover:shadow-indigo-500/20 transition-all group">
+                    <div class="absolute right-0 top-0 opacity-10 text-indigo-500 text-7xl -mr-4 -mt-4 group-hover:scale-110 transition"><i class="fa-solid fa-film"></i></div>
                     <h3 class="text-slate-400 text-sm font-bold uppercase tracking-wider mb-1">Total en Catálogo</h3>
                     <div class="text-4xl font-black text-indigo-400" id="dash-total-videos">0</div>
-                    <div class="mt-4 text-xs font-medium text-slate-500 flex items-center"><i class="fa-solid fa-circle-check text-emerald-400 mr-1.5"></i> Base de datos sincronizada</div>
+                    <div class="mt-4 text-xs font-medium text-slate-500 flex items-center"><i class="fa-solid fa-arrow-right text-indigo-400 mr-1.5"></i> Ir a BD_Videos</div>
                 </div>
-                <!-- Tarjeta 2 -->
-                <div class="bg-slate-800/80 backdrop-blur-sm p-6 rounded-2xl border border-emerald-500/30 shadow-lg relative overflow-hidden">
-                    <div class="absolute right-0 top-0 opacity-10 text-emerald-500 text-7xl -mr-4 -mt-4"><i class="fa-solid fa-tower-broadcast"></i></div>
+                <!-- Tarjeta 2 (Click a Videos Activos) -->
+                <div onclick="cambiarHoja('listadovigente')" class="bg-slate-800/80 backdrop-blur-sm p-6 rounded-2xl border border-emerald-500/30 shadow-lg relative overflow-hidden cursor-pointer hover:-translate-y-1 hover:shadow-emerald-500/20 transition-all group">
+                    <div class="absolute right-0 top-0 opacity-10 text-emerald-500 text-7xl -mr-4 -mt-4 group-hover:scale-110 transition"><i class="fa-solid fa-tower-broadcast"></i></div>
                     <h3 class="text-slate-400 text-sm font-bold uppercase tracking-wider mb-1">Transmitiendo Hoy</h3>
                     <div class="text-4xl font-black text-emerald-400" id="dash-videos-vigentes">0</div>
-                    <div class="mt-4 text-xs font-medium text-slate-500 flex items-center"><i class="fa-solid fa-play text-emerald-400 mr-1.5"></i> Videos activos en pantallas</div>
+                    <div class="mt-4 text-xs font-medium text-slate-500 flex items-center"><i class="fa-solid fa-arrow-right text-emerald-400 mr-1.5"></i> Ver Activos</div>
                 </div>
-                <!-- Tarjeta 3 -->
-                <div class="bg-slate-800/80 backdrop-blur-sm p-6 rounded-2xl border border-amber-500/30 shadow-lg relative overflow-hidden">
-                    <div class="absolute right-0 top-0 opacity-10 text-amber-500 text-7xl -mr-4 -mt-4"><i class="fa-solid fa-umbrella-beach"></i></div>
+                <!-- Tarjeta 3 (Click a Calendario) -->
+                <div onclick="cambiarHoja('Calendario')" class="bg-slate-800/80 backdrop-blur-sm p-6 rounded-2xl border border-amber-500/30 shadow-lg relative overflow-hidden cursor-pointer hover:-translate-y-1 hover:shadow-amber-500/20 transition-all group">
+                    <div class="absolute right-0 top-0 opacity-10 text-amber-500 text-7xl -mr-4 -mt-4 group-hover:scale-110 transition"><i class="fa-solid fa-umbrella-beach"></i></div>
                     <h3 class="text-slate-400 text-sm font-bold uppercase tracking-wider mb-1">Días Inhábiles</h3>
                     <div class="text-4xl font-black text-amber-400" id="dash-total-festivos">0</div>
-                    <div class="mt-4 text-xs font-medium text-slate-500 flex items-center"><i class="fa-solid fa-calendar-xmark text-amber-400 mr-1.5"></i> Descansos programados</div>
+                    <div class="mt-4 text-xs font-medium text-slate-500 flex items-center"><i class="fa-solid fa-arrow-right text-amber-400 mr-1.5"></i> Configurar Calendario</div>
                 </div>
-                <!-- Tarjeta 4 -->
+                <!-- Tarjeta 4 (Impactos Acumulados por Año) -->
                 <div class="bg-slate-800/80 backdrop-blur-sm p-6 rounded-2xl border border-rose-500/30 shadow-lg relative overflow-hidden">
                     <div class="absolute right-0 top-0 opacity-10 text-rose-500 text-7xl -mr-4 -mt-4"><i class="fa-solid fa-bolt"></i></div>
                     <h3 class="text-slate-400 text-sm font-bold uppercase tracking-wider mb-1">Impactos Acumulados</h3>
-                    <div class="text-4xl font-black text-rose-400" id="dash-total-impactos">0</div>
-                    <div class="mt-4 text-xs font-medium text-slate-500 flex items-center"><i class="fa-solid fa-chart-line text-rose-400 mr-1.5"></i> Suma global de repeticiones</div>
+                    <div class="text-2xl font-black text-rose-400 mb-2 border-b border-rose-500/20 pb-2">Global: <span id="dash-total-impactos">0</span></div>
+                    <!-- Lista por años generada por JS -->
+                    <div id="dash-impactos-anos" class="space-y-1 max-h-24 overflow-y-auto pr-1"></div>
                 </div>
             </div>
         </section>
@@ -109,7 +110,7 @@
                     <h2 class="text-xl font-bold text-white flex items-center">
                         <i class="fa-solid fa-database text-indigo-400 mr-2"></i> BD_Videos (Catálogo Oficial)
                     </h2>
-                    <p class="text-xs text-slate-400">Panel central de administración de registros.</p>
+                    <p class="text-xs text-slate-400">Los impactos y días en tabla reflejan el acumulado hasta el día de hoy.</p>
                 </div>
                 <div class="flex flex-wrap items-center gap-3">
                     <div class="flex items-center bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5">
@@ -169,11 +170,11 @@
                     <div class="flex flex-wrap gap-4 items-center">
                         <div>
                             <label class="block text-xs text-orange-400 font-semibold mb-1">INICIO PERIODO</label>
-                            <input type="date" id="rep-inicio" onchange="renderReporteVersion()" class="bg-slate-800 border border-slate-700 rounded px-3 py-1.5 text-sm text-white">
+                            <input type="date" id="rep-inicio" value="2025-01-01" onchange="renderReporteVersion()" class="bg-slate-800 border border-slate-700 rounded px-3 py-1.5 text-sm text-white">
                         </div>
                         <div>
                             <label class="block text-xs text-orange-400 font-semibold mb-1">FIN PERIODO</label>
-                            <input type="date" id="rep-fin" onchange="renderReporteVersion()" class="bg-slate-800 border border-slate-700 rounded px-3 py-1.5 text-sm text-white">
+                            <input type="date" id="rep-fin" value="2026-12-31" onchange="renderReporteVersion()" class="bg-slate-800 border border-slate-700 rounded px-3 py-1.5 text-sm text-white">
                         </div>
                     </div>
                     <div class="bg-indigo-600/20 border border-indigo-500/40 text-indigo-300 px-4 py-2 rounded-lg text-sm font-bold shadow flex items-center">
@@ -276,7 +277,7 @@
 
     <!-- PIE DE PÁGINA -->
     <footer class="bg-slate-800 border-t border-slate-700 py-4 mt-auto text-center text-xs text-slate-400">
-        SDCI Distrito 03 © 2026 - Versión 1.0.33
+        SDCI Distrito 03 © 2026 - Versión 1.0.34
     </footer>
 
     <!-- MODAL DE ADMINISTRACIÓN Y BACKUPS -->
@@ -449,7 +450,7 @@
         window.indiceEditandoVideo = -1;
         window.listaNavegacionVideo = [];
 
-        // FECHAS Y DÍAS LABORABLES
+        // FUNCIONES DE FECHAS
         window.formatearFechaDDMMYYYY = function(fechaStr) {
             if (!fechaStr) return "";
             if (fechaStr.includes('/')) return fechaStr;
@@ -475,13 +476,12 @@
             return 30;
         };
 
-        // Lógica actualizada: Sábados activos por defecto, Domingos descansa (salvo en adicionales).
         window.esDiaLaborable = function(fStr, festivosSet, adicionalesSet) {
             if (festivosSet.has(fStr) && !adicionalesSet.has(fStr)) return false;
             const [y, m, d] = fStr.split('-').map(Number);
             const fObj = new Date(y, m - 1, d);
-            if (fObj.getDay() === 0) return adicionalesSet.has(fStr); // Domingo
-            return true; // Lunes a Sábado siempre laborables (si no están en festivosSet)
+            if (fObj.getDay() === 0) return adicionalesSet.has(fStr); // Domingo inhábil por defecto
+            return true; // Sábados siempre laborables
         };
 
         window.procesarCalculosBDVideos = function() {
@@ -497,17 +497,21 @@
 
                 let festivosEnRango = 0, diasTransmisionCount = 0, repeticionesAcumuladas = 0;
                 let curr = new Date(inicio);
+                
                 while (curr <= cierre) {
                     let fStr = `${curr.getFullYear()}-${String(curr.getMonth() + 1).padStart(2, '0')}-${String(curr.getDate()).padStart(2, '0')}`;
 
                     if (festivosSet.has(fStr) && !adicionalesSet.has(fStr)) festivosEnRango++;
 
                     if (window.esDiaLaborable(fStr, festivosSet, adicionalesSet)) {
-                        diasTransmisionCount++;
-                        let lim = (v.vigente === "FINALIZADO") ? cierre : (hoy < cierre ? hoy : cierre);
-                        if (curr <= lim) {
+                        // LA LÓGICA ESTRELLA: Solo cuenta días e impactos hasta HOY o hasta el CIERRE (si finalizado).
+                        let limiteCalculo = (v.vigente === "FINALIZADO") ? cierre : (hoy < cierre ? hoy : cierre);
+                        
+                        if (curr <= limiteCalculo) {
+                            diasTransmisionCount++;
                             let videosActivosHoy = window.dbVideos.filter(vid => fStr >= vid.inicio_transmision && fStr <= vid.cierre_transmision);
                             let sumaSegundosHoy = videosActivosHoy.reduce((acc, vid) => acc + window.duracionASegundos(vid.duracion), 0);
+                            
                             if (sumaSegundosHoy > 0) {
                                 let durSeg = window.duracionASegundos(v.duracion);
                                 repeticionesAcumuladas += (3600 / sumaSegundosHoy) * 7 * (durSeg / 60);
@@ -516,11 +520,13 @@
                     }
                     curr.setDate(curr.getDate() + 1);
                 }
+                
                 v.festivos = festivosEnRango;
                 v.dias_transmision = diasTransmisionCount;
                 v.repeticiones = isNaN(repeticionesAcumuladas) ? 0 : repeticionesAcumuladas;
             });
 
+            // Reordenamiento
             window.dbVideos.sort((a, b) => {
                 let vA = a[window.criterioOrdenActual] || "", vB = b[window.criterioOrdenActual] || "";
                 if (window.criterioOrdenActual === 'id_video') return window.ordenAscendente ? String(vA).localeCompare(String(vB), undefined, {numeric: true}) : String(vB).localeCompare(String(vA), undefined, {numeric: true});
@@ -529,7 +535,7 @@
                 if (vA > vB) return window.ordenAscendente ? 1 : -1;
                 return 0;
             });
-            window.listaNavegacionVideo = [...window.dbVideos]; // Para flechas ant/sig
+            window.listaNavegacionVideo = [...window.dbVideos];
         };
 
         window.confirmarDoble = function(mensaje, callback) {
@@ -562,13 +568,32 @@
             let festivos = window.dbCalendario.filter(c => c.tipo === 'festivo').length;
             let impactosGlobales = Math.round(window.dbVideos.reduce((a,b)=>a+(b.repeticiones||0),0));
 
-            // Dashboard
+            // Actualización Dashboard principal
             document.getElementById('dash-total-videos').innerText = total;
             document.getElementById('dash-videos-vigentes').innerText = vigentes;
             document.getElementById('dash-total-festivos').innerText = festivos;
-            document.getElementById('dash-total-impactos').innerText = impactosGlobales;
+            document.getElementById('dash-total-impactos').innerText = impactosGlobales.toLocaleString();
             document.getElementById('contador-videos-nav').innerText = total;
             document.getElementById('badge-vigentes').innerText = vigentes;
+
+            // Procesar impactos acumulados por Año para tarjeta del Dashboard
+            let statsPorAno = {};
+            window.dbVideos.forEach(v => {
+                let ano = v.inicio_transmision ? v.inicio_transmision.substring(0, 4) : 'S/A';
+                if(!statsPorAno[ano]) statsPorAno[ano] = { videos: 0, impactos: 0 };
+                statsPorAno[ano].videos++;
+                statsPorAno[ano].impactos += (v.repeticiones || 0);
+            });
+
+            let htmlAnos = '';
+            Object.keys(statsPorAno).sort().forEach(ano => {
+                htmlAnos += `
+                    <div class="flex justify-between items-center text-xs border-b border-rose-500/20 py-1.5">
+                        <span class="text-slate-300 font-medium">${ano} <span class="text-slate-500 ml-1">(${statsPorAno[ano].videos} videos)</span></span>
+                        <span class="text-rose-400 font-bold">${Math.round(statsPorAno[ano].impactos).toLocaleString()} imp</span>
+                    </div>`;
+            });
+            document.getElementById('dash-impactos-anos').innerHTML = htmlAnos;
 
             window.renderBDVideos();
             window.renderReporteVersion();
@@ -576,6 +601,7 @@
             window.renderListadoVigente();
         };
 
+        // RENDER BD VIDEOS
         window.renderBDVideos = function() {
             const txt = document.getElementById('input-buscar-video').value.toLowerCase();
             const tbody = document.getElementById('tabla-bd-videos-body');
@@ -593,7 +619,7 @@
                         <td class="p-3 font-mono">${window.formatearFechaDDMMYYYY(v.cierre_transmision)}</td>
                         <td class="p-3 text-center">${v.festivos}</td>
                         <td class="p-3 text-center font-bold text-indigo-300">${v.dias_transmision}</td>
-                        <td class="p-3 text-center font-bold text-emerald-400">${Math.round(v.repeticiones)}</td>
+                        <td class="p-3 text-center font-bold text-emerald-400">${Math.round(v.repeticiones).toLocaleString()}</td>
                         <td class="p-3 text-center"><span class="px-2 py-0.5 rounded text-[11px] font-semibold ${v.vigente === 'VIGENTE' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-slate-700 text-slate-400'}">${v.vigente}</span></td>
                         <td class="p-3 text-center space-x-2">
                             <button onclick="editarVideo('${v.idDoc}')" class="text-indigo-400 hover:text-indigo-300"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -603,6 +629,96 @@
             });
         };
 
+        // FÓRMULA COMPLETA DE REPORTE DE IMPACTOS RESTAURADA
+        window.calcularImpactosRangoUsuario = function(v, inicioRangoStr, finRangoStr, festivosSet, adicionalesSet) {
+            let inicioRango = new Date(inicioRangoStr + "T00:00:00");
+            let finRango = new Date(finRangoStr + "T00:00:00");
+            let inicioProg = new Date(v.inicio_transmision + "T00:00:00");
+            let cierreProg = new Date(v.cierre_transmision + "T00:00:00");
+
+            let inicioEfectivo = inicioRango > inicioProg ? inicioRango : inicioProg;
+            let finEfectivo = finRango < cierreProg ? finRango : cierreProg;
+
+            if (inicioEfectivo > finEfectivo) return 0;
+
+            let impactosRango = 0;
+            let curr = new Date(inicioEfectivo);
+            while (curr <= finEfectivo) {
+                let yyyy = curr.getFullYear();
+                let mm = String(curr.getMonth() + 1).padStart(2, '0');
+                let dd = String(curr.getDate()).padStart(2, '0');
+                let fStr = `${yyyy}-${mm}-${dd}`;
+
+                let laborable = window.esDiaLaborable(fStr, festivosSet, adicionalesSet);
+                if (laborable) {
+                    let videosActivosHoy = window.dbVideos.filter(vid => fStr >= vid.inicio_transmision && fStr <= vid.cierre_transmision);
+                    let sumaSegundosHoy = videosActivosHoy.reduce((acc, vid) => acc + window.duracionASegundos(vid.duracion), 0);
+
+                    if (sumaSegundosHoy > 0) {
+                        let durSeg = window.duracionASegundos(v.duracion);
+                        let repDia = (3600 / sumaSegundosHoy) * 7 * (durSeg / 60);
+                        impactosRango += repDia;
+                    }
+                }
+                curr.setDate(curr.getDate() + 1);
+            }
+            return Math.round(impactosRango);
+        };
+
+        window.renderReporteVersion = function() {
+            const tbody = document.getElementById('tabla-reporte-version-body');
+            tbody.innerHTML = '';
+            
+            const inicioRango = document.getElementById('rep-inicio').value;
+            const finRango = document.getElementById('rep-fin').value;
+            if(!inicioRango || !finRango) return;
+
+            const festivosSet = new Set(window.dbCalendario.filter(c => c.tipo === 'festivo').map(c => c.fecha));
+            const adicionalesSet = new Set(window.dbCalendario.filter(c => c.tipo === 'adicional').map(c => c.fecha));
+
+            let totalPeriodo = 0;
+            let videosEnPeriodoCount = 0;
+
+            window.dbVideos.forEach(v => {
+                if (v.inicio_transmision <= finRango && v.cierre_transmision >= inicioRango) {
+                    videosEnPeriodoCount++;
+                    const impactosEnRango = window.calcularImpactosRangoUsuario(v, inicioRango, finRango, festivosSet, adicionalesSet);
+                    totalPeriodo += impactosEnRango;
+
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-750">
+                            <td class="p-3"><span class="px-2 py-0.5 rounded text-[11px] ${v.vigente === 'VIGENTE' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-700 text-slate-400'}">${v.vigente}</span></td>
+                            <td class="p-3 text-slate-400">${v.tematica || ''}</td>
+                            <td class="p-3 font-medium text-white">${v.version || ''}</td>
+                            <td class="p-3 text-right font-bold text-amber-400 border-l border-amber-500/40 bg-amber-950/10 text-base">${impactosEnRango.toLocaleString()}</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            document.getElementById('contador-videos-periodo').innerText = videosEnPeriodoCount;
+            document.getElementById('total-impactos-periodo').innerText = totalPeriodo.toLocaleString();
+        };
+
+        // RENDER VIDEOS ACTIVOS RESTAURADA
+        window.renderListadoVigente = function() {
+            const tbody = document.getElementById('tabla-listadovigente-body');
+            tbody.innerHTML = '';
+            const vigentesList = window.dbVideos.filter(v => v.vigente === 'VIGENTE');
+
+            vigentesList.forEach(v => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-750">
+                        <td class="p-3 font-bold text-indigo-400">${v.id_video}</td>
+                        <td class="p-3 font-medium text-white">${v.version}</td>
+                        <td class="p-3 text-slate-400">${v.tematica}</td>
+                        <td class="p-3 text-center font-mono">${v.dias_transmision || 0}</td>
+                        <td class="p-3 text-right font-bold text-emerald-400">${Math.round(v.repeticiones || 0).toLocaleString()}</td>
+                    </tr>`;
+            });
+        };
+
+        // RENDER CALENDARIO
         window.renderCalendario = function() {
             const festivosList = window.dbCalendario.filter(c => c.tipo === 'festivo').sort((a,b) => a.fecha.localeCompare(b.fecha));
             const adicionalesList = window.dbCalendario.filter(c => c.tipo === 'adicional').sort((a,b) => a.fecha.localeCompare(b.fecha));
@@ -616,10 +732,6 @@
             const bA = document.getElementById('tabla-adicionales-body'); bA.innerHTML = '';
             adicionalesList.forEach(c => bA.innerHTML += `<tr class="hover:bg-slate-750"><td class="p-3 font-mono text-emerald-300">${window.formatearFechaDDMMYYYY(c.fecha)}</td><td class="p-3 capitalize text-emerald-400">${window.obtenerDiaSemana(c.fecha)}</td><td class="p-3">${c.descripcion}</td><td class="p-3 text-center space-x-2"><button onclick="editarDia('${c.idDoc}')" class="text-indigo-400 hover:text-indigo-300"><i class="fa-solid fa-pen"></i></button><button onclick="eliminarDia('${c.idDoc}')" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-trash"></i></button></td></tr>`);
         };
-
-        // ... Resto de renders simplificados para espacio
-        window.renderReporteVersion = function() { document.getElementById('rep-inicio').value; /* la lógica permanece igual */ };
-        window.renderListadoVigente = function() { /* la lógica permanece igual */ };
 
         // MODAL VIDEO Y REORDEN
         window.abrirModalVideo = function() {
@@ -767,7 +879,74 @@
             document.getElementById(`sheet-${target}`).classList.remove('hidden');
             const btn = document.querySelector(`.nav-btn[data-target="${target}"]`);
             if (btn) { btn.classList.remove('bg-slate-700', 'text-slate-300'); btn.classList.add('bg-indigo-600', 'text-white', 'shadow'); }
-            window.renderizarTodo();
+            
+            if(target === 'Reporte') window.renderReporteVersion(); // Auto-generar reporte al entrar
+        };
+
+        // Importadores (parsean DD/MM/AAAA)
+        window.parsearFechaExcel = function(val) {
+            if (!val) return "2025-01-01";
+            if (typeof val === 'number') {
+                const date = new Date(Math.round((val - (25567 + 2)) * 86400 * 1000));
+                return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
+            }
+            let s = String(val).trim();
+            if (s.includes('/')) {
+                const parts = s.split('/');
+                if (parts.length === 3) {
+                    let y = parts[2].length === 2 ? "20" + parts[2] : parts[2];
+                    return `${y}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+                }
+            } else if (s.includes('-') && s.length >= 10) return s.substring(0, 10);
+            return s;
+        };
+
+        window.subirExcelBDVideos = function() {
+            const input = document.getElementById('file-excel-videos');
+            if (!input.files || input.files.length === 0) { alert("Selecciona un archivo."); return; }
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
+                    const batch = writeBatch(db);
+                    let count = 0;
+                    for (let i = 1; i < rows.length; i++) {
+                        const r = rows[i];
+                        if (!r || r.length === 0 || (!r[0] && !r[1])) continue;
+                        batch.set(doc(collection(db, "bd_videos")), {
+                            id_video: String(r[0] || ""), version: String(r[1] || ""), tematica: String(r[2] || "General"),
+                            duracion: String(r[3] || "00:00:30"), inicio_transmision: window.parsearFechaExcel(r[4]), cierre_transmision: window.parsearFechaExcel(r[5])
+                        });
+                        count++;
+                    }
+                    await batch.commit(); alert(`Importados ${count} videos.`); input.value=''; window.cargarDatosFirebase();
+                } catch(err) { alert("Error procesando Excel."); }
+            };
+            reader.readAsArrayBuffer(input.files[0]);
+        };
+
+        window.subirExcelFestivos = function(tipo) {
+            const input = document.getElementById(tipo === 'festivo' ? 'file-excel-festivos' : 'file-excel-adicionales');
+            if (!input.files || input.files.length === 0) return;
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
+                    const batch = writeBatch(db);
+                    let count = 0;
+                    for (let i = 1; i < rows.length; i++) {
+                        if (!rows[i] || !window.parsearFechaExcel(rows[i][0])) continue;
+                        batch.set(doc(collection(db, "calendario_config")), { tipo: tipo, fecha: window.parsearFechaExcel(rows[i][0]), descripcion: String(rows[i][1] || '') });
+                        count++;
+                    }
+                    await batch.commit(); alert(`Importados ${count} registros.`); input.value=''; window.cargarDatosFirebase();
+                } catch(err) { alert("Error procesando Excel."); }
+            };
+            reader.readAsArrayBuffer(input.files[0]);
         };
 
         // Borrados Masivos
