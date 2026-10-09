@@ -63,7 +63,7 @@
             <div class="bg-gradient-to-r from-indigo-900/60 to-slate-800/80 p-8 rounded-2xl border border-indigo-500/30 shadow-xl backdrop-blur-md">
                 <h2 class="text-3xl font-extrabold text-white mb-2">Panel de Control SDCI Distrito 03</h2>
                 <p class="text-slate-300 max-w-3xl">
-                    Sistema adaptado a pantalla completa para aprovechar todo el ancho del monitor, con etiquetas compactas para maximizar el espacio del nombre de las versiones.
+                    Sistema con corrección exacta de zona horaria para evitar que las fechas de transmisión se desplacen un día al subir los archivos.
                 </p>
             </div>
 
@@ -274,7 +274,7 @@
                         <thead class="bg-slate-900 text-slate-300 uppercase text-xs tracking-wider sticky top-0 border-b border-slate-700">
                             <tr>
                                 <th class="p-3 w-20">ID</th>
-                                <th class="p-3 w-[45]">Nombre de la versión</th>
+                                <th class="p-3 w-[45%]">Nombre de la versión</th>
                                 <th class="p-3 w-[30%]">Temática</th>
                                 <th class="p-3 text-center w-32">Días Transmitidos</th>
                                 <th class="p-3 text-right w-36">Impactos en el periodo</th>
@@ -290,7 +290,7 @@
 
     <!-- PIE DE PÁGINA -->
     <footer class="bg-slate-800 border-t border-slate-700 py-4 mt-auto text-center text-xs text-slate-400">
-        SDCI Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.30
+        SDCI Distrito 03 © 2026 - Diseño realizado por Mario A. Cárdenas Ledezma - Versión 1.0.31
     </footer>
 
     <!-- MODAL DE ADMINISTRACIÓN Y CARGA MASIVA EXCEL -->
@@ -308,7 +308,7 @@
                 <div class="flex flex-wrap justify-between items-center gap-2">
                     <div>
                         <h4 class="font-bold text-indigo-400 text-base">1. Gestión de Catálogo: BD_Videos</h4>
-                        <p class="text-xs text-slate-400">Lectura robusta por posición exacta de columnas.</p>
+                        <p class="text-xs text-slate-400">Lectura robusta por posición exacta de columnas sin desfase de zona horaria.</p>
                     </div>
                     <button onclick="borrarColeccion('bd_videos')" class="bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow transition">
                         <i class="fa-solid fa-trash mr-1.5"></i> Borrar Tabla BD_Videos
@@ -444,7 +444,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PRINCIPAL -->
+    <!-- SCRIPT PRINCIPAL CON CORRECCIÓN EXACTA DE FECHAS (SIN DESFASE) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -469,13 +469,14 @@
         window.criterioOrdenActual = 'id_video';
         window.ordenAscendente = true;
 
+        // Conversor blindado contra desfases de zona horaria (lee exacto AAAA-MM-DD o DD/MM/AAAA)
         window.parsearFechaExcel = function(val) {
             if (!val) return "2025-01-01";
             if (typeof val === 'number') {
                 const date = new Date(Math.round((val - (25567 + 2)) * 86400 * 1000));
-                let y = date.getFullYear();
-                let m = String(date.getMonth() + 1).padStart(2, '0');
-                let d = String(date.getDate()).padStart(2, '0');
+                let y = date.getUTCFullYear();
+                let m = String(date.getUTCMonth() + 1).padStart(2, '0');
+                let d = String(date.getUTCDate()).padStart(2, '0');
                 return `${y}-${m}-${d}`;
             }
             let s = String(val).trim();
@@ -488,6 +489,9 @@
                     if (y.length === 2) y = "20" + y;
                     return `${y}-${m}-${d}`;
                 }
+            } else if (s.includes('-') && s.length >= 10) {
+                // Asegurar formato limpio YYYY-MM-DD sin alterar por hora local
+                return s.substring(0, 10);
             }
             return s;
         };
@@ -1054,7 +1058,6 @@
 
         window.abrirModalCalendario = function() {
             document.getElementById('form-calendario').reset();
-            document.getElementById('modal-calendario').classList.add('hidden'); // bugfix
             document.getElementById('modal-calendario').classList.remove('hidden');
         };
 
