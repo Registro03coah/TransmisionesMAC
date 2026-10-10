@@ -38,9 +38,14 @@
     <main class="flex-grow w-[98%] mx-auto px-2 py-6">
         
         <section id="sheet-BD_Videos" class="sheet-view space-y-6">
-            <div class="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700 shadow">
+            <div class="flex flex-wrap justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700 shadow gap-4">
                 <h2 class="text-xl font-bold text-white"><i class="fa-solid fa-video text-cyan-400"></i> Mi Catálogo de Videos</h2>
-                <button onclick="abrirModalVideo()" class="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded font-bold text-sm shadow"><i class="fa-solid fa-plus"></i> Registrar Nuevo</button>
+                <div class="flex flex-wrap gap-2">
+                    <input type="file" id="csv-file-colab" accept=".csv" class="hidden" onchange="importarCSV(event)">
+                    <button onclick="exportarCSV()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded font-bold text-sm shadow"><i class="fa-solid fa-download"></i> Bajar Excel</button>
+                    <button onclick="document.getElementById('csv-file-colab').click()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-2 rounded font-bold text-sm shadow"><i class="fa-solid fa-upload"></i> Subir Excel</button>
+                    <button onclick="abrirModalVideo()" class="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded font-bold text-sm shadow"><i class="fa-solid fa-plus"></i> Registrar Nuevo</button>
+                </div>
             </div>
             <div class="bg-slate-800 rounded-xl overflow-hidden shadow-lg border border-cyan-900/50">
                 <table class="w-full text-left text-sm">
@@ -152,11 +157,12 @@
         
         if(!COLAB_ID || !DB_SUFFIX) { window.location.href = 'index.html'; }
         
+        // FIX PRINCIPAL PARA LA BASE DE DATOS VIEJA: Si el sufijo es '1', la tabla real era 'bd_videos' sin sufijo.
         document.getElementById('hdr-nombre').innerText = COLAB_NOM;
-        document.getElementById('hdr-sufijo').innerText = `(_${DB_SUFFIX})`;
+        document.getElementById('hdr-sufijo').innerText = DB_SUFFIX === '1' ? '(Base Antigua MAC)' : `(_${DB_SUFFIX})`;
 
-        const COLL_VID = `bd_videos_${DB_SUFFIX}`;
-        const COLL_CAL = `calendario_config_${DB_SUFFIX}`;
+        const COLL_VID = DB_SUFFIX === '1' ? 'bd_videos' : `bd_videos_${DB_SUFFIX}`;
+        const COLL_CAL = DB_SUFFIX === '1' ? 'calendario_config' : `calendario_config_${DB_SUFFIX}`;
         
         window.cfg = { horas: 7, pantallas: 1 };
         window.videos = [];
@@ -287,6 +293,58 @@
         };
         window.guardarCal = async (e) => { e.preventDefault(); await addDoc(collection(db, COLL_CAL), {tipo: document.getElementById('c-tipo').value, fecha: document.getElementById('c-fec').value, descripcion: document.getElementById('c-desc').value}); document.getElementById('modal-cal').classList.add('hidden'); await cargarData(); };
         window.borrarCal = async (id) => { if(confirm("¿Eliminar fecha?")){ await deleteDoc(doc(db, COLL_CAL, id)); await cargarData();} };
+
+        // EXPORTAR / IMPORTAR CSV EN COLABORADOR
+        window.exportarCSV = () => {
+            if(window.videos.length === 0) return alert("No hay videos para exportar.");
+            let csv = "id_video,version,duracion,inicio_transmision,cierre_transmision\n";
+            window.videos.forEach(v => {
+                let i = v.inicio_transmision || v.inicio || "";
+                let f = v.cierre_transmision || v.cierre || "";
+                let id_vid = (v.id_video||"").replace(/,/g, '');
+                let ver = (v.version||"").replace(/,/g, ' ');
+                let dur = (v.duracion||"").replace(/,/g, '');
+                csv += `${id_vid},${ver},${dur},${i},${f}\n`;
+            });
+            let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            let url = window.URL.createObjectURL(blob);
+            let a = document.createElement('a'); a.href = url;
+            a.download = `MisVideos_${DB_SUFFIX}_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        };
+
+        window.importarCSV = async (e) => {
+            let file = e.target.files[0];
+            if(!file) return;
+            
+            if(!confirm(`¿Importar datos desde Excel a tu base? Los videos se agregarán a tu lista actual sin borrar los anteriores.`)) { e.target.value = ''; return; }
+
+            let reader = new FileReader();
+            reader.onload = async function(event) {
+                let text = event.target.result;
+                let rows = text.split('\n');
+                let count = 0;
+                
+                for(let i=1; i<rows.length; i++) {
+                    if(!rows[i].trim()) continue;
+                    let cols = rows[i].split(',');
+                    if(cols.length >= 5) {
+                        await addDoc(collection(db, COLL_VID), {
+                            id_video: cols[0].trim(),
+                            version: cols[1].trim(),
+                            duracion: cols[2].trim(),
+                            inicio_transmision: cols[3].trim(),
+                            cierre_transmision: cols[4].trim()
+                        });
+                        count++;
+                    }
+                }
+                alert(`Éxito: Se subieron ${count} videos nuevos desde Excel.`);
+                e.target.value = '';
+                await cargarData();
+            };
+            reader.readAsText(file);
+        };
 
         window.addEventListener('DOMContentLoaded', init);
     </script>
