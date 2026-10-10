@@ -18,7 +18,7 @@
                 <div class="flex items-center justify-center mt-2 gap-2 text-xs font-bold">
                     <span id="login-conn-dot" class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
                     <span id="login-conn-text" class="text-slate-400">Conectando...</span>
-                    <span class="text-slate-500">| v1.0.38 (Fix)</span>
+                    <span class="text-slate-500">| v1.0.39 (CSV)</span>
                 </div>
             </div>
             
@@ -76,7 +76,7 @@
 
             <nav id="nav-tabs" class="flex flex-wrap gap-2 items-center hidden">
                 <div class="flex items-center px-3 py-1 bg-slate-900 border border-slate-700 rounded-lg text-xs font-bold text-slate-300 mr-2">
-                    <span id="nav-conn-dot" class="w-2 h-2 rounded-full bg-green-500 mr-2 shadow-[0_0_5px_#22c55e]"></span> BD Conectada | v1.0.38
+                    <span id="nav-conn-dot" class="w-2 h-2 rounded-full bg-green-500 mr-2 shadow-[0_0_5px_#22c55e]"></span> BD Conectada | v1.0.39
                 </div>
                 <button onclick="cambiarHoja('inicio')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-indigo-600 text-white" data-target="inicio">Dashboard</button>
                 <button onclick="cambiarHoja('BD_Videos')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-700 text-slate-300" data-target="BD_Videos">Control de Bases</button>
@@ -112,7 +112,12 @@
                          <option value="">Selecciona una base...</option>
                      </select>
                  </div>
-                 <button id="btn-nuevo-video" onclick="abrirModalVideoAdmin()" class="bg-indigo-600 text-white px-4 py-2 rounded font-bold hidden"><i class="fa-solid fa-plus"></i> Agregar Video</button>
+                 <div class="flex gap-2">
+                     <input type="file" id="csv-file-admin" accept=".csv" class="hidden" onchange="importarCSV(event)">
+                     <button id="btn-exportar" onclick="exportarCSV()" class="bg-emerald-600 text-white px-3 py-1.5 rounded font-bold hidden text-sm"><i class="fa-solid fa-download"></i> Bajar Excel</button>
+                     <button id="btn-importar" onclick="document.getElementById('csv-file-admin').click()" class="bg-amber-600 text-white px-3 py-1.5 rounded font-bold hidden text-sm"><i class="fa-solid fa-upload"></i> Subir Excel</button>
+                     <button id="btn-nuevo-video" onclick="abrirModalVideoAdmin()" class="bg-indigo-600 text-white px-3 py-1.5 rounded font-bold hidden text-sm"><i class="fa-solid fa-plus"></i> Nuevo</button>
+                 </div>
              </div>
              
              <div class="bg-slate-800 rounded-xl overflow-hidden shadow-lg">
@@ -268,8 +273,13 @@
                 document.getElementById('pantalla-login').classList.add('hidden');
                 document.getElementById('nav-tabs').classList.remove('hidden');
                 document.getElementById('nav-admin').classList.remove('hidden');
+                
+                // Mostrar botones de Admin DB
                 document.getElementById('btn-nuevo-video').classList.remove('hidden');
+                document.getElementById('btn-exportar').classList.remove('hidden');
+                document.getElementById('btn-importar').classList.remove('hidden');
                 document.getElementById('col-accion-video').classList.remove('hidden');
+                
                 window.cambiarHoja('inicio');
                 llenarSelectDBAdmin();
             } else { alert("Clave incorrecta"); }
@@ -336,7 +346,7 @@
 
         window.llenarSelectDBAdmin = () => {
             let s = '<option value="">Selecciona base a editar...</option>';
-            window.usuariosApp.forEach(u => s += `<option value="${u.db_suffix}">Base de: ${u.nombre} (bd_videos_${u.db_suffix})</option>`);
+            window.usuariosApp.forEach(u => s += `<option value="${u.db_suffix}">Base de: ${u.nombre} (${u.db_suffix==='1'?'bd_videos':'bd_videos_'+u.db_suffix})</option>`);
             document.getElementById('admin-select-db').innerHTML = s;
         };
 
@@ -345,13 +355,14 @@
             const tb = document.getElementById('tabla-bd-videos-body'); tb.innerHTML='';
             if(!sufijo) return;
             
-            const snap = await getDocs(collection(db, `bd_videos_${sufijo}`));
+            let colName = sufijo === '1' ? 'bd_videos' : `bd_videos_${sufijo}`;
+            const snap = await getDocs(collection(db, colName));
             window.videosEdit = [];
             snap.forEach(d => {
                 let v = {idDoc: d.id, ...d.data()};
                 window.videosEdit.push(v);
-                let i = v.inicio_transmision || v.inicio;
-                let f = v.cierre_transmision || v.cierre;
+                let i = v.inicio_transmision || v.inicio || '';
+                let f = v.cierre_transmision || v.cierre || '';
                 let acc = `<td class="p-3 text-center"><button onclick="editarVidAdmin('${d.id}')" class="text-indigo-400 mr-3"><i class="fa-solid fa-pen"></i></button><button onclick="borrarVidAdmin('${d.id}')" class="text-rose-400"><i class="fa-solid fa-trash"></i></button></td>`;
                 tb.innerHTML += `<tr class="hover:bg-slate-800"><td class="p-3 text-indigo-400 font-bold">${v.id_video}</td><td class="p-3">${v.version}</td><td class="p-3 font-mono">${v.duracion}</td><td class="p-3">${i}</td><td class="p-3">${f}</td>${acc}</tr>`;
             });
@@ -379,13 +390,73 @@
             let sufijo = document.getElementById('admin-select-db').value;
             let docId = document.getElementById('va-doc').value;
             let data = { id_video: document.getElementById('va-id').value, version: document.getElementById('va-ver').value, duracion: document.getElementById('va-dur').value, inicio_transmision: document.getElementById('va-ini').value, cierre_transmision: document.getElementById('va-fin').value };
-            if(docId) { await updateDoc(doc(db, `bd_videos_${sufijo}`, docId), data); } else { await addDoc(collection(db, `bd_videos_${sufijo}`), data); }
+            
+            let colName = sufijo === '1' ? 'bd_videos' : `bd_videos_${sufijo}`;
+            if(docId) { await updateDoc(doc(db, colName, docId), data); } else { await addDoc(collection(db, colName), data); }
             document.getElementById('modal-video-admin').classList.add('hidden');
             window.cargarVideosAdmin();
         };
 
         window.borrarVidAdmin = async (id) => {
-            if(confirm("¿Eliminar de esta base?")) { await deleteDoc(doc(db, `bd_videos_${document.getElementById('admin-select-db').value}`, id)); window.cargarVideosAdmin(); }
+            let sufijo = document.getElementById('admin-select-db').value;
+            let colName = sufijo === '1' ? 'bd_videos' : `bd_videos_${sufijo}`;
+            if(confirm("¿Eliminar de esta base?")) { await deleteDoc(doc(db, colName, id)); window.cargarVideosAdmin(); }
+        };
+
+        // EXPORTAR / IMPORTAR CSV EN ADMIN
+        window.exportarCSV = () => {
+            let sufijo = document.getElementById('admin-select-db').value;
+            if(!sufijo || window.videosEdit.length === 0) return alert("Selecciona una base con datos.");
+            let csv = "id_video,version,duracion,inicio_transmision,cierre_transmision\n";
+            window.videosEdit.forEach(v => {
+                let i = v.inicio_transmision || v.inicio || "";
+                let f = v.cierre_transmision || v.cierre || "";
+                let id_vid = (v.id_video||"").replace(/,/g, '');
+                let ver = (v.version||"").replace(/,/g, ' ');
+                let dur = (v.duracion||"").replace(/,/g, '');
+                csv += `${id_vid},${ver},${dur},${i},${f}\n`;
+            });
+            let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            let url = window.URL.createObjectURL(blob);
+            let a = document.createElement('a'); a.href = url;
+            a.download = `Respaldo_BD_${sufijo}_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        };
+
+        window.importarCSV = async (e) => {
+            let sufijo = document.getElementById('admin-select-db').value;
+            if(!sufijo) { alert("Selecciona a qué base vas a importar."); e.target.value=''; return; }
+            let file = e.target.files[0];
+            if(!file) return;
+            
+            if(!confirm(`¿Importar datos desde Excel a la base '${sufijo}'? Los videos se agregarán a los actuales sin borrarlos.`)) { e.target.value = ''; return; }
+
+            let reader = new FileReader();
+            reader.onload = async function(event) {
+                let text = event.target.result;
+                let rows = text.split('\n');
+                let count = 0;
+                let colName = sufijo === '1' ? 'bd_videos' : `bd_videos_${sufijo}`;
+                
+                for(let i=1; i<rows.length; i++) {
+                    if(!rows[i].trim()) continue;
+                    let cols = rows[i].split(',');
+                    if(cols.length >= 5) {
+                        await addDoc(collection(db, colName), {
+                            id_video: cols[0].trim(),
+                            version: cols[1].trim(),
+                            duracion: cols[2].trim(),
+                            inicio_transmision: cols[3].trim(),
+                            cierre_transmision: cols[4].trim()
+                        });
+                        count++;
+                    }
+                }
+                alert(`Éxito: Se subieron ${count} videos desde el archivo Excel.`);
+                e.target.value = '';
+                window.cargarVideosAdmin();
+            };
+            reader.readAsText(file);
         };
 
         window.addEventListener('DOMContentLoaded', cargarUsuarios);
