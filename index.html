@@ -19,7 +19,6 @@
                 <p class="text-xs text-slate-400 mt-1">SDCI Distrito 03</p>
             </div>
             
-            <!-- Pestañas de Perfil -->
             <div class="flex border-b border-slate-700 mb-6">
                 <button id="tab-visitor" onclick="setLoginMode('visitor')" class="flex-1 py-2.5 text-sm font-bold border-b-2 border-indigo-500 text-indigo-400 transition">Visitante</button>
                 <button id="tab-admin" onclick="setLoginMode('admin')" class="flex-1 py-2.5 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-300 transition">Administrador</button>
@@ -84,14 +83,17 @@
                     Calendario & Festivos
                 </button>
                 <button id="nav-admin" onclick="abrirModalAdminBD()" class="px-3 py-1.5 rounded-lg text-sm font-semibold transition bg-rose-600/30 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/40 shadow flex items-center">
-                    <i class="fa-solid fa-server mr-1.5 text-rose-400"></i> Admin / Backups
+                    <i class="fa-solid fa-server mr-1.5"></i> Admin / Backups
+                </button>
+                <button id="nav-logs" onclick="abrirModalLogs()" class="px-3 py-1.5 rounded-lg text-sm font-semibold transition bg-cyan-600/30 hover:bg-cyan-600 text-cyan-300 hover:text-white border border-cyan-500/40 shadow flex items-center">
+                    <i class="fa-solid fa-users-viewfinder mr-1.5"></i> Accesos (Logs)
+                </button>
+                
+                <!-- BOTÓN SALIR -->
+                <button onclick="cerrarSesion()" class="ml-2 px-3 py-1.5 rounded-lg text-sm font-bold transition bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-500/30 flex items-center">
+                    <i class="fa-solid fa-right-from-bracket mr-1.5"></i> Salir
                 </button>
             </nav>
-
-            <div id="db-status" class="flex items-center space-x-2 text-xs bg-slate-900 px-3 py-1.5 rounded-full border border-slate-700">
-                <span class="w-2.5 h-2.5 rounded-full bg-yellow-500 animate-pulse" id="status-dot"></span>
-                <span id="status-text" class="text-slate-300">Conectando...</span>
-            </div>
         </div>
     </header>
 
@@ -304,78 +306,92 @@
 
     <!-- PIE DE PÁGINA -->
     <footer class="bg-slate-800 border-t border-slate-700 py-4 mt-auto text-center text-xs text-slate-400">
-        SDCI Distrito 03 © 2026 - Versión 1.0.35 (Acceso Protegido)
+        SDCI Distrito 03 © 2026 - Versión 1.0.36 (Seguridad y Auditoría)
     </footer>
+
+    <!-- MODAL DE REGISTRO DE ACCESOS (LOGS) -->
+    <div id="modal-logs" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-cyan-500/50 rounded-2xl max-w-3xl w-full p-6 shadow-[0_0_25px_rgba(6,182,212,0.2)] max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-4 mb-4">
+                <h3 class="text-xl font-extrabold text-cyan-400 flex items-center"><i class="fa-solid fa-users-viewfinder mr-2"></i> Historial de Accesos al Sistema</h3>
+                <button onclick="cerrarModalLogs()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="flex justify-between items-center mb-3">
+                <p class="text-xs text-slate-400">Auditoría completa de visitas e ingresos administrativos.</p>
+                <button onclick="cargarAccesosAdmin()" class="bg-cyan-600 hover:bg-cyan-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow transition"><i class="fa-solid fa-rotate mr-1"></i> Actualizar</button>
+            </div>
+            <div class="flex-grow overflow-y-auto border border-slate-700 rounded-lg bg-slate-800/50">
+                <table class="w-full text-left text-sm text-slate-300">
+                    <thead class="bg-slate-800 text-slate-400 uppercase sticky top-0 text-xs">
+                        <tr>
+                            <th class="p-3 w-24">Fecha</th>
+                            <th class="p-3 w-24">Hora</th>
+                            <th class="p-3">Usuario Registrado</th>
+                            <th class="p-3 w-28 text-center">Tipo de Perfil</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-accesos-body" class="divide-y divide-slate-700">
+                        <tr><td colspan="4" class="text-center p-4 text-slate-500">Cargando registros...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="flex justify-end pt-4 mt-4 border-t border-slate-700">
+                <button onclick="cerrarModalLogs()" class="px-5 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-sm font-semibold shadow">Cerrar Historial</button>
+            </div>
+        </div>
+    </div>
 
     <!-- MODAL DE ADMINISTRACIÓN Y BACKUPS (SOLO ADMIN) -->
     <div id="modal-admin-bd" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-5xl w-full p-6 shadow-2xl max-h-[95vh] overflow-y-auto">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-2xl w-full p-6 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-700 pb-4 mb-4">
                 <h3 class="text-xl font-extrabold text-white flex items-center"><i class="fa-solid fa-server text-rose-400 mr-2"></i> Panel de Administración y Backups</h3>
                 <button onclick="cerrarModalAdminBD()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <!-- Columna Izquierda: Importar/Exportar -->
-                <div class="space-y-4">
-                    <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700 space-y-3">
-                        <div class="flex flex-wrap justify-between items-center gap-2">
-                            <h4 class="font-bold text-indigo-400 text-sm">1. BD_Videos</h4>
-                            <div class="flex gap-2">
-                                <button onclick="descargarRespaldo('bd_videos')" class="bg-blue-600 hover:bg-blue-500 text-white px-2 py-1 rounded text-[11px] font-bold shadow"><i class="fa-solid fa-download mr-1"></i> Respaldar</button>
-                                <button onclick="borrarColeccion('bd_videos')" class="bg-rose-600 hover:bg-rose-500 text-white px-2 py-1 rounded text-[11px] font-bold shadow"><i class="fa-solid fa-trash mr-1"></i> Borrar Todo</button>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <input type="file" id="file-excel-videos" accept=".xlsx, .xls, .csv" class="block w-full text-[10px] text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-indigo-600 file:text-white cursor-pointer">
-                            <button onclick="subirExcelBDVideos()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded text-[11px] font-bold shadow"><i class="fa-solid fa-upload"></i></button>
+            <div class="space-y-4">
+                <!-- BD Videos -->
+                <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700 space-y-3">
+                    <div class="flex flex-wrap justify-between items-center gap-2">
+                        <h4 class="font-bold text-indigo-400 text-sm">1. BD_Videos</h4>
+                        <div class="flex gap-2">
+                            <button onclick="descargarRespaldo('bd_videos')" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded text-xs font-bold shadow"><i class="fa-solid fa-download mr-1"></i> Respaldar</button>
+                            <button onclick="borrarColeccion('bd_videos')" class="bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded text-xs font-bold shadow"><i class="fa-solid fa-trash mr-1"></i> Borrar Todo</button>
                         </div>
                     </div>
-
-                    <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700 space-y-3">
-                        <div class="flex flex-wrap justify-between items-center gap-2">
-                            <h4 class="font-bold text-amber-400 text-sm">2. Festivos</h4>
-                            <div class="flex gap-2">
-                                <button onclick="descargarRespaldo('festivos')" class="bg-blue-600 hover:bg-blue-500 text-white px-2 py-1 rounded text-[11px] font-bold shadow"><i class="fa-solid fa-download mr-1"></i> Respaldar</button>
-                                <button onclick="borrarColeccionFestivos('festivo')" class="bg-rose-600 hover:bg-rose-500 text-white px-2 py-1 rounded text-[11px] font-bold shadow"><i class="fa-solid fa-trash mr-1"></i> Borrar Todo</button>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <input type="file" id="file-excel-festivos" accept=".xlsx, .xls, .csv" class="block w-full text-[10px] text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-amber-600 file:text-white cursor-pointer">
-                            <button onclick="subirExcelFestivos('festivo')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded text-[11px] font-bold shadow"><i class="fa-solid fa-upload"></i></button>
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700 space-y-3">
-                        <div class="flex flex-wrap justify-between items-center gap-2">
-                            <h4 class="font-bold text-emerald-400 text-sm">3. Adicionales</h4>
-                            <div class="flex gap-2">
-                                <button onclick="descargarRespaldo('adicionales')" class="bg-blue-600 hover:bg-blue-500 text-white px-2 py-1 rounded text-[11px] font-bold shadow"><i class="fa-solid fa-download mr-1"></i> Respaldar</button>
-                                <button onclick="borrarColeccionFestivos('adicional')" class="bg-rose-600 hover:bg-rose-500 text-white px-2 py-1 rounded text-[11px] font-bold shadow"><i class="fa-solid fa-trash mr-1"></i> Borrar Todo</button>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <input type="file" id="file-excel-adicionales" accept=".xlsx, .xls, .csv" class="block w-full text-[10px] text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-emerald-600 file:text-white cursor-pointer">
-                            <button onclick="subirExcelFestivos('adicional')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded text-[11px] font-bold shadow"><i class="fa-solid fa-upload"></i></button>
-                        </div>
+                    <div class="flex items-center gap-2">
+                        <input type="file" id="file-excel-videos" accept=".xlsx, .xls, .csv" class="block w-full text-xs text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-indigo-600 file:text-white cursor-pointer">
+                        <button onclick="subirExcelBDVideos()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-1.5 rounded text-xs font-bold shadow"><i class="fa-solid fa-upload"></i> Importar</button>
                     </div>
                 </div>
 
-                <!-- Columna Derecha: LOGS DE AUDITORÍA -->
-                <div class="bg-slate-900/90 p-4 rounded-xl border border-cyan-500/50 shadow-[0_0_15px_rgba(6,182,212,0.15)] flex flex-col h-[500px]">
-                    <div class="flex justify-between items-center border-b border-slate-700 pb-3 mb-3">
-                        <h4 class="font-bold text-cyan-400 text-base flex items-center"><i class="fa-solid fa-user-secret mr-2"></i> Registro de Accesos (Log)</h4>
-                        <button onclick="cargarAccesosAdmin()" class="bg-cyan-600 hover:bg-cyan-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow transition"><i class="fa-solid fa-rotate mr-1"></i> Actualizar</button>
+                <!-- Festivos -->
+                <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700 space-y-3">
+                    <div class="flex flex-wrap justify-between items-center gap-2">
+                        <h4 class="font-bold text-amber-400 text-sm">2. Festivos</h4>
+                        <div class="flex gap-2">
+                            <button onclick="descargarRespaldo('festivos')" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded text-xs font-bold shadow"><i class="fa-solid fa-download mr-1"></i> Respaldar</button>
+                            <button onclick="borrarColeccionFestivos('festivo')" class="bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded text-xs font-bold shadow"><i class="fa-solid fa-trash mr-1"></i> Borrar Todo</button>
+                        </div>
                     </div>
-                    <div class="flex-grow overflow-y-auto pr-2">
-                        <table class="w-full text-left text-[11px] text-slate-300">
-                            <thead class="bg-slate-800 text-slate-400 uppercase sticky top-0">
-                                <tr><th class="p-2 w-16">Fecha</th><th class="p-2 w-16">Hora</th><th class="p-2">Usuario</th><th class="p-2 w-16 text-center">Rol</th></tr>
-                            </thead>
-                            <tbody id="tabla-accesos-body" class="divide-y divide-slate-700/50">
-                                <tr><td colspan="4" class="text-center p-4 text-slate-500">Haz clic en Actualizar para ver el registro.</td></tr>
-                            </tbody>
-                        </table>
+                    <div class="flex items-center gap-2">
+                        <input type="file" id="file-excel-festivos" accept=".xlsx, .xls, .csv" class="block w-full text-xs text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-amber-600 file:text-white cursor-pointer">
+                        <button onclick="subirExcelFestivos('festivo')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-1.5 rounded text-xs font-bold shadow"><i class="fa-solid fa-upload"></i> Importar</button>
+                    </div>
+                </div>
+
+                <!-- Adicionales -->
+                <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700 space-y-3">
+                    <div class="flex flex-wrap justify-between items-center gap-2">
+                        <h4 class="font-bold text-emerald-400 text-sm">3. Adicionales</h4>
+                        <div class="flex gap-2">
+                            <button onclick="descargarRespaldo('adicionales')" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded text-xs font-bold shadow"><i class="fa-solid fa-download mr-1"></i> Respaldar</button>
+                            <button onclick="borrarColeccionFestivos('adicional')" class="bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded text-xs font-bold shadow"><i class="fa-solid fa-trash mr-1"></i> Borrar Todo</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="file" id="file-excel-adicionales" accept=".xlsx, .xls, .csv" class="block w-full text-xs text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-emerald-600 file:text-white cursor-pointer">
+                        <button onclick="subirExcelFestivos('adicional')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-1.5 rounded text-xs font-bold shadow"><i class="fa-solid fa-upload"></i> Importar</button>
                     </div>
                 </div>
             </div>
@@ -388,7 +404,6 @@
 
     <!-- MODAL NUEVO / EDITAR VIDEO (ADMIN) -->
     <div id="modal-video" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <!-- Contenido idéntico para el modal de video -->
         <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-xl w-full p-6 space-y-6 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-700 pb-4">
                 <h3 id="modal-video-titulo" class="text-lg font-bold text-white">Video</h3>
@@ -441,7 +456,6 @@
 
     <!-- MODAL CALENDARIO (ADMIN) -->
     <div id="modal-calendario" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <!-- Contenido idéntico para el modal de calendario -->
         <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-6 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-700 pb-4">
                 <h3 id="modal-cal-titulo" class="text-lg font-bold text-white">Día de Calendario</h3>
@@ -503,7 +517,7 @@
         window.userRole = null; 
         window.userName = '';
 
-        // UI DE LOGIN
+        // UI DE LOGIN Y CERRAR SESIÓN
         window.setLoginMode = function(mode) {
             if(mode === 'visitor') {
                 document.getElementById('form-visitor').classList.remove('hidden');
@@ -534,7 +548,7 @@
                     hora: horaStr,
                     timestamp: ahora.getTime()
                 });
-            } catch(e) { console.error("Error al registrar el log de acceso", e); }
+            } catch(e) { console.error("Error log acceso", e); }
         };
 
         window.entrarVisitante = async function(e) {
@@ -572,22 +586,48 @@
             document.getElementById('pantalla-login').classList.add('hidden');
             
             if(window.userRole === 'visitante') {
-                // Ocultar botones de Admin/Configuraciones para visitante
                 document.getElementById('nav-inicio').classList.add('hidden');
                 document.getElementById('nav-calendario').classList.add('hidden');
                 document.getElementById('nav-admin').classList.add('hidden');
+                document.getElementById('nav-logs').classList.add('hidden');
                 document.getElementById('btn-nuevo-video').classList.add('hidden');
-                window.cambiarHoja('BD_Videos'); // Entra directo a BD
+                window.cambiarHoja('BD_Videos'); 
             } else {
-                window.cambiarHoja('inicio'); // Admin entra al dashboard
+                // Si es admin, asegurar que todo esté visible
+                document.getElementById('nav-inicio').classList.remove('hidden');
+                document.getElementById('nav-calendario').classList.remove('hidden');
+                document.getElementById('nav-admin').classList.remove('hidden');
+                document.getElementById('nav-logs').classList.remove('hidden');
+                document.getElementById('btn-nuevo-video').classList.remove('hidden');
+                window.cambiarHoja('inicio'); 
             }
-            window.renderizarTodo(); // Para inyectar/quitar columnas de acciones
+            window.renderizarTodo(); 
         };
 
-        // VISOR DE LOGS PARA ADMIN
+        window.cerrarSesion = function() {
+            if(confirm("¿Estás seguro de que deseas salir del sistema?")) {
+                window.userRole = null;
+                window.userName = '';
+                document.getElementById('visitor-name').value = '';
+                document.getElementById('admin-pass').value = '';
+                document.getElementById('pantalla-login').classList.remove('hidden');
+                document.querySelectorAll('.sheet-view').forEach(el => el.classList.add('hidden'));
+            }
+        };
+
+        // VISOR DE LOGS PARA ADMIN (MODAL EXCLUSIVO)
+        window.abrirModalLogs = function() {
+            document.getElementById('modal-logs').classList.remove('hidden');
+            window.cargarAccesosAdmin();
+        };
+        
+        window.cerrarModalLogs = function() {
+            document.getElementById('modal-logs').classList.add('hidden');
+        };
+
         window.cargarAccesosAdmin = async function() {
             const tbody = document.getElementById('tabla-accesos-body');
-            tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4 text-cyan-400 animate-pulse">Cargando registros de servidor...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4 text-cyan-400 animate-pulse">Cargando registros del servidor...</td></tr>';
             try {
                 const snap = await getDocs(collection(db, "registro_accesos"));
                 let logs = [];
@@ -595,24 +635,24 @@
                 logs.sort((a,b) => b.timestamp - a.timestamp);
                 
                 tbody.innerHTML = '';
-                if(logs.length === 0) tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4">No hay registros.</td></tr>';
+                if(logs.length === 0) tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4">No hay registros de accesos.</td></tr>';
                 
                 logs.forEach(l => {
                     let rolClase = l.rol === 'Admin' ? 'bg-rose-500/20 text-rose-400' : 'bg-emerald-500/20 text-emerald-400';
                     tbody.innerHTML += `
-                        <tr class="hover:bg-slate-800 transition">
-                            <td class="p-2 border-b border-slate-700/50">${l.fecha}</td>
-                            <td class="p-2 border-b border-slate-700/50">${l.hora}</td>
-                            <td class="p-2 border-b border-slate-700/50 font-bold">${l.nombre}</td>
-                            <td class="p-2 border-b border-slate-700/50 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${rolClase}">${l.rol}</span></td>
+                        <tr class="hover:bg-slate-700/50 transition">
+                            <td class="p-3 border-b border-slate-700/50">${l.fecha}</td>
+                            <td class="p-3 border-b border-slate-700/50">${l.hora}</td>
+                            <td class="p-3 border-b border-slate-700/50 font-bold">${l.nombre}</td>
+                            <td class="p-3 border-b border-slate-700/50 text-center"><span class="px-2 py-1 rounded text-[11px] font-bold ${rolClase}">${l.rol}</span></td>
                         </tr>`;
                 });
             } catch(e) {
-                tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4 text-rose-400">Error al leer registros</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4 text-rose-400">Error al leer registros de auditoría</td></tr>';
             }
         };
 
-        // FUNCIONES DE FECHAS Y CALCULOS
+        // FUNCIONES MATEMÁTICAS Y FECHAS
         window.formatearFechaDDMMYYYY = function(fechaStr) {
             if (!fechaStr) return "";
             if (fechaStr.includes('/')) return fechaStr;
@@ -697,9 +737,7 @@
 
         window.confirmarDoble = function(mensaje, callback) {
             if (confirm(mensaje)) {
-                if (confirm("⚠️ CONFIRMACIÓN DE SEGURIDAD ⚠️\n¿Estás completamente seguro de realizar esta acción? Esto no se puede deshacer.")) {
-                    callback();
-                }
+                if (confirm("⚠️ CONFIRMACIÓN DE SEGURIDAD ⚠️\n¿Estás completamente seguro de realizar esta acción? Esto no se puede deshacer.")) callback();
             }
         };
 
@@ -719,7 +757,7 @@
 
         // RENDER GENERAL
         window.renderizarTodo = function() {
-            if(!window.userRole) return; // Si no hay login, no renderiza las tablas aún
+            if(!window.userRole) return; 
             window.procesarCalculosBDVideos();
             let total = window.dbVideos.length;
             let vigentes = window.dbVideos.filter(v => v.vigente === 'VIGENTE').length;
@@ -755,7 +793,6 @@
         };
 
         window.renderBDVideos = function() {
-            // Inyectar Encabezados dinámicamente según Rol
             const thead = document.getElementById('tabla-bd-videos-head');
             thead.innerHTML = `
                 <tr>
@@ -886,7 +923,7 @@
         };
 
         window.renderCalendario = function() {
-            if(window.userRole !== 'admin') return; // Visitante ni siquiera entra a esta hoja
+            if(window.userRole !== 'admin') return; 
             const festivosList = window.dbCalendario.filter(c => c.tipo === 'festivo').sort((a,b) => a.fecha.localeCompare(b.fecha));
             const adicionalesList = window.dbCalendario.filter(c => c.tipo === 'adicional').sort((a,b) => a.fecha.localeCompare(b.fecha));
             
@@ -900,17 +937,16 @@
             adicionalesList.forEach(c => bA.innerHTML += `<tr class="hover:bg-slate-750"><td class="p-3 font-mono text-emerald-300">${window.formatearFechaDDMMYYYY(c.fecha)}</td><td class="p-3 capitalize text-emerald-400">${window.obtenerDiaSemana(c.fecha)}</td><td class="p-3">${c.descripcion}</td><td class="p-3 text-center space-x-2"><button onclick="editarDia('${c.idDoc}')" class="text-indigo-400 hover:text-indigo-300"><i class="fa-solid fa-pen"></i></button><button onclick="eliminarDia('${c.idDoc}')" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-trash"></i></button></td></tr>`);
         };
 
-        // ADMIN MODAL Y OPERACIONES (SOLO ADMIN)
-        window.abrirModalAdminBD = () => { 
-            document.getElementById('modal-admin-bd').classList.remove('hidden');
-            window.cargarAccesosAdmin();
-        };
+        window.abrirModalAdminBD = () => document.getElementById('modal-admin-bd').classList.remove('hidden');
         window.cerrarModalAdminBD = () => document.getElementById('modal-admin-bd').classList.add('hidden');
         
         window.cambiarHoja = function(target) {
             document.querySelectorAll('.sheet-view').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.nav-btn').forEach(el => {
-                if(!el.classList.contains('bg-rose-600/30')) { el.classList.remove('bg-indigo-600', 'text-white', 'shadow'); el.classList.add('bg-slate-700', 'text-slate-300'); }
+                if(!el.classList.contains('bg-rose-600/30') && !el.classList.contains('bg-cyan-600/30')) { 
+                    el.classList.remove('bg-indigo-600', 'text-white', 'shadow'); 
+                    el.classList.add('bg-slate-700', 'text-slate-300'); 
+                }
             });
             document.getElementById(`sheet-${target}`).classList.remove('hidden');
             const btn = document.querySelector(`.nav-btn[data-target="${target}"]`);
@@ -918,7 +954,6 @@
             if(target === 'Reporte') window.renderReporteVersion(); 
         };
 
-        // MODAL VIDEO, CALENDARIO Y EDICIÓN (SOLO ADMIN)
         window.abrirModalVideo = function() {
             document.getElementById('form-video').reset();
             document.getElementById('video-doc-id').value = '';
@@ -1026,7 +1061,6 @@
             });
         };
 
-        // EXCEL IMPORT / EXPORT (SOLO ADMIN)
         window.descargarRespaldo = function(tipo) {
             let ws_data = []; let fileName = "";
             if (tipo === 'bd_videos') {
@@ -1137,7 +1171,6 @@
         async function initApp() {
             const dot = document.getElementById('status-dot'), txt = document.getElementById('status-text');
             try {
-                // Carga la base de datos de fondo (silencioso)
                 await window.cargarDatosFirebase();
                 dot.classList.replace('bg-yellow-500', 'bg-emerald-500');
                 dot.classList.remove('animate-pulse');
