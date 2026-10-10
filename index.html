@@ -18,7 +18,7 @@
                 <div class="flex items-center justify-center mt-2 gap-2 text-xs font-bold">
                     <span id="login-conn-dot" class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
                     <span id="login-conn-text" class="text-slate-400">Conectando...</span>
-                    <span class="text-slate-500">| v1.0.39 (CSV)</span>
+                    <span class="text-slate-500">| v1.0.40</span>
                 </div>
             </div>
             
@@ -34,7 +34,7 @@
                     <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Nombre completo</label>
                     <input type="text" id="visitor-name" required placeholder="Escribe tu nombre..." class="w-full bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-lg px-4 py-2 text-white outline-none">
                 </div>
-                <button type="submit" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold">Entrar</button>
+                <button type="submit" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold">Entrar como Visitante</button>
             </form>
 
             <!-- Usuario Colaborador -->
@@ -76,7 +76,7 @@
 
             <nav id="nav-tabs" class="flex flex-wrap gap-2 items-center hidden">
                 <div class="flex items-center px-3 py-1 bg-slate-900 border border-slate-700 rounded-lg text-xs font-bold text-slate-300 mr-2">
-                    <span id="nav-conn-dot" class="w-2 h-2 rounded-full bg-green-500 mr-2 shadow-[0_0_5px_#22c55e]"></span> BD Conectada | v1.0.39
+                    <span id="nav-conn-dot" class="w-2 h-2 rounded-full bg-green-500 mr-2 shadow-[0_0_5px_#22c55e]"></span> BD Conectada | v1.0.40
                 </div>
                 <button onclick="cambiarHoja('inicio')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-indigo-600 text-white" data-target="inicio">Dashboard</button>
                 <button onclick="cambiarHoja('BD_Videos')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-700 text-slate-300" data-target="BD_Videos">Control de Bases</button>
@@ -245,6 +245,17 @@
         async function logAcceso(n, r) {
             const d = new Date(); await addDoc(collection(db, "registro_accesos"), { nombre: n, rol: r, fecha: d.toLocaleDateString(), hora: d.toLocaleTimeString(), ts: d.getTime() });
         }
+
+        // --- NUEVA FUNCIÓN PARA VISITANTES ---
+        window.entrarVisitante = async (e) => {
+            e.preventDefault();
+            const nom = document.getElementById('visitor-name').value.trim();
+            if(!nom) return alert("Por favor ingresa tu nombre");
+            
+            await logAcceso(nom, 'Visitante');
+            sessionStorage.setItem('session_visitante_nombre', nom);
+            window.location.href = 'visitante.html';
+        };
 
         window.entrarColaborador = async (e) => {
             e.preventDefault();
