@@ -18,7 +18,7 @@
                 <div class="flex items-center justify-center mt-2 gap-2 text-xs font-bold">
                     <span id="login-conn-dot" class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
                     <span id="login-conn-text" class="text-slate-400">Conectando...</span>
-                    <span class="text-slate-500">| v1.0.40</span>
+                    <span class="text-slate-500">| v1.0.41</span>
                 </div>
             </div>
             
@@ -28,7 +28,6 @@
                 <button id="tab-admin" onclick="setLoginMode('admin')" class="flex-1 py-2.5 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-300 transition">Admin</button>
             </div>
             
-            <!-- Visitante -->
             <form id="form-visitor" onsubmit="entrarVisitante(event)" class="space-y-5">
                 <div>
                     <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Nombre completo</label>
@@ -37,7 +36,6 @@
                 <button type="submit" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold">Entrar como Visitante</button>
             </form>
 
-            <!-- Usuario Colaborador -->
             <form id="form-colab" onsubmit="entrarColaborador(event)" class="space-y-5 hidden">
                 <div>
                     <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Seleccionar Usuario</label>
@@ -52,7 +50,6 @@
                 <button type="submit" class="w-full py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg font-bold">Ingresar a Módulo</button>
             </form>
             
-            <!-- Administrador -->
             <form id="form-admin" onsubmit="entrarAdmin(event)" class="space-y-5 hidden">
                 <div>
                     <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Contraseña</label>
@@ -76,7 +73,7 @@
 
             <nav id="nav-tabs" class="flex flex-wrap gap-2 items-center hidden">
                 <div class="flex items-center px-3 py-1 bg-slate-900 border border-slate-700 rounded-lg text-xs font-bold text-slate-300 mr-2">
-                    <span id="nav-conn-dot" class="w-2 h-2 rounded-full bg-green-500 mr-2 shadow-[0_0_5px_#22c55e]"></span> BD Conectada | v1.0.40
+                    <span id="nav-conn-dot" class="w-2 h-2 rounded-full bg-green-500 mr-2 shadow-[0_0_5px_#22c55e]"></span> BD Conectada
                 </div>
                 <button onclick="cambiarHoja('inicio')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-indigo-600 text-white" data-target="inicio">Dashboard</button>
                 <button onclick="cambiarHoja('BD_Videos')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-700 text-slate-300" data-target="BD_Videos">Control de Bases</button>
@@ -87,7 +84,6 @@
     </header>
 
     <main class="flex-grow w-[98%] mx-auto px-2 py-6">
-        <!-- Dashboard -->
         <section id="sheet-inicio" class="sheet-view space-y-6 hidden">
             <div class="p-8 bg-slate-900 rounded-2xl border border-indigo-500/40 text-center">
                 <h2 class="text-3xl font-black text-indigo-400">Panel Central de Administración</h2>
@@ -103,7 +99,6 @@
             </div>
         </section>
 
-        <!-- Control de Bases de Datos -->
         <section id="sheet-BD_Videos" class="sheet-view hidden space-y-6">
              <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex flex-wrap gap-4 justify-between items-center">
                  <div class="flex items-center gap-3">
@@ -120,10 +115,20 @@
                  </div>
              </div>
              
-             <div class="bg-slate-800 rounded-xl overflow-hidden shadow-lg">
-                 <table class="w-full text-left text-sm">
-                     <thead class="bg-slate-900 text-slate-300">
-                         <tr><th class="p-3">ID</th><th class="p-3">Versión</th><th class="p-3">Duración</th><th class="p-3">Inicio</th><th class="p-3">Cierre</th><th id="col-accion-video" class="p-3 text-center hidden">Acciones</th></tr>
+             <div class="bg-slate-800 rounded-xl overflow-hidden shadow-lg border border-indigo-900/50">
+                 <table class="w-full text-left text-xs">
+                     <thead class="bg-slate-900 text-slate-300 uppercase">
+                         <tr>
+                             <th class="p-2">Versión</th>
+                             <th class="p-2">Temática</th>
+                             <th class="p-2">Duración</th>
+                             <th class="p-2">Inicio</th>
+                             <th class="p-2">Cierre</th>
+                             <th class="p-2 text-center" title="Días Festivos en el rango">Festivos</th>
+                             <th class="p-2 text-center" title="Días Transcurridos">Transcurridos</th>
+                             <th class="p-2 text-center">Estado</th>
+                             <th id="col-accion-video" class="p-2 text-center hidden">Acciones</th>
+                         </tr>
                      </thead>
                      <tbody id="tabla-bd-videos-body" class="divide-y divide-slate-700"></tbody>
                  </table>
@@ -131,7 +136,7 @@
         </section>
     </main>
 
-    <!-- MODAL PANEL MAESTRO -->
+    <!-- MODALES VARIOS ADMIN (PANEL, USUARIO) -->
     <div id="modal-admin" class="fixed inset-0 bg-slate-950/90 hidden z-50 flex items-center justify-center p-4">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-5xl w-full h-[85vh] flex flex-col shadow-2xl">
             <div class="flex justify-between items-center p-4 border-b border-slate-700">
@@ -200,11 +205,14 @@
             <h3 class="font-bold text-white mb-4">Edición de Video</h3>
             <form onsubmit="guardarVideoAdmin(event)" class="space-y-3">
                 <input type="hidden" id="va-doc">
-                <input type="text" id="va-id" placeholder="ID" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white">
-                <input type="text" id="va-ver" placeholder="Versión" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white">
-                <input type="text" id="va-dur" placeholder="Duración (MM:SS)" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white">
-                <input type="date" id="va-ini" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white">
-                <input type="date" id="va-fin" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white">
+                <input type="hidden" id="va-id">
+                <input type="text" id="va-ver" placeholder="Versión / Nombre" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white font-bold">
+                <input type="text" id="va-tema" placeholder="Temática (ej. Promoción, Informativo)" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white">
+                <input type="text" id="va-dur" placeholder="Duración (MM:SS)" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white font-mono">
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="text-xs text-slate-400">Inicio</label><input type="date" id="va-ini" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white"></div>
+                    <div><label class="text-xs text-slate-400">Cierre</label><input type="date" id="va-fin" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white"></div>
+                </div>
                 <div class="flex justify-end gap-2 mt-4">
                     <button type="button" onclick="document.getElementById('modal-video-admin').classList.add('hidden')" class="bg-slate-700 px-4 py-2 rounded text-white">Cancelar</button>
                     <button type="submit" class="bg-indigo-600 px-4 py-2 rounded text-white font-bold">Guardar en BD</button>
@@ -213,7 +221,6 @@
         </div>
     </div>
 
-    <!-- SCRIPT FIREBASE Y LOGICA ADMIN -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, setDoc, doc, updateDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -222,11 +229,8 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app); window.db = db;
 
-        window.userRole = null;
-        window.usuariosApp = [];
-        window.videosEdit = []; 
+        window.userRole = null; window.usuariosApp = []; window.videosEdit = []; 
 
-        // Marcar conexión
         getDocs(collection(db, "test_conn")).then(()=>{
             document.getElementById('login-conn-dot').classList.replace('bg-red-500','bg-green-500');
             document.getElementById('login-conn-text').innerText = 'Conectado a Firebase';
@@ -246,12 +250,10 @@
             const d = new Date(); await addDoc(collection(db, "registro_accesos"), { nombre: n, rol: r, fecha: d.toLocaleDateString(), hora: d.toLocaleTimeString(), ts: d.getTime() });
         }
 
-        // --- NUEVA FUNCIÓN PARA VISITANTES ---
         window.entrarVisitante = async (e) => {
             e.preventDefault();
             const nom = document.getElementById('visitor-name').value.trim();
             if(!nom) return alert("Por favor ingresa tu nombre");
-            
             await logAcceso(nom, 'Visitante');
             sessionStorage.setItem('session_visitante_nombre', nom);
             window.location.href = 'visitante.html';
@@ -262,11 +264,7 @@
             const id = document.getElementById('colab-select').value;
             const pass = document.getElementById('colab-pass').value;
             const user = window.usuariosApp.find(u => u.id === id);
-            
-            if(!user) return alert("Selecciona un usuario");
-            if(user.bloqueado) return alert("Usuario bloqueado.");
-            if(user.password !== pass) return alert("Contraseña incorrecta");
-
+            if(!user || user.bloqueado || user.password !== pass) return alert("Error de acceso");
             await logAcceso(user.nombre, 'Colaborador');
             localStorage.setItem('session_colab_id', user.id);
             localStorage.setItem('session_colab_nombre', user.nombre);
@@ -284,13 +282,10 @@
                 document.getElementById('pantalla-login').classList.add('hidden');
                 document.getElementById('nav-tabs').classList.remove('hidden');
                 document.getElementById('nav-admin').classList.remove('hidden');
-                
-                // Mostrar botones de Admin DB
                 document.getElementById('btn-nuevo-video').classList.remove('hidden');
                 document.getElementById('btn-exportar').classList.remove('hidden');
                 document.getElementById('btn-importar').classList.remove('hidden');
                 document.getElementById('col-accion-video').classList.remove('hidden');
-                
                 window.cambiarHoja('inicio');
                 llenarSelectDBAdmin();
             } else { alert("Clave incorrecta"); }
@@ -298,36 +293,18 @@
 
         window.cerrarSesion = () => { localStorage.clear(); location.reload(); };
         window.cambiarHoja = (t) => { document.querySelectorAll('.sheet-view').forEach(e => e.classList.add('hidden')); document.getElementById(`sheet-${t}`).classList.remove('hidden'); };
-
         window.abrirModalAdmin = (tab = 'usuarios') => { document.getElementById('modal-admin').classList.remove('hidden'); window.switchAdminTab(tab); };
         window.cerrarModalAdmin = () => document.getElementById('modal-admin').classList.add('hidden');
         window.switchAdminTab = (tab) => {
             document.getElementById('adm-sec-usuarios').classList.toggle('hidden', tab !== 'usuarios');
             document.getElementById('adm-sec-logs').classList.toggle('hidden', tab !== 'logs');
-            document.getElementById('tab-adm-usuarios').className = tab==='usuarios' ? 'px-6 py-3 font-bold border-b-2 border-cyan-500 text-cyan-400' : 'px-6 py-3 font-bold border-b-2 border-transparent text-slate-400';
-            document.getElementById('tab-adm-logs').className = tab==='logs' ? 'px-6 py-3 font-bold border-b-2 border-indigo-500 text-indigo-400' : 'px-6 py-3 font-bold border-b-2 border-transparent text-slate-400';
-            if(tab === 'usuarios') renderUsuarios(); if(tab === 'logs') cargarLogs();
+            if(tab === 'usuarios') renderUsuarios();
         };
 
         window.cargarUsuarios = async () => {
             const snap = await getDocs(collection(db, "usuarios_colaboradores"));
             window.usuariosApp = [];
-            let existeYaz = false, existeDis = false;
-            snap.forEach(d => { 
-                window.usuariosApp.push({id: d.id, ...d.data()}); 
-                if(d.id === 'yazmin') existeYaz = true;
-                if(d.id === 'distrito03') existeDis = true;
-            });
-            if(!existeYaz) {
-                let y = { nombre: "Yazmin Vallejo", password: "yazmin", pagina: "index2.html", db_suffix: "yazmin", bloqueado: false };
-                await setDoc(doc(db, "usuarios_colaboradores", "yazmin"), y);
-                window.usuariosApp.push({id: "yazmin", ...y});
-            }
-            if(!existeDis) {
-                let dis = { nombre: "Distrito 03", password: "Registro03", pagina: "index3.html", db_suffix: "1", bloqueado: false };
-                await setDoc(doc(db, "usuarios_colaboradores", "distrito03"), dis);
-                window.usuariosApp.push({id: "distrito03", ...dis});
-            }
+            snap.forEach(d => window.usuariosApp.push({id: d.id, ...d.data()}));
             let s = '<option value="">Seleccione usuario...</option>';
             window.usuariosApp.forEach(u => s+=`<option value="${u.id}">${u.nombre}</option>`);
             document.getElementById('colab-select').innerHTML = s;
@@ -341,16 +318,7 @@
                 tb.innerHTML += `<tr><td class="p-3 text-cyan-300 font-bold">${u.id}</td><td class="p-3">${u.nombre}</td><td class="p-3">${u.pagina}</td><td class="p-3 font-mono text-amber-400">${u.db_suffix}</td><td class="p-3">${status}</td><td class="p-3 text-right"><button onclick="resetPass('${u.id}')" class="bg-slate-700 px-2 py-1 rounded text-white">Pass</button>${bToggle}</td></tr>`;
             });
         };
-
-        window.guardarNuevoUsuario = async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('nu-id').value.trim().toLowerCase();
-            const user = { nombre: document.getElementById('nu-nombre').value, password: document.getElementById('nu-pass').value, pagina: document.getElementById('nu-pag').value, db_suffix: document.getElementById('nu-sufijo').value, bloqueado: false };
-            await setDoc(doc(db, "usuarios_colaboradores", id), user);
-            document.getElementById('modal-nuevo-usr').classList.add('hidden');
-            await cargarUsuarios(); renderUsuarios(); llenarSelectDBAdmin();
-        };
-
+        window.guardarNuevoUsuario = async (e) => { e.preventDefault(); const id = document.getElementById('nu-id').value.trim().toLowerCase(); await setDoc(doc(db, "usuarios_colaboradores", id), { nombre: document.getElementById('nu-nombre').value, password: document.getElementById('nu-pass').value, pagina: document.getElementById('nu-pag').value, db_suffix: document.getElementById('nu-sufijo').value, bloqueado: false }); document.getElementById('modal-nuevo-usr').classList.add('hidden'); await cargarUsuarios(); renderUsuarios(); llenarSelectDBAdmin(); };
         window.toggleBloqueo = async (id, est) => { await updateDoc(doc(db, "usuarios_colaboradores", id), {bloqueado: est}); await cargarUsuarios(); renderUsuarios(); };
         window.resetPass = async (id) => { let p = prompt("Nueva clave para " + id); if(p) { await updateDoc(doc(db, "usuarios_colaboradores", id), {password: p}); await cargarUsuarios(); renderUsuarios(); } };
         window.cargarLogs = async () => {};
@@ -367,29 +335,70 @@
             if(!sufijo) return;
             
             let colName = sufijo === '1' ? 'bd_videos' : `bd_videos_${sufijo}`;
-            const snap = await getDocs(collection(db, colName));
+            let calName = sufijo === '1' ? 'calendario_config' : `calendario_config_${sufijo}`;
+            
+            const [vSnap, cSnap] = await Promise.all([ getDocs(collection(db, colName)), getDocs(collection(db, calName)) ]);
+            let fest = new Set(); cSnap.forEach(d => { if(d.data().tipo==='festivo') fest.add(d.data().fecha); });
+            let hoyStr = new Date().toISOString().split('T')[0];
+            
             window.videosEdit = [];
-            snap.forEach(d => {
+            vSnap.forEach(d => {
                 let v = {idDoc: d.id, ...d.data()};
+                let vIni = v.inicio_transmision || v.inicio || '';
+                let vFin = v.cierre_transmision || v.cierre || '';
+                let tema = v.tematica || 'General';
+                
+                let est = 'Error', festRango = 0, transCal = 0;
+                if(vIni && vFin) {
+                    let ini = new Date(vIni+"T00:00:00"), fin = new Date(vFin+"T00:00:00"), hoy = new Date(hoyStr+"T00:00:00");
+                    if (hoy > fin) est = 'Finalizado'; else if (hoy < ini) est = 'Próximo'; else est = 'Vigente';
+                    
+                    let iter = new Date(ini);
+                    while(iter <= fin) {
+                        if(fest.has(iter.toISOString().split('T')[0])) festRango++;
+                        iter.setDate(iter.getDate()+1);
+                    }
+                    
+                    let lim = (fin < hoy) ? fin : hoy;
+                    if(hoy >= ini) { transCal = Math.ceil(Math.abs(lim - ini) / 86400000) + 1; }
+                }
+                
                 window.videosEdit.push(v);
-                let i = v.inicio_transmision || v.inicio || '';
-                let f = v.cierre_transmision || v.cierre || '';
-                let acc = `<td class="p-3 text-center"><button onclick="editarVidAdmin('${d.id}')" class="text-indigo-400 mr-3"><i class="fa-solid fa-pen"></i></button><button onclick="borrarVidAdmin('${d.id}')" class="text-rose-400"><i class="fa-solid fa-trash"></i></button></td>`;
-                tb.innerHTML += `<tr class="hover:bg-slate-800"><td class="p-3 text-indigo-400 font-bold">${v.id_video}</td><td class="p-3">${v.version}</td><td class="p-3 font-mono">${v.duracion}</td><td class="p-3">${i}</td><td class="p-3">${f}</td>${acc}</tr>`;
+                let estBd = est === 'Vigente' ? '<span class="text-green-400 font-bold">Vigente</span>' : (est==='Finalizado'?'<span class="text-slate-500 font-bold">Finalizado</span>':'<span class="text-amber-400 font-bold">Próximo</span>');
+                let acc = `<button onclick="editarVidAdmin('${d.id}')" class="text-indigo-400 mr-2"><i class="fa-solid fa-pen"></i></button><button onclick="borrarVidAdmin('${d.id}')" class="text-rose-400"><i class="fa-solid fa-trash"></i></button>`;
+                
+                tb.innerHTML += `<tr class="hover:bg-slate-800/50">
+                    <td class="p-2 font-medium">${v.version}</td>
+                    <td class="p-2 text-indigo-300 text-xs">${tema}</td>
+                    <td class="p-2 font-mono text-slate-400">${v.duracion}</td>
+                    <td class="p-2 font-mono">${vIni}</td>
+                    <td class="p-2 font-mono">${vFin}</td>
+                    <td class="p-2 text-center text-rose-400 font-bold">${festRango}</td>
+                    <td class="p-2 text-center text-cyan-400 font-bold">${transCal}</td>
+                    <td class="p-2 text-center">${estBd}</td>
+                    <td class="p-2 text-center">${acc}</td>
+                </tr>`;
             });
         };
 
         window.abrirModalVideoAdmin = () => {
             if(!document.getElementById('admin-select-db').value) return alert("Selecciona una base primero");
-            document.getElementById('va-doc').value = ''; document.getElementById('va-id').value = ''; document.getElementById('va-ver').value = ''; document.getElementById('va-dur').value = ''; document.getElementById('va-ini').value = ''; document.getElementById('va-fin').value = '';
+            document.getElementById('va-doc').value = ''; 
+            document.getElementById('va-id').value = 'VID-' + Math.floor(Date.now()/1000); 
+            document.getElementById('va-ver').value = ''; 
+            document.getElementById('va-tema').value = ''; 
+            document.getElementById('va-dur').value = ''; 
+            document.getElementById('va-ini').value = ''; 
+            document.getElementById('va-fin').value = '';
             document.getElementById('modal-video-admin').classList.remove('hidden');
         };
 
         window.editarVidAdmin = (id) => {
             let v = window.videosEdit.find(x => x.idDoc === id); if(!v) return;
             document.getElementById('va-doc').value = v.idDoc; 
-            document.getElementById('va-id').value = v.id_video; 
+            document.getElementById('va-id').value = v.id_video || 'VID-' + Math.floor(Date.now()/1000); 
             document.getElementById('va-ver').value = v.version; 
+            document.getElementById('va-tema').value = v.tematica || 'General';
             document.getElementById('va-dur').value = v.duracion; 
             document.getElementById('va-ini').value = v.inicio_transmision || v.inicio || ''; 
             document.getElementById('va-fin').value = v.cierre_transmision || v.cierre || '';
@@ -400,8 +409,7 @@
             e.preventDefault();
             let sufijo = document.getElementById('admin-select-db').value;
             let docId = document.getElementById('va-doc').value;
-            let data = { id_video: document.getElementById('va-id').value, version: document.getElementById('va-ver').value, duracion: document.getElementById('va-dur').value, inicio_transmision: document.getElementById('va-ini').value, cierre_transmision: document.getElementById('va-fin').value };
-            
+            let data = { id_video: document.getElementById('va-id').value, version: document.getElementById('va-ver').value, tematica: document.getElementById('va-tema').value, duracion: document.getElementById('va-dur').value, inicio_transmision: document.getElementById('va-ini').value, cierre_transmision: document.getElementById('va-fin').value };
             let colName = sufijo === '1' ? 'bd_videos' : `bd_videos_${sufijo}`;
             if(docId) { await updateDoc(doc(db, colName, docId), data); } else { await addDoc(collection(db, colName), data); }
             document.getElementById('modal-video-admin').classList.add('hidden');
@@ -414,62 +422,39 @@
             if(confirm("¿Eliminar de esta base?")) { await deleteDoc(doc(db, colName, id)); window.cargarVideosAdmin(); }
         };
 
-        // EXPORTAR / IMPORTAR CSV EN ADMIN
         window.exportarCSV = () => {
             let sufijo = document.getElementById('admin-select-db').value;
             if(!sufijo || window.videosEdit.length === 0) return alert("Selecciona una base con datos.");
-            let csv = "id_video,version,duracion,inicio_transmision,cierre_transmision\n";
+            let csv = "id_video,version,tematica,duracion,inicio_transmision,cierre_transmision\n";
             window.videosEdit.forEach(v => {
-                let i = v.inicio_transmision || v.inicio || "";
-                let f = v.cierre_transmision || v.cierre || "";
-                let id_vid = (v.id_video||"").replace(/,/g, '');
-                let ver = (v.version||"").replace(/,/g, ' ');
-                let dur = (v.duracion||"").replace(/,/g, '');
-                csv += `${id_vid},${ver},${dur},${i},${f}\n`;
+                let i = v.inicio_transmision || v.inicio || ""; let f = v.cierre_transmision || v.cierre || "";
+                let id_vid = (v.id_video||"").replace(/,/g, ''); let ver = (v.version||"").replace(/,/g, ' '); let tema = (v.tematica||"General").replace(/,/g, ' '); let dur = (v.duracion||"").replace(/,/g, '');
+                csv += `${id_vid},${ver},${tema},${dur},${i},${f}\n`;
             });
-            let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            let url = window.URL.createObjectURL(blob);
-            let a = document.createElement('a'); a.href = url;
-            a.download = `Respaldo_BD_${sufijo}_${new Date().toISOString().split('T')[0]}.csv`;
-            a.click();
+            let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); let url = window.URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url;
+            a.download = `Respaldo_BD_${sufijo}_${new Date().toISOString().split('T')[0]}.csv`; a.click();
         };
 
         window.importarCSV = async (e) => {
             let sufijo = document.getElementById('admin-select-db').value;
             if(!sufijo) { alert("Selecciona a qué base vas a importar."); e.target.value=''; return; }
-            let file = e.target.files[0];
-            if(!file) return;
-            
-            if(!confirm(`¿Importar datos desde Excel a la base '${sufijo}'? Los videos se agregarán a los actuales sin borrarlos.`)) { e.target.value = ''; return; }
-
+            let file = e.target.files[0]; if(!file) return;
+            if(!confirm(`¿Importar datos desde Excel a la base '${sufijo}'?`)) { e.target.value = ''; return; }
             let reader = new FileReader();
             reader.onload = async function(event) {
-                let text = event.target.result;
-                let rows = text.split('\n');
-                let count = 0;
-                let colName = sufijo === '1' ? 'bd_videos' : `bd_videos_${sufijo}`;
-                
+                let rows = event.target.result.split('\n'); let count = 0; let colName = sufijo === '1' ? 'bd_videos' : `bd_videos_${sufijo}`;
                 for(let i=1; i<rows.length; i++) {
-                    if(!rows[i].trim()) continue;
-                    let cols = rows[i].split(',');
-                    if(cols.length >= 5) {
-                        await addDoc(collection(db, colName), {
-                            id_video: cols[0].trim(),
-                            version: cols[1].trim(),
-                            duracion: cols[2].trim(),
-                            inicio_transmision: cols[3].trim(),
-                            cierre_transmision: cols[4].trim()
-                        });
-                        count++;
+                    if(!rows[i].trim()) continue; let cols = rows[i].split(',');
+                    if(cols.length >= 6 && cols[3].includes(':')) {
+                        await addDoc(collection(db, colName), { id_video: cols[0].trim(), version: cols[1].trim(), tematica: cols[2].trim(), duracion: cols[3].trim(), inicio_transmision: cols[4].trim(), cierre_transmision: cols[5].trim() }); count++;
+                    } else if(cols.length >= 5) {
+                        await addDoc(collection(db, colName), { id_video: cols[0].trim(), version: cols[1].trim(), tematica: 'General', duracion: cols[2].trim(), inicio_transmision: cols[3].trim(), cierre_transmision: cols[4].trim() }); count++;
                     }
                 }
-                alert(`Éxito: Se subieron ${count} videos desde el archivo Excel.`);
-                e.target.value = '';
-                window.cargarVideosAdmin();
+                alert(`Éxito: Se subieron ${count} videos.`); e.target.value = ''; window.cargarVideosAdmin();
             };
             reader.readAsText(file);
         };
-
         window.addEventListener('DOMContentLoaded', cargarUsuarios);
     </script>
 </body>

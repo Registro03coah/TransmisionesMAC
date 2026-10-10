@@ -24,7 +24,7 @@
                 </div>
                 
                 <button onclick="cambiarHoja('BD_Videos')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-cyan-600 text-white" data-target="BD_Videos">Mis Videos</button>
-                <button onclick="cambiarHoja('Reporte')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-700 text-slate-300" data-target="Reporte">Reportes</button>
+                <button onclick="cambiarHoja('Reporte')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-700 text-slate-300" data-target="Reporte">Generador de Reportes</button>
                 <button onclick="cambiarHoja('Calendario')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-700 text-slate-300" data-target="Calendario">Festivos</button>
                 
                 <div class="w-px h-6 bg-slate-700 mx-1"></div>
@@ -48,9 +48,20 @@
                 </div>
             </div>
             <div class="bg-slate-800 rounded-xl overflow-hidden shadow-lg border border-cyan-900/50">
-                <table class="w-full text-left text-sm">
-                    <thead class="bg-slate-900 text-slate-300 text-xs uppercase">
-                        <tr><th class="p-3">ID</th><th class="p-3">Versión</th><th class="p-3">Inicio</th><th class="p-3">Cierre</th><th class="p-3 text-center">Días Trans.</th><th class="p-3 text-right">Impactos Calculados</th><th class="p-3 text-center">Borrar</th></tr>
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-900 text-slate-300 uppercase">
+                        <tr>
+                            <th class="p-2">Versión</th>
+                            <th class="p-2">Temática</th>
+                            <th class="p-2">Duración</th>
+                            <th class="p-2">Inicio</th>
+                            <th class="p-2">Cierre</th>
+                            <th class="p-2 text-center" title="Festivos en Rango">Festivos</th>
+                            <th class="p-2 text-center" title="Días Transcurridos">Transcurridos</th>
+                            <th class="p-2 text-center">Estado</th>
+                            <th class="p-2 text-right">Impactos</th>
+                            <th class="p-2 text-center">Borrar</th>
+                        </tr>
                     </thead>
                     <tbody id="tabla-videos-body" class="divide-y divide-slate-700"></tbody>
                 </table>
@@ -59,13 +70,45 @@
 
         <section id="sheet-Reporte" class="sheet-view hidden space-y-6">
             <div class="bg-slate-800 p-6 rounded-xl border border-orange-500 shadow-xl">
-                <h2 class="text-xl font-bold text-white mb-4"><i class="fa-solid fa-chart-pie text-orange-400"></i> Reporte Acumulado</h2>
-                <div class="flex gap-4 mb-4">
-                    <input type="date" id="rep-inicio" class="bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white font-bold" onchange="renderReporte()">
-                    <input type="date" id="rep-fin" class="bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white font-bold" onchange="renderReporte()">
+                <h2 class="text-xl font-bold text-white mb-4"><i class="fa-solid fa-chart-pie text-orange-400"></i> Generador de Reportes</h2>
+                
+                <div class="flex gap-4 mb-4 bg-slate-900 p-4 rounded-xl border border-slate-700 items-center">
+                    <div>
+                        <label class="text-xs text-slate-400 font-bold block mb-1">Día de Inicio</label>
+                        <input type="date" id="rep-inicio" class="bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white font-bold outline-none focus:border-orange-500" onchange="renderReporte()">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 font-bold block mb-1">Día de Cierre</label>
+                        <input type="date" id="rep-fin" class="bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white font-bold outline-none focus:border-orange-500" onchange="renderReporte()">
+                    </div>
                 </div>
-                <table class="w-full text-left text-sm bg-slate-900 rounded-xl overflow-hidden shadow">
-                    <thead class="bg-slate-950 text-slate-400"><tr><th class="p-3">Versión / Campaña</th><th class="p-3 text-right text-amber-400 font-bold">Total Impactos</th></tr></thead>
+
+                <!-- Resumen Total -->
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 flex justify-between items-center">
+                        <span class="text-slate-400 font-bold uppercase text-xs tracking-wider">Suma de Videos en Periodo:</span>
+                        <span id="rep-total-videos" class="text-3xl font-black text-white">0</span>
+                    </div>
+                    <div class="bg-slate-900 p-4 rounded-xl border border-amber-500/50 flex justify-between items-center shadow-[0_0_15px_rgba(245,158,11,0.1)]">
+                        <span class="text-amber-400 font-bold uppercase text-xs tracking-wider">Total Impactos Sumados:</span>
+                        <span id="rep-total-impactos" class="text-3xl font-black text-amber-400">0</span>
+                    </div>
+                </div>
+
+                <table class="w-full text-left text-xs bg-slate-900 rounded-xl overflow-hidden shadow">
+                    <thead class="bg-slate-950 text-slate-400 uppercase">
+                        <tr>
+                            <th class="p-2">Versión</th>
+                            <th class="p-2">Temática</th>
+                            <th class="p-2">Duración</th>
+                            <th class="p-2">Inicio</th>
+                            <th class="p-2">Cierre</th>
+                            <th class="p-2 text-center">Festivos</th>
+                            <th class="p-2 text-center">Transcurridos</th>
+                            <th class="p-2 text-center">Estado</th>
+                            <th class="p-2 text-right text-amber-400 font-bold">Impactos</th>
+                        </tr>
+                    </thead>
                     <tbody id="tabla-reporte-body" class="divide-y divide-slate-800"></tbody>
                 </table>
             </div>
@@ -112,8 +155,9 @@
         <div class="bg-slate-800 p-6 rounded-xl max-w-md w-full border border-slate-700 shadow-2xl">
             <h3 class="font-bold mb-4 text-white">Nuevo Video en Módulo</h3>
             <form onsubmit="guardarVideo(event)" class="space-y-3">
-                <input type="text" id="v-id" placeholder="ID (ej. 001)" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white font-bold text-cyan-400">
-                <input type="text" id="v-ver" placeholder="Versión / Nombre" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white">
+                <input type="hidden" id="v-id">
+                <input type="text" id="v-ver" placeholder="Versión / Nombre" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white font-bold">
+                <input type="text" id="v-tema" placeholder="Temática (ej. Promoción, Informativo)" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white">
                 <input type="text" id="v-dur" placeholder="Duración (MM:SS)" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white font-mono">
                 <div class="grid grid-cols-2 gap-2">
                     <div>
@@ -157,7 +201,6 @@
         
         if(!COLAB_ID || !DB_SUFFIX) { window.location.href = 'index.html'; }
         
-        // FIX PRINCIPAL PARA LA BASE DE DATOS VIEJA: Si el sufijo es '1', la tabla real era 'bd_videos' sin sufijo.
         document.getElementById('hdr-nombre').innerText = COLAB_NOM;
         document.getElementById('hdr-sufijo').innerText = DB_SUFFIX === '1' ? '(Base Antigua MAC)' : `(_${DB_SUFFIX})`;
 
@@ -220,19 +263,40 @@
             let hoyStr = new Date().toISOString().split('T')[0];
 
             window.videos.forEach(v => {
-                // FIX: Soporte para esquema viejo (inicio_transmision) y nuevo (inicio)
                 let vIni = v.inicio_transmision || v.inicio;
                 let vFin = v.cierre_transmision || v.cierre;
                 
-                v._ini = vIni; // Guardar temporal para la tabla
+                v._ini = vIni;
                 v._fin = vFin;
+                v._tema = v.tematica || 'General';
 
-                // Si no hay fechas válidas, saltar para evitar error
-                if(!vIni || !vFin) { v.dias = 0; v.imp = 0; return; }
+                if(!vIni || !vFin) { v.dias = 0; v.imp = 0; v.est='Error'; v.fest_rango=0; v.trans_cal=0; return; }
 
                 let ini = new Date(vIni+"T00:00:00"), fin = new Date(vFin+"T00:00:00"), hoy = new Date(hoyStr+"T00:00:00");
-                let lim = (fin < hoy) ? fin : hoy; let dias = 0, rep = 0; let c = new Date(ini);
                 
+                // Estado
+                if (hoy > fin) v.est = 'Finalizado';
+                else if (hoy < ini) v.est = 'Próximo';
+                else v.est = 'Vigente';
+
+                // Festivos en Rango & Transcurridos Calendario
+                let festRango = 0;
+                let iter = new Date(ini);
+                while(iter <= fin) {
+                    if(fest.has(iter.toISOString().split('T')[0])) festRango++;
+                    iter.setDate(iter.getDate()+1);
+                }
+                v.fest_rango = festRango;
+
+                let lim = (fin < hoy) ? fin : hoy; 
+                let transCal = 0;
+                if (hoy >= ini) {
+                    transCal = Math.ceil(Math.abs(lim - ini) / 86400000) + 1; 
+                }
+                v.trans_cal = transCal;
+
+                // Impactos
+                let dias = 0, rep = 0; let c = new Date(ini);
                 while(c <= lim) {
                     let f = c.toISOString().split('T')[0];
                     if(!fest.has(f) && (c.getDay()!==0 || adic.has(f))) {
@@ -254,26 +318,69 @@
         window.renderVideos = () => {
             const tb = document.getElementById('tabla-videos-body'); tb.innerHTML='';
             window.videos.forEach(v => {
-                tb.innerHTML += `<tr class="hover:bg-slate-700/50"><td class="p-3 font-bold text-cyan-400">${v.id_video}</td><td class="p-3">${v.version}</td><td class="p-3 font-mono">${v._ini || 'Error'}</td><td class="p-3 font-mono">${v._fin || 'Error'}</td><td class="p-3 text-center">${v.dias}</td><td class="p-3 text-right font-bold text-amber-400 text-base">${v.imp.toLocaleString()}</td><td class="p-3 text-center"><button onclick="borrarVid('${v.idDoc}')" class="text-rose-400"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                let estBd = v.est === 'Vigente' ? '<span class="text-green-400 font-bold">Vigente</span>' : (v.est==='Finalizado'?'<span class="text-slate-500 font-bold">Finalizado</span>':'<span class="text-amber-400 font-bold">Próximo</span>');
+                
+                tb.innerHTML += `<tr class="hover:bg-slate-700/50">
+                    <td class="p-2 font-medium">${v.version}</td>
+                    <td class="p-2 text-indigo-300 text-xs">${v._tema}</td>
+                    <td class="p-2 font-mono text-slate-400">${v.duracion}</td>
+                    <td class="p-2 font-mono">${v._ini || '-'}</td>
+                    <td class="p-2 font-mono">${v._fin || '-'}</td>
+                    <td class="p-2 text-center text-rose-400 font-bold">${v.fest_rango}</td>
+                    <td class="p-2 text-center text-cyan-400 font-bold">${v.trans_cal}</td>
+                    <td class="p-2 text-center">${estBd}</td>
+                    <td class="p-2 text-right font-bold text-amber-400 text-base">${v.imp.toLocaleString()}</td>
+                    <td class="p-2 text-center"><button onclick="borrarVid('${v.idDoc}')" class="text-rose-400"><i class="fa-solid fa-trash"></i></button></td>
+                </tr>`;
             });
         };
 
         window.renderReporte = () => {
             const tb = document.getElementById('tabla-reporte-body'); tb.innerHTML='';
             let ini = document.getElementById('rep-inicio').value; let fin = document.getElementById('rep-fin').value;
-            if(!ini || !fin) return;
+            if(!ini || !fin) {
+                document.getElementById('rep-total-videos').innerText = '0';
+                document.getElementById('rep-total-impactos').innerText = '0';
+                return;
+            }
+            
+            let tVid = 0; let tImp = 0;
             window.videos.forEach(v => {
-                if(v._ini <= fin && v._fin >= ini) tb.innerHTML += `<tr class="hover:bg-slate-700/50"><td class="p-3">${v.version}</td><td class="p-3 text-right text-amber-400 font-bold text-lg">${v.imp.toLocaleString()}</td></tr>`;
+                if(v._ini <= fin && v._fin >= ini) {
+                    tVid++; tImp += v.imp;
+                    let estBd = v.est === 'Vigente' ? '<span class="text-green-400 font-bold">Vigente</span>' : (v.est==='Finalizado'?'<span class="text-slate-500 font-bold">Finalizado</span>':'<span class="text-amber-400 font-bold">Próximo</span>');
+                    
+                    tb.innerHTML += `<tr class="hover:bg-slate-700/50">
+                        <td class="p-2 font-medium">${v.version}</td>
+                        <td class="p-2 text-indigo-300 text-xs">${v._tema}</td>
+                        <td class="p-2 font-mono text-slate-400">${v.duracion}</td>
+                        <td class="p-2 font-mono">${v._ini}</td>
+                        <td class="p-2 font-mono">${v._fin}</td>
+                        <td class="p-2 text-center text-rose-400">${v.fest_rango}</td>
+                        <td class="p-2 text-center text-cyan-400">${v.trans_cal}</td>
+                        <td class="p-2 text-center">${estBd}</td>
+                        <td class="p-2 text-right text-amber-400 font-bold text-base">${v.imp.toLocaleString()}</td>
+                    </tr>`;
+                }
             });
+            document.getElementById('rep-total-videos').innerText = tVid;
+            document.getElementById('rep-total-impactos').innerText = tImp.toLocaleString();
         };
 
-        window.abrirModalVideo = () => { document.getElementById('v-id').value=''; document.getElementById('v-ver').value=''; document.getElementById('v-dur').value=''; document.getElementById('modal-video').classList.remove('hidden'); };
+        window.abrirModalVideo = () => { 
+            document.getElementById('v-id').value = 'VID-' + Math.floor(Date.now()/1000); 
+            document.getElementById('v-ver').value=''; 
+            document.getElementById('v-tema').value=''; 
+            document.getElementById('v-dur').value=''; 
+            document.getElementById('modal-video').classList.remove('hidden'); 
+        };
         
         window.guardarVideo = async (e) => { 
             e.preventDefault(); 
             await addDoc(collection(db, COLL_VID), {
                 id_video: document.getElementById('v-id').value, 
                 version: document.getElementById('v-ver').value, 
+                tematica: document.getElementById('v-tema').value,
                 duracion: document.getElementById('v-dur').value, 
                 inicio_transmision: document.getElementById('v-ini').value, 
                 cierre_transmision: document.getElementById('v-fin').value
@@ -297,51 +404,31 @@
         // EXPORTAR / IMPORTAR CSV EN COLABORADOR
         window.exportarCSV = () => {
             if(window.videos.length === 0) return alert("No hay videos para exportar.");
-            let csv = "id_video,version,duracion,inicio_transmision,cierre_transmision\n";
+            let csv = "id_video,version,tematica,duracion,inicio_transmision,cierre_transmision\n";
             window.videos.forEach(v => {
-                let i = v.inicio_transmision || v.inicio || "";
-                let f = v.cierre_transmision || v.cierre || "";
-                let id_vid = (v.id_video||"").replace(/,/g, '');
-                let ver = (v.version||"").replace(/,/g, ' ');
-                let dur = (v.duracion||"").replace(/,/g, '');
-                csv += `${id_vid},${ver},${dur},${i},${f}\n`;
+                let i = v.inicio_transmision || v.inicio || ""; let f = v.cierre_transmision || v.cierre || "";
+                let id_vid = (v.id_video||"").replace(/,/g, ''); let ver = (v.version||"").replace(/,/g, ' '); let tema = (v.tematica||"General").replace(/,/g, ' '); let dur = (v.duracion||"").replace(/,/g, '');
+                csv += `${id_vid},${ver},${tema},${dur},${i},${f}\n`;
             });
-            let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            let url = window.URL.createObjectURL(blob);
-            let a = document.createElement('a'); a.href = url;
-            a.download = `MisVideos_${DB_SUFFIX}_${new Date().toISOString().split('T')[0]}.csv`;
-            a.click();
+            let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); let url = window.URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url;
+            a.download = `MisVideos_${DB_SUFFIX}_${new Date().toISOString().split('T')[0]}.csv`; a.click();
         };
 
         window.importarCSV = async (e) => {
-            let file = e.target.files[0];
-            if(!file) return;
-            
-            if(!confirm(`¿Importar datos desde Excel a tu base? Los videos se agregarán a tu lista actual sin borrar los anteriores.`)) { e.target.value = ''; return; }
-
+            let file = e.target.files[0]; if(!file) return;
+            if(!confirm(`¿Importar datos desde Excel a tu base?`)) { e.target.value = ''; return; }
             let reader = new FileReader();
             reader.onload = async function(event) {
-                let text = event.target.result;
-                let rows = text.split('\n');
-                let count = 0;
-                
+                let rows = event.target.result.split('\n'); let count = 0;
                 for(let i=1; i<rows.length; i++) {
-                    if(!rows[i].trim()) continue;
-                    let cols = rows[i].split(',');
-                    if(cols.length >= 5) {
-                        await addDoc(collection(db, COLL_VID), {
-                            id_video: cols[0].trim(),
-                            version: cols[1].trim(),
-                            duracion: cols[2].trim(),
-                            inicio_transmision: cols[3].trim(),
-                            cierre_transmision: cols[4].trim()
-                        });
-                        count++;
+                    if(!rows[i].trim()) continue; let cols = rows[i].split(',');
+                    if(cols.length >= 6 && cols[3].includes(':')) {
+                        await addDoc(collection(db, COLL_VID), { id_video: cols[0].trim(), version: cols[1].trim(), tematica: cols[2].trim(), duracion: cols[3].trim(), inicio_transmision: cols[4].trim(), cierre_transmision: cols[5].trim() }); count++;
+                    } else if(cols.length >= 5) {
+                        await addDoc(collection(db, COLL_VID), { id_video: cols[0].trim(), version: cols[1].trim(), tematica: 'General', duracion: cols[2].trim(), inicio_transmision: cols[3].trim(), cierre_transmision: cols[4].trim() }); count++;
                     }
                 }
-                alert(`Éxito: Se subieron ${count} videos nuevos desde Excel.`);
-                e.target.value = '';
-                await cargarData();
+                alert(`Éxito: Se subieron ${count} videos nuevos desde Excel.`); e.target.value = ''; await cargarData();
             };
             reader.readAsText(file);
         };
