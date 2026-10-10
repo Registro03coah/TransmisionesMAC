@@ -18,7 +18,7 @@
                 <div class="flex items-center justify-center mt-2 gap-2 text-xs font-bold">
                     <span id="login-conn-dot" class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
                     <span id="login-conn-text" class="text-slate-400">Conectando...</span>
-                    <span class="text-slate-500">| v1.0.38</span>
+                    <span class="text-slate-500">| v1.0.38 (Fix)</span>
                 </div>
             </div>
             
@@ -219,7 +219,7 @@
 
         window.userRole = null;
         window.usuariosApp = [];
-        window.videosEdit = []; // Videos cargados para el admin
+        window.videosEdit = []; 
 
         // Marcar conexión
         getDocs(collection(db, "test_conn")).then(()=>{
@@ -254,7 +254,7 @@
             await logAcceso(user.nombre, 'Colaborador');
             localStorage.setItem('session_colab_id', user.id);
             localStorage.setItem('session_colab_nombre', user.nombre);
-            localStorage.setItem('session_colab_db', user.db_suffix); // MAGIA: Asigna la BD correcta
+            localStorage.setItem('session_colab_db', user.db_suffix); 
             window.location.href = user.pagina; 
         };
 
@@ -276,13 +276,8 @@
         };
 
         window.cerrarSesion = () => { localStorage.clear(); location.reload(); };
+        window.cambiarHoja = (t) => { document.querySelectorAll('.sheet-view').forEach(e => e.classList.add('hidden')); document.getElementById(`sheet-${t}`).classList.remove('hidden'); };
 
-        window.cambiarHoja = (t) => {
-            document.querySelectorAll('.sheet-view').forEach(e => e.classList.add('hidden'));
-            document.getElementById(`sheet-${t}`).classList.remove('hidden');
-        };
-
-        // Panel Admin Tabs
         window.abrirModalAdmin = (tab = 'usuarios') => { document.getElementById('modal-admin').classList.remove('hidden'); window.switchAdminTab(tab); };
         window.cerrarModalAdmin = () => document.getElementById('modal-admin').classList.add('hidden');
         window.switchAdminTab = (tab) => {
@@ -293,32 +288,25 @@
             if(tab === 'usuarios') renderUsuarios(); if(tab === 'logs') cargarLogs();
         };
 
-        // SEMBRAR Y LEER USUARIOS
         window.cargarUsuarios = async () => {
             const snap = await getDocs(collection(db, "usuarios_colaboradores"));
             window.usuariosApp = [];
-            
-            // Si no existen los default, crearlos
             let existeYaz = false, existeDis = false;
             snap.forEach(d => { 
                 window.usuariosApp.push({id: d.id, ...d.data()}); 
                 if(d.id === 'yazmin') existeYaz = true;
                 if(d.id === 'distrito03') existeDis = true;
             });
-
             if(!existeYaz) {
                 let y = { nombre: "Yazmin Vallejo", password: "yazmin", pagina: "index2.html", db_suffix: "yazmin", bloqueado: false };
                 await setDoc(doc(db, "usuarios_colaboradores", "yazmin"), y);
                 window.usuariosApp.push({id: "yazmin", ...y});
             }
             if(!existeDis) {
-                // DISTRITO 03 -> SE CONECTA AL SUFIJO "1" PARA RESCATAR DATOS DE V1.0.36
                 let dis = { nombre: "Distrito 03", password: "Registro03", pagina: "index3.html", db_suffix: "1", bloqueado: false };
                 await setDoc(doc(db, "usuarios_colaboradores", "distrito03"), dis);
                 window.usuariosApp.push({id: "distrito03", ...dis});
             }
-
-            // Llenar selects
             let s = '<option value="">Seleccione usuario...</option>';
             window.usuariosApp.forEach(u => s+=`<option value="${u.id}">${u.nombre}</option>`);
             document.getElementById('colab-select').innerHTML = s;
@@ -344,9 +332,8 @@
 
         window.toggleBloqueo = async (id, est) => { await updateDoc(doc(db, "usuarios_colaboradores", id), {bloqueado: est}); await cargarUsuarios(); renderUsuarios(); };
         window.resetPass = async (id) => { let p = prompt("Nueva clave para " + id); if(p) { await updateDoc(doc(db, "usuarios_colaboradores", id), {password: p}); await cargarUsuarios(); renderUsuarios(); } };
-        window.cargarLogs = async () => { /* omitido por espacio, ya funciona */ };
+        window.cargarLogs = async () => {};
 
-        // LOGICA DE EDICION MULTI-BASE PARA EL ADMIN
         window.llenarSelectDBAdmin = () => {
             let s = '<option value="">Selecciona base a editar...</option>';
             window.usuariosApp.forEach(u => s += `<option value="${u.db_suffix}">Base de: ${u.nombre} (bd_videos_${u.db_suffix})</option>`);
@@ -363,8 +350,10 @@
             snap.forEach(d => {
                 let v = {idDoc: d.id, ...d.data()};
                 window.videosEdit.push(v);
+                let i = v.inicio_transmision || v.inicio;
+                let f = v.cierre_transmision || v.cierre;
                 let acc = `<td class="p-3 text-center"><button onclick="editarVidAdmin('${d.id}')" class="text-indigo-400 mr-3"><i class="fa-solid fa-pen"></i></button><button onclick="borrarVidAdmin('${d.id}')" class="text-rose-400"><i class="fa-solid fa-trash"></i></button></td>`;
-                tb.innerHTML += `<tr class="hover:bg-slate-800"><td class="p-3 text-indigo-400 font-bold">${v.id_video}</td><td class="p-3">${v.version}</td><td class="p-3 font-mono">${v.duracion}</td><td class="p-3">${v.inicio}</td><td class="p-3">${v.cierre}</td>${acc}</tr>`;
+                tb.innerHTML += `<tr class="hover:bg-slate-800"><td class="p-3 text-indigo-400 font-bold">${v.id_video}</td><td class="p-3">${v.version}</td><td class="p-3 font-mono">${v.duracion}</td><td class="p-3">${i}</td><td class="p-3">${f}</td>${acc}</tr>`;
             });
         };
 
@@ -376,7 +365,12 @@
 
         window.editarVidAdmin = (id) => {
             let v = window.videosEdit.find(x => x.idDoc === id); if(!v) return;
-            document.getElementById('va-doc').value = v.idDoc; document.getElementById('va-id').value = v.id_video; document.getElementById('va-ver').value = v.version; document.getElementById('va-dur').value = v.duracion; document.getElementById('va-ini').value = v.inicio; document.getElementById('va-fin').value = v.cierre;
+            document.getElementById('va-doc').value = v.idDoc; 
+            document.getElementById('va-id').value = v.id_video; 
+            document.getElementById('va-ver').value = v.version; 
+            document.getElementById('va-dur').value = v.duracion; 
+            document.getElementById('va-ini').value = v.inicio_transmision || v.inicio || ''; 
+            document.getElementById('va-fin').value = v.cierre_transmision || v.cierre || '';
             document.getElementById('modal-video-admin').classList.remove('hidden');
         };
 
@@ -384,7 +378,7 @@
             e.preventDefault();
             let sufijo = document.getElementById('admin-select-db').value;
             let docId = document.getElementById('va-doc').value;
-            let data = { id_video: document.getElementById('va-id').value, version: document.getElementById('va-ver').value, duracion: document.getElementById('va-dur').value, inicio: document.getElementById('va-ini').value, cierre: document.getElementById('va-fin').value };
+            let data = { id_video: document.getElementById('va-id').value, version: document.getElementById('va-ver').value, duracion: document.getElementById('va-dur').value, inicio_transmision: document.getElementById('va-ini').value, cierre_transmision: document.getElementById('va-fin').value };
             if(docId) { await updateDoc(doc(db, `bd_videos_${sufijo}`, docId), data); } else { await addDoc(collection(db, `bd_videos_${sufijo}`), data); }
             document.getElementById('modal-video-admin').classList.add('hidden');
             window.cargarVideosAdmin();
