@@ -9,7 +9,6 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
     
-    <!-- HEADER -->
     <header class="bg-slate-800 border-b border-cyan-700 sticky top-0 z-40 shadow-md">
         <div class="w-[98%] mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
             <div class="flex items-center space-x-3">
@@ -21,7 +20,7 @@
             </div>
             <nav id="nav-tabs" class="flex flex-wrap gap-2 items-center">
                 <div class="flex items-center px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs font-bold text-slate-300 mr-2">
-                    <span id="nav-conn-dot" class="w-2.5 h-2.5 rounded-full bg-red-500 mr-2 shadow-[0_0_5px_#ef4444]"></span> BD <span id="hdr-sufijo" class="ml-1 text-cyan-400">...</span> | v1.0.38
+                    <span id="nav-conn-dot" class="w-2.5 h-2.5 rounded-full bg-red-500 mr-2 shadow-[0_0_5px_#ef4444]"></span> BD <span id="hdr-sufijo" class="ml-1 text-cyan-400">...</span>
                 </div>
                 
                 <button onclick="cambiarHoja('BD_Videos')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-cyan-600 text-white" data-target="BD_Videos">Mis Videos</button>
@@ -30,7 +29,7 @@
                 
                 <div class="w-px h-6 bg-slate-700 mx-1"></div>
                 
-                <button onclick="abrirConfig()" class="px-3 py-1.5 rounded-lg text-sm font-semibold bg-amber-600/20 text-amber-400 border border-amber-500/30"><i class="fa-solid fa-sliders"></i> Horas/Pantallas</button>
+                <button onclick="abrirConfig()" class="px-3 py-1.5 rounded-lg text-sm font-semibold bg-amber-600/20 text-amber-400 border border-amber-500/30"><i class="fa-solid fa-sliders"></i> Ajustes</button>
                 <button onclick="salir()" class="ml-2 px-3 py-1.5 rounded-lg text-sm font-bold bg-red-600 hover:bg-red-500 text-white"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
             </nav>
         </div>
@@ -38,7 +37,6 @@
 
     <main class="flex-grow w-[98%] mx-auto px-2 py-6">
         
-        <!-- VIDEOS -->
         <section id="sheet-BD_Videos" class="sheet-view space-y-6">
             <div class="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700 shadow">
                 <h2 class="text-xl font-bold text-white"><i class="fa-solid fa-video text-cyan-400"></i> Mi Catálogo de Videos</h2>
@@ -54,7 +52,6 @@
             </div>
         </section>
 
-        <!-- REPORTE -->
         <section id="sheet-Reporte" class="sheet-view hidden space-y-6">
             <div class="bg-slate-800 p-6 rounded-xl border border-orange-500 shadow-xl">
                 <h2 class="text-xl font-bold text-white mb-4"><i class="fa-solid fa-chart-pie text-orange-400"></i> Reporte Acumulado</h2>
@@ -69,7 +66,6 @@
             </div>
         </section>
         
-        <!-- CALENDARIO -->
         <section id="sheet-Calendario" class="sheet-view hidden space-y-6">
             <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
                 <h2 class="text-xl font-bold text-white mb-4"><i class="fa-solid fa-calendar-xmark text-amber-400"></i> Días Festivos / Inhábiles</h2>
@@ -83,7 +79,7 @@
 
     </main>
 
-    <!-- MODAL CONFIGURACION INICIAL -->
+    <!-- MODALES -->
     <div id="modal-config" class="fixed inset-0 bg-slate-950/95 z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-slate-800 border-2 border-amber-500 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative">
             <button id="btn-cerrar-config" onclick="cerrarConfig()" class="absolute top-4 right-4 text-slate-400 hover:text-white hidden"><i class="fa-solid fa-xmark text-xl"></i></button>
@@ -107,7 +103,6 @@
         </div>
     </div>
 
-    <!-- MODAL VIDEO -->
     <div id="modal-video" class="fixed inset-0 bg-slate-950/80 hidden z-[60] flex items-center justify-center p-4">
         <div class="bg-slate-800 p-6 rounded-xl max-w-md w-full border border-slate-700 shadow-2xl">
             <h3 class="font-bold mb-4 text-white">Nuevo Video en Módulo</h3>
@@ -130,7 +125,6 @@
         </div>
     </div>
     
-    <!-- MODAL CALENDARIO -->
     <div id="modal-cal" class="fixed inset-0 bg-slate-950/80 hidden z-[60] flex items-center justify-center p-4">
         <div class="bg-slate-800 p-6 rounded-xl max-w-sm w-full border border-slate-700 shadow-2xl">
             <h3 class="font-bold mb-4 text-white">Agregar Fecha</h3>
@@ -152,17 +146,15 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app); window.db = db;
 
-        // Recuperar sesión del localStorage (inyectada por el login del Admin)
         const COLAB_ID = localStorage.getItem('session_colab_id');
         const COLAB_NOM = localStorage.getItem('session_colab_nombre');
-        const DB_SUFFIX = localStorage.getItem('session_colab_db'); // ESTA ES LA CLAVE DE LA BD
+        const DB_SUFFIX = localStorage.getItem('session_colab_db');
         
-        if(!COLAB_ID || !DB_SUFFIX) { window.location.href = 'index.html'; } // Obliga a loguearse
+        if(!COLAB_ID || !DB_SUFFIX) { window.location.href = 'index.html'; }
         
         document.getElementById('hdr-nombre').innerText = COLAB_NOM;
         document.getElementById('hdr-sufijo').innerText = `(_${DB_SUFFIX})`;
 
-        // COLECCIONES EXACTAS (Respetando el "calendario_config_" de la version 1.0.36)
         const COLL_VID = `bd_videos_${DB_SUFFIX}`;
         const COLL_CAL = `calendario_config_${DB_SUFFIX}`;
         
@@ -181,13 +173,11 @@
         };
 
         async function init() {
-            // Test connection dot
             getDocs(collection(db, "test_conn")).then(()=>{
                 document.getElementById('nav-conn-dot').classList.replace('bg-red-500','bg-green-500');
                 document.getElementById('nav-conn-dot').classList.replace('shadow-[0_0_5px_#ef4444]','shadow-[0_0_5px_#22c55e]');
             });
 
-            // Configuración
             const docCfg = await getDoc(doc(db, "config_modulos", COLAB_ID));
             if(docCfg.exists()) {
                 window.cfg = docCfg.data();
@@ -224,13 +214,28 @@
             let hoyStr = new Date().toISOString().split('T')[0];
 
             window.videos.forEach(v => {
-                let ini = new Date(v.inicio+"T00:00:00"), fin = new Date(v.cierre+"T00:00:00"), hoy = new Date(hoyStr+"T00:00:00");
+                // FIX: Soporte para esquema viejo (inicio_transmision) y nuevo (inicio)
+                let vIni = v.inicio_transmision || v.inicio;
+                let vFin = v.cierre_transmision || v.cierre;
+                
+                v._ini = vIni; // Guardar temporal para la tabla
+                v._fin = vFin;
+
+                // Si no hay fechas válidas, saltar para evitar error
+                if(!vIni || !vFin) { v.dias = 0; v.imp = 0; return; }
+
+                let ini = new Date(vIni+"T00:00:00"), fin = new Date(vFin+"T00:00:00"), hoy = new Date(hoyStr+"T00:00:00");
                 let lim = (fin < hoy) ? fin : hoy; let dias = 0, rep = 0; let c = new Date(ini);
+                
                 while(c <= lim) {
                     let f = c.toISOString().split('T')[0];
                     if(!fest.has(f) && (c.getDay()!==0 || adic.has(f))) {
                         dias++;
-                        let actHoy = window.videos.filter(vid => f>=vid.inicio && f<=vid.cierre);
+                        let actHoy = window.videos.filter(vid => {
+                            let i = vid.inicio_transmision || vid.inicio;
+                            let fn = vid.cierre_transmision || vid.cierre;
+                            return f >= i && f <= fn;
+                        });
                         let sumS = actHoy.reduce((a,b)=>a+window.duracionSeg(b.duracion), 0);
                         if(sumS>0) rep += (3600 / sumS) * window.cfg.horas * window.cfg.pantallas * (window.duracionSeg(v.duracion)/60);
                     }
@@ -243,7 +248,7 @@
         window.renderVideos = () => {
             const tb = document.getElementById('tabla-videos-body'); tb.innerHTML='';
             window.videos.forEach(v => {
-                tb.innerHTML += `<tr class="hover:bg-slate-700/50"><td class="p-3 font-bold text-cyan-400">${v.id_video}</td><td class="p-3">${v.version}</td><td class="p-3 font-mono">${v.inicio}</td><td class="p-3 font-mono">${v.cierre}</td><td class="p-3 text-center">${v.dias}</td><td class="p-3 text-right font-bold text-amber-400 text-base">${v.imp.toLocaleString()}</td><td class="p-3 text-center"><button onclick="borrarVid('${v.idDoc}')" class="text-rose-400"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                tb.innerHTML += `<tr class="hover:bg-slate-700/50"><td class="p-3 font-bold text-cyan-400">${v.id_video}</td><td class="p-3">${v.version}</td><td class="p-3 font-mono">${v._ini || 'Error'}</td><td class="p-3 font-mono">${v._fin || 'Error'}</td><td class="p-3 text-center">${v.dias}</td><td class="p-3 text-right font-bold text-amber-400 text-base">${v.imp.toLocaleString()}</td><td class="p-3 text-center"><button onclick="borrarVid('${v.idDoc}')" class="text-rose-400"><i class="fa-solid fa-trash"></i></button></td></tr>`;
             });
         };
 
@@ -252,15 +257,27 @@
             let ini = document.getElementById('rep-inicio').value; let fin = document.getElementById('rep-fin').value;
             if(!ini || !fin) return;
             window.videos.forEach(v => {
-                if(v.inicio <= fin && v.cierre >= ini) tb.innerHTML += `<tr class="hover:bg-slate-700/50"><td class="p-3">${v.version}</td><td class="p-3 text-right text-amber-400 font-bold text-lg">${v.imp.toLocaleString()}</td></tr>`;
+                if(v._ini <= fin && v._fin >= ini) tb.innerHTML += `<tr class="hover:bg-slate-700/50"><td class="p-3">${v.version}</td><td class="p-3 text-right text-amber-400 font-bold text-lg">${v.imp.toLocaleString()}</td></tr>`;
             });
         };
 
         window.abrirModalVideo = () => { document.getElementById('v-id').value=''; document.getElementById('v-ver').value=''; document.getElementById('v-dur').value=''; document.getElementById('modal-video').classList.remove('hidden'); };
-        window.guardarVideo = async (e) => { e.preventDefault(); await addDoc(collection(db, COLL_VID), {id_video: document.getElementById('v-id').value, version: document.getElementById('v-ver').value, duracion: document.getElementById('v-dur').value, inicio: document.getElementById('v-ini').value, cierre: document.getElementById('v-fin').value}); document.getElementById('modal-video').classList.add('hidden'); await cargarData(); };
+        
+        window.guardarVideo = async (e) => { 
+            e.preventDefault(); 
+            await addDoc(collection(db, COLL_VID), {
+                id_video: document.getElementById('v-id').value, 
+                version: document.getElementById('v-ver').value, 
+                duracion: document.getElementById('v-dur').value, 
+                inicio_transmision: document.getElementById('v-ini').value, 
+                cierre_transmision: document.getElementById('v-fin').value
+            }); 
+            document.getElementById('modal-video').classList.add('hidden'); 
+            await cargarData(); 
+        };
+        
         window.borrarVid = async (id) => { if(confirm("¿Eliminar video?")){ await deleteDoc(doc(db, COLL_VID, id)); await cargarData();} };
 
-        // Calendario
         window.renderCal = () => {
             const tb = document.getElementById('tabla-cal-body'); tb.innerHTML='';
             window.calendario.forEach(c => {
