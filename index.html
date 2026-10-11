@@ -18,7 +18,7 @@
                 <div class="flex items-center justify-center mt-2 gap-2 text-xs font-bold">
                     <span id="login-conn-dot" class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
                     <span id="login-conn-text" class="text-slate-400">Conectando...</span>
-                    <span class="text-slate-500">| v1.0.45</span>
+                    <span class="text-slate-500">| v1.0.47</span>
                 </div>
             </div>
             
@@ -75,7 +75,7 @@
                 <div class="flex items-center px-3 py-1 bg-slate-900 border border-slate-700 rounded-lg text-xs font-bold text-slate-300 mr-2">
                     <span id="nav-conn-dot" class="w-2 h-2 rounded-full bg-green-500 mr-2 shadow-[0_0_5px_#22c55e]"></span> BD Conectada
                 </div>
-                <!-- Pestañas de navegación con clases interactivas -->
+                
                 <button onclick="cambiarHoja('inicio')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-indigo-600 text-white transition-colors" data-target="inicio">Dashboard</button>
                 <button onclick="cambiarHoja('BD_Videos')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-700 text-slate-300 transition-colors hover:bg-slate-600" data-target="BD_Videos">Control de Bases</button>
                 <button onclick="cambiarHoja('BD_Festivos')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-700 text-slate-300 transition-colors hover:bg-slate-600" data-target="BD_Festivos">Festivos</button>
@@ -125,7 +125,6 @@
                      <input type="file" id="csv-file-admin" accept=".csv" class="hidden" onchange="importarCSV(event)">
                      <button id="btn-exportar" onclick="exportarCSV()" class="bg-emerald-600 hover:bg-emerald-500 transition text-white px-3 py-1.5 rounded font-bold hidden text-sm"><i class="fa-solid fa-download"></i> Bajar Excel</button>
                      <button id="btn-importar" onclick="document.getElementById('csv-file-admin').click()" class="bg-amber-600 hover:bg-amber-500 transition text-white px-3 py-1.5 rounded font-bold hidden text-sm"><i class="fa-solid fa-upload"></i> Subir Excel</button>
-                     <!-- BOTÓN BORRAR BASE AGREGADO -->
                      <button id="btn-borrar-base" onclick="borrarBaseVideos()" class="bg-red-600 hover:bg-red-500 transition text-white px-3 py-1.5 rounded font-bold hidden text-sm"><i class="fa-solid fa-trash-can"></i> Borrar Base</button>
                      <button id="btn-nuevo-video" onclick="abrirModalVideoAdmin()" class="bg-indigo-600 hover:bg-indigo-500 transition text-white px-3 py-1.5 rounded font-bold hidden text-sm"><i class="fa-solid fa-plus"></i> Nuevo</button>
                  </div>
@@ -192,23 +191,26 @@
         <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-6xl w-full h-[85vh] flex flex-col shadow-2xl">
             <div class="flex justify-between items-center p-4 border-b border-slate-700">
                 <h3 class="text-xl font-bold text-white"><i class="fa-solid fa-server text-rose-400 mr-2"></i> Panel Maestro</h3>
-                <button onclick="cerrarModalAdmin()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <button onclick="cerrarModalAdmin()" class="text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             
             <div class="flex border-b border-slate-700 bg-slate-900/50">
                 <button onclick="switchAdminTab('usuarios')" id="tab-adm-usuarios" class="px-6 py-3 font-bold border-b-2 border-cyan-500 text-cyan-400">Perfiles de Usuarios Registrados</button>
-                <button onclick="switchAdminTab('logs')" id="tab-adm-logs" class="px-6 py-3 font-bold border-b-2 border-transparent text-slate-400">Auditoría (Logs)</button>
+                <button onclick="switchAdminTab('logs')" id="tab-adm-logs" class="px-6 py-3 font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-300 transition">Auditoría (Logs)</button>
             </div>
 
             <div class="p-4 flex-grow overflow-y-auto">
                 <div id="adm-sec-usuarios" class="space-y-4">
                     <div class="flex justify-between items-center bg-slate-900 p-4 rounded-xl">
                         <h4 class="font-bold text-white">Usuarios Autorizados</h4>
-                        <button onclick="document.getElementById('modal-nuevo-usr').classList.remove('hidden')" class="bg-cyan-600 text-white px-3 py-1.5 rounded font-bold"><i class="fa-solid fa-user-plus"></i> Nuevo</button>
+                        <div class="flex gap-2">
+                            <!-- NUEVO: Botón de refrescar para jalar contraseñas nuevas -->
+                            <button onclick="window.cargarUsuarios(true)" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded font-bold transition"><i class="fa-solid fa-rotate-right"></i> Refrescar</button>
+                            <button onclick="document.getElementById('modal-nuevo-usr').classList.remove('hidden')" class="bg-cyan-600 hover:bg-cyan-500 text-white px-3 py-1.5 rounded font-bold transition"><i class="fa-solid fa-user-plus"></i> Nuevo</button>
+                        </div>
                     </div>
                     <table class="w-full text-left text-sm bg-slate-900 rounded-xl overflow-hidden">
                         <thead class="bg-slate-950 text-slate-400">
-                            <!-- COLUMNA CLAVE AÑADIDA AQUÍ -->
                             <tr><th class="p-3">ID Login</th><th class="p-3">Nombre</th><th class="p-3">Contraseña</th><th class="p-3">Página</th><th class="p-3">Sufijo BD</th><th class="p-3">Estado</th><th class="p-3 text-right">Acciones</th></tr>
                         </thead>
                         <tbody id="tabla-usuarios-body" class="divide-y divide-slate-800"></tbody>
@@ -217,11 +219,11 @@
 
                 <div id="adm-sec-logs" class="hidden space-y-4">
                     <div class="flex justify-between items-center bg-slate-900 p-4 rounded-xl">
-                        <h4 class="font-bold text-white">Registro de Entradas</h4>
-                        <button onclick="cargarLogs()" class="bg-indigo-600 text-white px-3 py-1.5 rounded font-bold">Actualizar</button>
+                        <h4 class="font-bold text-white">Registro de Accesos (Últimos 100)</h4>
+                        <button onclick="cargarLogs()" class="bg-indigo-600 hover:bg-indigo-500 transition text-white px-3 py-1.5 rounded font-bold"><i class="fa-solid fa-rotate-right"></i> Actualizar</button>
                     </div>
                     <table class="w-full text-left text-sm bg-slate-900 rounded-xl overflow-hidden">
-                        <thead class="bg-slate-950 text-slate-400"><tr><th class="p-3">Fecha</th><th class="p-3">Hora</th><th class="p-3">Usuario</th><th class="p-3">Rol</th></tr></thead>
+                        <thead class="bg-slate-950 text-slate-400"><tr><th class="p-3">Fecha</th><th class="p-3">Hora</th><th class="p-3">Nombre del Usuario</th><th class="p-3">Rol</th></tr></thead>
                         <tbody id="tabla-logs-body" class="divide-y divide-slate-800"></tbody>
                     </table>
                 </div>
@@ -361,7 +363,7 @@
             if(!nom) return alert("Por favor ingresa tu nombre");
             await logAcceso(nom, 'Visitante');
             sessionStorage.setItem('session_visitante_nombre', nom);
-            window.location.href = 'visitante_modificado.html';
+            window.location.href = 'visitante.html';
         };
 
         window.entrarColaborador = async (e) => {
@@ -398,7 +400,7 @@
                 document.getElementById('btn-nuevo-video').classList.remove('hidden');
                 document.getElementById('btn-exportar').classList.remove('hidden');
                 document.getElementById('btn-importar').classList.remove('hidden');
-                document.getElementById('btn-borrar-base').classList.remove('hidden'); // MOSTRAR NUEVO BOTÓN
+                document.getElementById('btn-borrar-base').classList.remove('hidden');
                 document.getElementById('col-accion-video').classList.remove('hidden');
                 
                 window.cambiarHoja('inicio');
@@ -432,19 +434,23 @@
             document.getElementById('adm-sec-usuarios').classList.toggle('hidden', tab !== 'usuarios');
             document.getElementById('adm-sec-logs').classList.toggle('hidden', tab !== 'logs');
             
-            document.getElementById('tab-adm-usuarios').className = tab === 'usuarios' ? "px-6 py-3 font-bold border-b-2 border-cyan-500 text-cyan-400" : "px-6 py-3 font-bold border-b-2 border-transparent text-slate-400";
-            document.getElementById('tab-adm-logs').className = tab === 'logs' ? "px-6 py-3 font-bold border-b-2 border-cyan-500 text-cyan-400" : "px-6 py-3 font-bold border-b-2 border-transparent text-slate-400";
+            document.getElementById('tab-adm-usuarios').className = tab === 'usuarios' ? "px-6 py-3 font-bold border-b-2 border-cyan-500 text-cyan-400" : "px-6 py-3 font-bold border-b-2 border-transparent text-slate-400 transition hover:text-slate-300";
+            document.getElementById('tab-adm-logs').className = tab === 'logs' ? "px-6 py-3 font-bold border-b-2 border-cyan-500 text-cyan-400" : "px-6 py-3 font-bold border-b-2 border-transparent text-slate-400 transition hover:text-slate-300";
 
-            if(tab === 'usuarios') renderUsuarios();
+            if(tab === 'usuarios') window.cargarUsuarios(true);
+            if(tab === 'logs') window.cargarLogs();
         };
 
-        window.cargarUsuarios = async () => {
+        window.cargarUsuarios = async (forzarRender = false) => {
             const snap = await getDocs(collection(db, "usuarios_colaboradores"));
             window.usuariosApp = [];
             snap.forEach(d => window.usuariosApp.push({id: d.id, ...d.data()}));
             let s = '<option value="">Seleccione usuario...</option>';
             window.usuariosApp.forEach(u => s+=`<option value="${u.id}">${u.nombre}</option>`);
             document.getElementById('colab-select').innerHTML = s;
+            
+            // Si el parametro es true, fuerza la actualizacion de la tabla visualmente
+            if (forzarRender) window.renderUsuarios();
         };
 
         // CONTRASEÑAS VISIBLES
@@ -452,7 +458,7 @@
             const tb = document.getElementById('tabla-usuarios-body'); tb.innerHTML = '';
             window.usuariosApp.forEach(u => {
                 let status = u.bloqueado ? '<span class="text-red-400">Bloqueado</span>' : '<span class="text-green-400">Activo</span>';
-                let bToggle = u.bloqueado ? `<button onclick="toggleBloqueo('${u.id}', false)" class="bg-green-600 px-2 py-1 rounded text-white mx-1">Activar</button>` : `<button onclick="toggleBloqueo('${u.id}', true)" class="bg-red-600 px-2 py-1 rounded text-white mx-1">Bloquear</button>`;
+                let bToggle = u.bloqueado ? `<button onclick="toggleBloqueo('${u.id}', false)" class="bg-green-600 hover:bg-green-500 px-2 py-1 rounded text-white mx-1 transition">Activar</button>` : `<button onclick="toggleBloqueo('${u.id}', true)" class="bg-red-600 hover:bg-red-500 px-2 py-1 rounded text-white mx-1 transition">Bloquear</button>`;
                 let dbsuf = u.db_suffix || u.id || '1';
                 
                 tb.innerHTML += `<tr class="hover:bg-slate-800/40">
@@ -463,7 +469,7 @@
                     <td class="p-3 font-mono text-amber-400">${dbsuf}</td>
                     <td class="p-3">${status}</td>
                     <td class="p-3 text-right">
-                        <button onclick="resetPass('${u.id}')" class="bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded text-white"><i class="fa-solid fa-key"></i> Pass</button>
+                        <button onclick="resetPass('${u.id}')" class="bg-slate-700 hover:bg-slate-600 transition px-2 py-1 rounded text-white"><i class="fa-solid fa-key"></i> Pass</button>
                         ${bToggle}
                     </td>
                 </tr>`;
@@ -471,9 +477,54 @@
         };
 
         window.guardarNuevoUsuario = async (e) => { e.preventDefault(); const id = document.getElementById('nu-id').value.trim().toLowerCase(); await setDoc(doc(db, "usuarios_colaboradores", id), { nombre: document.getElementById('nu-nombre').value, password: document.getElementById('nu-pass').value, pagina: document.getElementById('nu-pag').value, db_suffix: document.getElementById('nu-sufijo').value, bloqueado: false }); document.getElementById('modal-nuevo-usr').classList.add('hidden'); await cargarUsuarios(); renderUsuarios(); llenarSelectDBAdmin(); };
-        window.toggleBloqueo = async (id, est) => { await updateDoc(doc(db, "usuarios_colaboradores", id), {bloqueado: est}); await cargarUsuarios(); renderUsuarios(); };
-        window.resetPass = async (id) => { let p = prompt("Nueva clave para " + id); if(p) { await updateDoc(doc(db, "usuarios_colaboradores", id), {password: p}); await cargarUsuarios(); renderUsuarios(); } };
-        window.cargarLogs = async () => {};
+        window.toggleBloqueo = async (id, est) => { await updateDoc(doc(db, "usuarios_colaboradores", id), {bloqueado: est}); await cargarUsuarios(true); };
+        
+        window.resetPass = async (id) => { 
+            let p = prompt("Ingresa la NUEVA clave para el usuario: " + id); 
+            if(p && p.trim() !== "") { 
+                await updateDoc(doc(db, "usuarios_colaboradores", id), {password: p.trim()}); 
+                await window.cargarUsuarios(true); // Esto fuerza la recarga de base y visual
+                alert("¡Contraseña actualizada correctamente!");
+            } 
+        };
+
+        // NUEVO: SISTEMA DE LOGS ARREGLADO
+        window.cargarLogs = async () => {
+            const tb = document.getElementById('tabla-logs-body');
+            tb.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Cargando registros...</td></tr>';
+            try {
+                const snap = await getDocs(collection(db, "registro_accesos"));
+                let logs = [];
+                snap.forEach(d => logs.push(d.data()));
+                
+                // Ordenar del más reciente al más viejo
+                logs.sort((a, b) => b.ts - a.ts); 
+                // Limitar a los ultimos 100
+                logs = logs.slice(0, 100);
+                
+                tb.innerHTML = '';
+                if(logs.length === 0) {
+                    tb.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-slate-400">No hay registros de acceso aún.</td></tr>';
+                    return;
+                }
+                
+                logs.forEach(l => {
+                    let rolBadge = '';
+                    if(l.rol === 'Visitante') rolBadge = '<span class="bg-indigo-900/50 text-indigo-400 px-2 py-1 rounded text-xs font-bold">Invitado</span>';
+                    else if(l.rol === 'Colaborador') rolBadge = '<span class="bg-cyan-900/50 text-cyan-400 px-2 py-1 rounded text-xs font-bold">Usuario</span>';
+                    else rolBadge = '<span class="bg-rose-900/50 text-rose-400 px-2 py-1 rounded text-xs font-bold">Admin Master</span>';
+                    
+                    tb.innerHTML += `<tr class="hover:bg-slate-800/40">
+                        <td class="p-3 text-slate-300 font-mono">${l.fecha || '-'}</td>
+                        <td class="p-3 text-slate-400 font-mono">${l.hora || '-'}</td>
+                        <td class="p-3 font-bold text-white">${l.nombre || 'Desconocido'}</td>
+                        <td class="p-3">${rolBadge}</td>
+                    </tr>`;
+                });
+            } catch(error) {
+                tb.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-red-400">Error al cargar el historial.</td></tr>';
+            }
+        };
 
         // LLENAR SELECTORES DE BASE
         window.llenarSelectDBAdmin = () => {
@@ -591,7 +642,6 @@
             if(confirm("¿Eliminar video de esta base?")) { await deleteDoc(doc(db, colName, id)); window.cargarVideosAdmin(); }
         };
 
-        // NUEVO: FUNCION BORRAR BASE COMPLETA VIDEOS
         window.borrarBaseVideos = async () => {
             let sufijo = document.getElementById('admin-select-db').value;
             if(!sufijo) return alert("Selecciona una base para borrar.");
@@ -760,7 +810,7 @@
             reader.readAsText(file);
         };
 
-        window.addEventListener('DOMContentLoaded', cargarUsuarios);
+        window.addEventListener('DOMContentLoaded', () => window.cargarUsuarios(false));
     </script>
 </body>
 </html>
