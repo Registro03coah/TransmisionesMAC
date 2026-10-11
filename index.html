@@ -412,7 +412,7 @@
         window.entrarAdmin = async (e) => {
             e.preventDefault();
             const pass = document.getElementById('admin-pass').value;
-            if(pass === 's0p0rt3' || pass === 'charro') {
+            if(pass === 'sistemas' || pass === 'charro') {
                 window.userRole = 'admin';
                 document.getElementById('nav-user-rol').innerText = 'Admin Master';
                 await logAcceso('Admin Master', 'Administrador');
