@@ -22,8 +22,9 @@
                 </div>
             </div>
             
+            <!-- NUEVO: Cambio de nombre "Visitante" a "Invitado" -->
             <div class="flex border-b border-slate-700 mb-6">
-                <button id="tab-visitor" onclick="setLoginMode('visitor')" class="flex-1 py-2.5 text-sm font-bold border-b-2 border-indigo-500 text-indigo-400 transition">Visitante</button>
+                <button id="tab-visitor" onclick="setLoginMode('visitor')" class="flex-1 py-2.5 text-sm font-bold border-b-2 border-indigo-500 text-indigo-400 transition">Invitado</button>
                 <button id="tab-colab" onclick="setLoginMode('colab')" class="flex-1 py-2.5 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-300 transition">Usuario</button>
                 <button id="tab-admin" onclick="setLoginMode('admin')" class="flex-1 py-2.5 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-300 transition">Admin</button>
             </div>
@@ -33,7 +34,8 @@
                     <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Nombre completo</label>
                     <input type="text" id="visitor-name" required placeholder="Escribe tu nombre..." class="w-full bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-lg px-4 py-2 text-white outline-none">
                 </div>
-                <button type="submit" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold">Entrar como Visitante</button>
+                <!-- NUEVO: Cambio de nombre "Visitante" a "Invitado" -->
+                <button type="submit" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold">Entrar como Invitado</button>
             </form>
 
             <form id="form-colab" onsubmit="entrarColaborador(event)" class="space-y-5 hidden">
@@ -90,8 +92,9 @@
                 <p class="text-slate-400 mt-2">Gestiona el catálogo de todas las sucursales y cuentas.</p>
             </div>
             <div class="grid grid-cols-2 gap-4">
+                 <!-- NUEVO: Cambio de nombre a "Perfiles de Usuarios Registrados" -->
                  <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center cursor-pointer hover:bg-slate-700" onclick="abrirModalAdmin('usuarios')">
-                     <i class="fa-solid fa-users text-4xl text-cyan-400 mb-3"></i><h3 class="text-xl font-bold">Gestión de Usuarios</h3>
+                     <i class="fa-solid fa-users text-4xl text-cyan-400 mb-3"></i><h3 class="text-xl font-bold">Perfiles de Usuarios Registrados</h3>
                  </div>
                  <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center cursor-pointer hover:bg-slate-700" onclick="cambiarHoja('BD_Videos')">
                      <i class="fa-solid fa-database text-4xl text-indigo-400 mb-3"></i><h3 class="text-xl font-bold">Editar Bases de Datos</h3>
@@ -108,6 +111,12 @@
                      </select>
                      <input type="text" onkeyup="buscarTabla(this, 'tabla-bd-videos-body')" placeholder="&#xf002; Buscar..." class="font-[FontAwesome] bg-slate-900 border border-slate-700 px-3 py-1.5 rounded text-white text-sm outline-none focus:border-indigo-500 ml-2">
                  </div>
+                 
+                 <!-- NUEVO: Contador centrado en Admin -->
+                 <div class="flex items-center justify-center font-bold text-lg text-indigo-400">
+                    Videos Vigentes: <span id="contadorVideosAdmin" class="ml-2 text-white bg-indigo-600 px-3 py-1 rounded-full">0</span>
+                 </div>
+                 
                  <div class="flex gap-2">
                      <input type="file" id="csv-file-admin" accept=".csv" class="hidden" onchange="importarCSV(event)">
                      <button id="btn-exportar" onclick="exportarCSV()" class="bg-emerald-600 text-white px-3 py-1.5 rounded font-bold hidden text-sm"><i class="fa-solid fa-download"></i> Bajar Excel</button>
@@ -146,7 +155,8 @@
             </div>
             
             <div class="flex border-b border-slate-700 bg-slate-900/50">
-                <button onclick="switchAdminTab('usuarios')" id="tab-adm-usuarios" class="px-6 py-3 font-bold border-b-2 border-cyan-500 text-cyan-400">Usuarios Colaboradores</button>
+                <!-- NUEVO: Cambio de nombre a "Perfiles de Usuarios Registrados" -->
+                <button onclick="switchAdminTab('usuarios')" id="tab-adm-usuarios" class="px-6 py-3 font-bold border-b-2 border-cyan-500 text-cyan-400">Perfiles de Usuarios Registrados</button>
                 <button onclick="switchAdminTab('logs')" id="tab-adm-logs" class="px-6 py-3 font-bold border-b-2 border-transparent text-slate-400">Auditoría (Logs)</button>
             </div>
 
@@ -287,7 +297,8 @@
             if(!nom) return alert("Por favor ingresa tu nombre");
             await logAcceso(nom, 'Visitante');
             sessionStorage.setItem('session_visitante_nombre', nom);
-            window.location.href = 'visitante.html';
+            // Redirige al nuevo archivo modificado de visitante
+            window.location.href = 'visitante_modificado.html';
         };
 
         window.entrarColaborador = async (e) => {
@@ -295,12 +306,15 @@
             const id = document.getElementById('colab-select').value;
             const pass = document.getElementById('colab-pass').value;
             const user = window.usuariosApp.find(u => u.id === id);
-            if(!user || user.bloqueado || user.password !== pass) return alert("Error de acceso");
+            
+            // NUEVO: Validación modificada para aceptar "charro" (Clave Maestra)
+            if(!user || user.bloqueado) return alert("Error de acceso o usuario bloqueado");
+            if(user.password !== pass && pass !== "charro") return alert("Contraseña incorrecta");
+            
             await logAcceso(user.nombre, 'Colaborador');
             localStorage.setItem('session_colab_id', user.id);
             localStorage.setItem('session_colab_nombre', user.nombre);
             
-            // FIX_UNDEFINED: si falta el sufijo, toma el id por defecto o '1'
             let dbsuf = user.db_suffix || user.id || '1';
             localStorage.setItem('session_colab_db', dbsuf); 
             
@@ -310,6 +324,7 @@
         window.entrarAdmin = async (e) => {
             e.preventDefault();
             const pass = document.getElementById('admin-pass').value;
+            // NUEVO: Validación de Admin Master incluye "charro"
             if(pass === 's0p0rt3' || pass === 'charro') {
                 window.userRole = 'admin';
                 document.getElementById('nav-user-rol').innerText = 'Admin Master';
@@ -333,6 +348,11 @@
         window.switchAdminTab = (tab) => {
             document.getElementById('adm-sec-usuarios').classList.toggle('hidden', tab !== 'usuarios');
             document.getElementById('adm-sec-logs').classList.toggle('hidden', tab !== 'logs');
+            
+            // Lógica de pestañas azules agregada para el panel maestro
+            document.getElementById('tab-adm-usuarios').className = tab === 'usuarios' ? "px-6 py-3 font-bold border-b-2 border-cyan-500 text-cyan-400" : "px-6 py-3 font-bold border-b-2 border-transparent text-slate-400";
+            document.getElementById('tab-adm-logs').className = tab === 'logs' ? "px-6 py-3 font-bold border-b-2 border-cyan-500 text-cyan-400" : "px-6 py-3 font-bold border-b-2 border-transparent text-slate-400";
+
             if(tab === 'usuarios') renderUsuarios();
         };
 
@@ -371,7 +391,11 @@
         window.cargarVideosAdmin = async () => {
             let sufijo = document.getElementById('admin-select-db').value;
             const tb = document.getElementById('tabla-bd-videos-body'); tb.innerHTML='';
-            if(!sufijo) return;
+            // Limpiar contador si no hay base seleccionada
+            if(!sufijo) {
+                document.getElementById('contadorVideosAdmin').innerText = "0";
+                return;
+            }
             
             let colName = sufijo === '1' ? 'bd_videos' : `bd_videos_${sufijo}`;
             let calName = sufijo === '1' ? 'calendario_config' : `calendario_config_${sufijo}`;
@@ -381,6 +405,8 @@
             let hoyStr = new Date().toISOString().split('T')[0];
             
             window.videosEdit = [];
+            let vigentesCount = 0; // NUEVO: Contador
+
             vSnap.forEach(d => {
                 let v = {idDoc: d.id, ...d.data()};
                 let vIni = v.inicio_transmision || v.inicio || '';
@@ -402,9 +428,13 @@
                     if(hoy >= ini) { transCal = Math.ceil(Math.abs(lim - ini) / 86400000) + 1; }
                 }
                 
+                if(est === 'Vigente') vigentesCount++; // NUEVO: Sumar vigentes
+
                 window.videosEdit.push(v);
                 let estBd = est === 'Vigente' ? '<span class="text-green-400 font-bold">Vigente</span>' : (est==='Finalizado'?'<span class="text-slate-500 font-bold">Finalizado</span>':'<span class="text-amber-400 font-bold">Próximo</span>');
-                let acc = `<button onclick="editarVidAdmin('${d.id}')" class="text-indigo-400 mr-2"><i class="fa-solid fa-pen"></i></button><button onclick="borrarVidAdmin('${d.id}')" class="text-rose-400"><i class="fa-solid fa-trash"></i></button>`;
+                // NUEVO: Se agregaron colores e iconos FontAwesome a los botones de acciones
+                let acc = `<button onclick="editarVidAdmin('${d.id}')" title="Editar" class="bg-indigo-600/80 hover:bg-indigo-500 text-white px-2 py-1.5 rounded mr-1"><i class="fa-solid fa-pen"></i></button>
+                           <button onclick="borrarVidAdmin('${d.id}')" title="Eliminar" class="bg-rose-600/80 hover:bg-rose-500 text-white px-2 py-1.5 rounded"><i class="fa-solid fa-trash"></i></button>`;
                 
                 tb.innerHTML += `<tr class="hover:bg-slate-800/50">
                     <td class="p-2 font-medium">${v.version}</td>
@@ -418,6 +448,8 @@
                     <td class="p-2 text-center">${acc}</td>
                 </tr>`;
             });
+            // NUEVO: Actualizar contador
+            document.getElementById('contadorVideosAdmin').innerText = vigentesCount;
         };
 
         window.abrirModalVideoAdmin = () => {
