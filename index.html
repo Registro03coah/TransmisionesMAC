@@ -152,36 +152,41 @@
 
         <!-- SHEET FESTIVOS HÁBILES -->
         <section id="sheet-BD_Festivos" class="sheet-view hidden space-y-6">
-            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex flex-wrap gap-4 justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <h2 class="text-xl font-bold text-white"><i class="fa-solid fa-calendar-days text-amber-400"></i> BD Festivos:</h2>
-                    <select id="admin-select-festivos" onchange="cargarFestivosAdmin()" class="bg-slate-900 border border-amber-500 text-amber-300 font-bold rounded px-3 py-1.5 outline-none">
-                        <option value="">Selecciona una base...</option>
-                    </select>
+            <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-xl">
+                <div class="flex flex-wrap gap-4 justify-between items-center mb-4">
+                    <div class="flex items-center gap-3">
+                        <h2 class="text-xl font-bold text-white"><i class="fa-solid fa-calendar-days text-amber-400"></i> BD Festivos:</h2>
+                        <select id="admin-select-festivos" onchange="cargarFestivosAdmin()" class="bg-slate-900 border border-amber-500 text-amber-300 font-bold rounded px-3 py-1.5 outline-none">
+                            <option value="">Selecciona una base...</option>
+                        </select>
+                        <input type="text" onkeyup="buscarTabla(this, 'tabla-bd-festivos-body')" placeholder="&#xf002; Buscar fecha..." class="font-[FontAwesome] bg-slate-900 border border-slate-700 px-3 py-1.5 rounded text-white text-sm font-normal outline-none focus:border-amber-500">
+                    </div>
+                    <div class="flex items-center justify-center font-bold text-lg text-amber-400">
+                        Fechas Registradas: <span id="contadorFestivosAdmin" class="ml-2 text-white bg-amber-600 px-3 py-1 rounded-full shadow-lg">0</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <input type="file" id="csv-file-festivos" accept=".csv" class="hidden" onchange="importarFestivos(event)">
+                        <button onclick="exportarFestivos()" class="bg-emerald-600 hover:bg-emerald-500 transition text-white px-3 py-1.5 rounded font-bold shadow text-sm"><i class="fa-solid fa-download"></i> Bajar Calendario</button>
+                        <button onclick="document.getElementById('csv-file-festivos').click()" class="bg-amber-600 hover:bg-amber-500 transition text-white px-3 py-1.5 rounded font-bold shadow text-sm"><i class="fa-solid fa-upload"></i> Subir Calendario</button>
+                        <button onclick="borrarBaseFestivos()" class="bg-red-600 hover:bg-red-500 transition text-white px-3 py-1.5 rounded font-bold shadow text-sm"><i class="fa-solid fa-trash-can"></i> Borrar Todo</button>
+                        <button onclick="abrirModalFestivo()" class="bg-indigo-600 hover:bg-indigo-500 transition text-white px-3 py-1.5 rounded font-bold shadow text-sm"><i class="fa-solid fa-plus"></i> Añadir Fecha</button>
+                    </div>
                 </div>
-                <div class="flex items-center justify-center font-bold text-lg text-amber-400">
-                    Total Festivos: <span id="contadorFestivosAdmin" class="ml-2 text-white bg-amber-600 px-3 py-1 rounded-full">0</span>
+                
+                <div class="bg-slate-900 rounded-xl overflow-hidden border border-amber-900/50 shadow-lg">
+                    <table class="w-full text-left text-sm cursor-pointer select-none">
+                        <thead class="bg-slate-950 text-slate-400 uppercase text-xs">
+                            <tr>
+                                <th class="p-3 hover:text-amber-400" onclick="ordenarTabla(this, 0, false, 'text-amber-400')">Tipo <i class="fa-solid fa-sort text-slate-600"></i></th>
+                                <th class="p-3 hover:text-amber-400" onclick="ordenarTabla(this, 1, false, 'text-amber-400')">Fecha <i class="fa-solid fa-sort text-slate-600"></i></th>
+                                <th class="p-3 hover:text-amber-400" onclick="ordenarTabla(this, 2, false, 'text-amber-400')">Descripción <i class="fa-solid fa-sort text-slate-600"></i></th>
+                                <th class="p-3 hover:text-amber-400" onclick="ordenarTabla(this, 3, true, 'text-amber-400')">Horas <i class="fa-solid fa-sort text-slate-600"></i></th>
+                                <th class="p-3 text-center cursor-default">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-bd-festivos-body" class="divide-y divide-slate-800"></tbody>
+                    </table>
                 </div>
-                <div class="flex gap-2">
-                    <input type="file" id="csv-file-festivos" accept=".csv" class="hidden" onchange="importarFestivos(event)">
-                    <button onclick="exportarFestivos()" class="bg-emerald-600 hover:bg-emerald-500 transition text-white px-3 py-1.5 rounded font-bold text-sm"><i class="fa-solid fa-download"></i> Bajar Excel</button>
-                    <button onclick="document.getElementById('csv-file-festivos').click()" class="bg-amber-600 hover:bg-amber-500 transition text-white px-3 py-1.5 rounded font-bold text-sm"><i class="fa-solid fa-upload"></i> Subir Excel</button>
-                    <button onclick="borrarBaseFestivos()" class="bg-red-600 hover:bg-red-500 transition text-white px-3 py-1.5 rounded font-bold text-sm"><i class="fa-solid fa-trash-can"></i> Borrar Base</button>
-                    <button onclick="abrirModalFestivo()" class="bg-indigo-600 hover:bg-indigo-500 transition text-white px-3 py-1.5 rounded font-bold text-sm"><i class="fa-solid fa-plus"></i> Nuevo Festivo</button>
-                </div>
-            </div>
-            
-            <div class="bg-slate-800 rounded-xl overflow-hidden shadow-lg border border-amber-900/50 max-w-4xl mx-auto">
-                <table class="w-full text-left text-sm">
-                    <thead class="bg-slate-900 text-slate-300 uppercase">
-                        <tr>
-                            <th class="p-3">Fecha (YYYY-MM-DD)</th>
-                            <th class="p-3">Tipo / Descripción</th>
-                            <th class="p-3 text-center">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabla-bd-festivos-body" class="divide-y divide-slate-700"></tbody>
-                </table>
             </div>
         </section>
     </main>
@@ -280,21 +285,40 @@
     </div>
 
     <!-- MODAL FESTIVO NUEVO (ADMIN) -->
+    <!-- MODAL FESTIVO NUEVO/EDITAR (ADMIN) -->
     <div id="modal-festivo-admin" class="fixed inset-0 bg-slate-950/80 hidden z-[55] flex items-center justify-center p-4">
-        <div class="bg-slate-800 rounded-xl max-w-sm w-full p-6 border border-slate-700">
-            <h3 class="font-bold text-white mb-4">Agregar Día Festivo</h3>
-            <form onsubmit="guardarFestivoAdmin(event)" class="space-y-3">
+        <div class="bg-slate-800 p-6 rounded-xl max-w-sm w-full border border-slate-700 shadow-2xl">
+            <h3 id="titulo-modal-festivo-admin" class="font-bold mb-4 text-white text-lg">Agregar Fecha al Calendario</h3>
+            <form onsubmit="guardarFestivoAdmin(event)" class="space-y-4">
+                <input type="hidden" id="fa-doc">
+                
                 <div>
-                    <label class="text-xs text-slate-400">Fecha del Festivo</label>
-                    <input type="date" id="fa-fecha" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white font-mono">
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Tipo de Evento</label>
+                    <select id="fa-tipo" class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white focus:border-amber-500 outline-none" onchange="verificarTipoHorasAdmin()">
+                        <option value="festivo">Día Inhábil (Descanso General)</option>
+                        <option value="adicional">Día Laboral Adicional (Ej. Domingo)</option>
+                        <option value="especial">Horario Especial (Ajuste de Horas)</option>
+                    </select>
                 </div>
+                
+                <div id="div-fa-horas" class="hidden">
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Horas laborables para este día</label>
+                    <input type="number" id="fa-horas" min="1" max="24" value="5" class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white font-bold outline-none focus:border-amber-500">
+                </div>
+                
                 <div>
-                    <label class="text-xs text-slate-400">Descripción / Tipo</label>
-                    <input type="text" id="fa-tipo" value="festivo" placeholder="Ej. Día del trabajo" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white">
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Fecha</label>
+                    <input type="date" id="fa-fec" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white outline-none focus:border-amber-500">
                 </div>
-                <div class="flex justify-end gap-2 mt-4">
-                    <button type="button" onclick="document.getElementById('modal-festivo-admin').classList.add('hidden')" class="bg-slate-700 px-4 py-2 rounded text-white">Cancelar</button>
-                    <button type="submit" class="bg-amber-600 px-4 py-2 rounded text-white font-bold">Guardar Día</button>
+                
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Descripción / Motivo</label>
+                    <input type="text" id="fa-desc" placeholder="Ej. Navidad, Mantenimiento..." required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white outline-none focus:border-amber-500">
+                </div>
+                
+                <div class="flex justify-end gap-2 mt-4 pt-2 border-t border-slate-700">
+                    <button type="button" onclick="document.getElementById('modal-festivo-admin').classList.add('hidden')" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded text-white transition">Cancelar</button>
+                    <button type="submit" class="bg-amber-600 hover:bg-amber-500 px-4 py-2 rounded text-white font-bold shadow transition">Guardar Fecha</button>
                 </div>
             </form>
         </div>
@@ -696,6 +720,11 @@
         };
 
         /* ======= LÓGICA DE FESTIVOS (NUEVO MÓDULO) ======= */
+        window.verificarTipoHorasAdmin = () => {
+            const val = document.getElementById('fa-tipo').value;
+            document.getElementById('div-fa-horas').classList.toggle('hidden', val !== 'especial');
+        };
+
         window.cargarFestivosAdmin = async () => {
             let sufijo = document.getElementById('admin-select-festivos').value;
             const tb = document.getElementById('tabla-bd-festivos-body'); tb.innerHTML='';
@@ -711,40 +740,81 @@
             let countFestivos = 0;
 
             cSnap.forEach(d => {
-                let f = { idDoc: d.id, ...d.data() };
-                window.festivosEdit.push(f);
-                countFestivos++;
+                window.festivosEdit.push({ idDoc: d.id, ...d.data() });
+            });
 
-                let acc = `<button onclick="borrarFestivoAdmin('${d.id}')" title="Eliminar Festivo" class="bg-rose-600/80 hover:bg-rose-500 text-white px-2 py-1.5 rounded"><i class="fa-solid fa-trash"></i></button>`;
+            // Ordenar por fecha antes de renderizar
+            window.festivosEdit.sort((a,b) => a.fecha.localeCompare(b.fecha));
+
+            window.festivosEdit.forEach(c => {
+                countFestivos++;
+                let badge = '';
+                if(c.tipo==='festivo') badge = '<span class="bg-rose-900/50 text-rose-400 px-3 py-1 rounded text-xs font-bold uppercase">Inhábil</span>';
+                else if(c.tipo==='especial') badge = `<span class="bg-cyan-900/50 text-cyan-400 px-3 py-1 rounded text-xs font-bold uppercase">Especial</span>`;
+                else badge = '<span class="bg-emerald-900/50 text-emerald-400 px-3 py-1 rounded text-xs font-bold uppercase">Día Extra</span>';
                 
-                tb.innerHTML += `<tr class="hover:bg-slate-800/50">
-                    <td class="p-3 font-mono font-bold text-amber-300">${f.fecha}</td>
-                    <td class="p-3 text-slate-300 uppercase">${f.tipo || 'Festivo General'}</td>
-                    <td class="p-3 text-center">${acc}</td>
+                let horasText = c.tipo === 'especial' ? `<span class="font-bold text-amber-300">${c.horas} h</span>` : '<span class="text-slate-500">-</span>';
+
+                let acc = `<button onclick="editarFestivoAdmin('${c.idDoc}')" title="Editar Fecha" class="bg-indigo-600/80 hover:bg-indigo-500 text-white px-2 py-1.5 rounded mr-1 transition"><i class="fa-solid fa-pen"></i></button>
+                           <button onclick="borrarFestivoAdmin('${c.idDoc}')" title="Borrar Fecha" class="bg-rose-600/80 hover:bg-rose-500 text-white px-2 py-1.5 rounded transition"><i class="fa-solid fa-trash"></i></button>`;
+
+                tb.innerHTML += `<tr class="hover:bg-slate-700/50 transition-colors">
+                    <td class="p-3">${badge}</td>
+                    <td class="p-3 font-mono font-bold text-white">${c.fecha}</td>
+                    <td class="p-3 text-slate-300 font-medium">${c.descripcion || '-'}</td>
+                    <td class="p-3">${horasText}</td>
+                    <td class="p-3 text-center whitespace-nowrap">${acc}</td>
                 </tr>`;
             });
-            
-            // Ordenar por fecha cronológica visualmente en la tabla
-            window.ordenarTabla(tb.closest('table').querySelector('th'), 0, false, 'text-amber-400');
             
             document.getElementById('contadorFestivosAdmin').innerText = countFestivos;
         };
 
         window.abrirModalFestivo = () => {
             if(!document.getElementById('admin-select-festivos').value) return alert("Selecciona la base de festivos primero");
-            document.getElementById('fa-fecha').value = '';
-            document.getElementById('fa-tipo').value = 'Festivo';
+            document.getElementById('titulo-modal-festivo-admin').innerText = "Agregar Fecha al Calendario";
+            document.getElementById('fa-doc').value = '';
+            document.getElementById('fa-tipo').value = 'festivo';
+            document.getElementById('fa-fec').value = '';
+            document.getElementById('fa-desc').value = '';
+            document.getElementById('fa-horas').value = 5;
+            window.verificarTipoHorasAdmin();
+            document.getElementById('modal-festivo-admin').classList.remove('hidden');
+        };
+
+        window.editarFestivoAdmin = (id) => {
+            let c = window.festivosEdit.find(x => x.idDoc === id); 
+            if(!c) return;
+            document.getElementById('titulo-modal-festivo-admin').innerText = "Editar Fecha Especial";
+            document.getElementById('fa-doc').value = c.idDoc;
+            document.getElementById('fa-tipo').value = c.tipo || 'festivo';
+            document.getElementById('fa-fec').value = c.fecha;
+            document.getElementById('fa-desc').value = c.descripcion || '';
+            document.getElementById('fa-horas').value = c.horas || 5;
+            window.verificarTipoHorasAdmin();
             document.getElementById('modal-festivo-admin').classList.remove('hidden');
         };
 
         window.guardarFestivoAdmin = async (e) => {
             e.preventDefault();
             let sufijo = document.getElementById('admin-select-festivos').value;
-            let fecha = document.getElementById('fa-fecha').value;
+            let docId = document.getElementById('fa-doc').value;
             let tipo = document.getElementById('fa-tipo').value;
             
+            let data = { 
+                tipo: tipo, 
+                fecha: document.getElementById('fa-fec').value, 
+                descripcion: document.getElementById('fa-desc').value 
+            };
+            if (tipo === 'especial') data.horas = Number(document.getElementById('fa-horas').value);
+            
             let calName = sufijo === '1' ? 'calendario_config' : `calendario_config_${sufijo}`;
-            await addDoc(collection(db, calName), { fecha: fecha, tipo: tipo });
+            
+            if(docId) {
+                await updateDoc(doc(db, calName, docId), data);
+            } else {
+                await addDoc(collection(db, calName), data);
+            }
             
             document.getElementById('modal-festivo-admin').classList.add('hidden');
             window.cargarFestivosAdmin();
@@ -753,7 +823,7 @@
         window.borrarFestivoAdmin = async (id) => {
             let sufijo = document.getElementById('admin-select-festivos').value;
             let calName = sufijo === '1' ? 'calendario_config' : `calendario_config_${sufijo}`;
-            if(confirm("¿Eliminar este día festivo de la base?")) { 
+            if(confirm("¿Eliminar esta fecha del calendario?")) { 
                 await deleteDoc(doc(db, calName, id)); 
                 window.cargarFestivosAdmin(); 
             }
@@ -778,19 +848,19 @@
         window.exportarFestivos = () => {
             let sufijo = document.getElementById('admin-select-festivos').value;
             if(!sufijo || window.festivosEdit.length === 0) return alert("No hay datos de festivos para exportar.");
-            let csv = "fecha,tipo\n";
-            window.festivosEdit.forEach(f => { csv += `${f.fecha},${f.tipo}\n`; });
+            let csv = "tipo,fecha,descripcion,horas\n";
+            window.festivosEdit.forEach(c => { csv += `${c.tipo},${c.fecha},${c.descripcion||''},${c.horas||''}\n`; });
             
             let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); 
             let url = window.URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url;
-            a.download = `Festivos_BD_${sufijo}_${new Date().toISOString().split('T')[0]}.csv`; a.click();
+            a.download = `Calendario_BD_${sufijo}_${new Date().toISOString().split('T')[0]}.csv`; a.click();
         };
 
         window.importarFestivos = async (e) => {
             let sufijo = document.getElementById('admin-select-festivos').value;
             if(!sufijo) { alert("Selecciona a qué base vas a importar los festivos."); e.target.value=''; return; }
             let file = e.target.files[0]; if(!file) return;
-            if(!confirm(`¿Importar festivos desde Excel a la base '${sufijo}'?`)) { e.target.value = ''; return; }
+            if(!confirm(`¿Importar calendario desde Excel a la base '${sufijo}'?`)) { e.target.value = ''; return; }
             
             let reader = new FileReader();
             reader.onload = async function(event) {
@@ -798,14 +868,13 @@
                 let calName = sufijo === '1' ? 'calendario_config' : `calendario_config_${sufijo}`;
                 for(let i=1; i<rows.length; i++) {
                     if(!rows[i].trim()) continue; let cols = rows[i].split(',');
-                    // Verificar formato basico de fecha YYYY-MM-DD
-                    if(cols.length >= 1 && cols[0].includes('-')) {
-                        let fTipo = cols[1] ? cols[1].trim() : 'festivo';
-                        await addDoc(collection(db, calName), { fecha: cols[0].trim(), tipo: fTipo }); 
-                        count++;
+                    if(cols.length >= 3) {
+                        let obj = { tipo: cols[0].trim(), fecha: cols[1].trim(), descripcion: cols[2].trim() };
+                        if(cols[3] && !isNaN(cols[3].trim())) obj.horas = Number(cols[3].trim());
+                        await addDoc(collection(db, calName), obj); count++;
                     }
                 }
-                alert(`Éxito: Se subieron ${count} días festivos.`); e.target.value = ''; window.cargarFestivosAdmin();
+                alert(`Éxito: Se subieron ${count} fechas de calendario.`); e.target.value = ''; window.cargarFestivosAdmin();
             };
             reader.readAsText(file);
         };
