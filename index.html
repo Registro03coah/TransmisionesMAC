@@ -18,7 +18,7 @@
                 <div class="flex items-center justify-center mt-2 gap-2 text-xs font-bold">
                     <span id="login-conn-dot" class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
                     <span id="login-conn-text" class="text-slate-400">Conectando...</span>
-                    <span class="text-slate-500">| v1.0.48</span>
+                    <span class="text-slate-500">| v1.0.49</span>
                 </div>
             </div>
             
@@ -223,18 +223,24 @@
                 </div>
 
                 <div id="adm-sec-logs" class="hidden space-y-4">
-                    <div class="flex justify-between items-center bg-slate-900 p-4 rounded-xl">
-                        <h4 class="font-bold text-white">Registro de Accesos (Últimos 100)</h4>
-                        <button onclick="cargarLogs()" class="bg-indigo-600 hover:bg-indigo-500 transition text-white px-3 py-1.5 rounded font-bold"><i class="fa-solid fa-rotate-right"></i> Actualizar</button>
+                    <div class="flex flex-wrap gap-4 justify-between items-center bg-slate-900 p-4 rounded-xl">
+                        <div class="flex items-center gap-3">
+                            <h4 class="font-bold text-white">Registro de Accesos (Últimos 100)</h4>
+                            <!-- Filtro de Fecha (Azul) -->
+                            <input type="date" id="log-date-filter" onchange="cargarLogs()" class="bg-slate-800 border border-slate-700 text-slate-300 px-3 py-1.5 rounded outline-none focus:border-cyan-500 font-mono text-sm cursor-pointer">
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <!-- Botón Borrar Todo (Rojo) -->
+                            <button onclick="borrarLogs()" class="bg-red-600 hover:bg-red-500 transition text-white px-3 py-1.5 rounded font-bold text-sm shadow"><i class="fa-solid fa-trash-can"></i> Borrar Todo</button>
+                            <!-- Botón Actualizar (Original) -->
+                            <button onclick="cargarLogs()" class="bg-indigo-600 hover:bg-indigo-500 transition text-white px-3 py-1.5 rounded font-bold text-sm shadow"><i class="fa-solid fa-rotate-right"></i> Actualizar</button>
+                        </div>
                     </div>
                     <table class="w-full text-left text-sm bg-slate-900 rounded-xl overflow-hidden">
                         <thead class="bg-slate-950 text-slate-400"><tr><th class="p-3">Fecha</th><th class="p-3">Hora</th><th class="p-3">Nombre del Usuario</th><th class="p-3">Rol</th></tr></thead>
                         <tbody id="tabla-logs-body" class="divide-y divide-slate-800"></tbody>
                     </table>
                 </div>
-            </div>
-        </div>
-    </div>
 
     <!-- MODAL NUEVO USUARIO -->
     <div id="modal-nuevo-usr" class="fixed inset-0 bg-slate-950/80 hidden z-[60] flex items-center justify-center p-4">
@@ -512,23 +518,38 @@
             } 
         };
 
-        // NUEVO: SISTEMA DE LOGS ARREGLADO
+        // NUEVO: SISTEMA DE LOGS CON FILTRO Y BORRADO
         window.cargarLogs = async () => {
             const tb = document.getElementById('tabla-logs-body');
             tb.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Cargando registros...</td></tr>';
             try {
                 const snap = await getDocs(collection(db, "registro_accesos"));
                 let logs = [];
-                snap.forEach(d => logs.push(d.data()));
+                
+                // Obtener y formatear la fecha del filtro para que coincida con la base de datos
+                let valFiltro = document.getElementById('log-date-filter').value;
+                let fechaFiltro = null;
+                if(valFiltro) {
+                    let [y, m, d] = valFiltro.split('-');
+                    fechaFiltro = new Date(y, m-1, d).toLocaleDateString();
+                }
+
+                snap.forEach(d => {
+                    let data = d.data();
+                    // Si hay una fecha en el filtro, validamos que coincida. Si no hay filtro, pasan todas.
+                    if (!fechaFiltro || data.fecha === fechaFiltro) {
+                        logs.push({ idDoc: d.id, ...data });
+                    }
+                });
                 
                 // Ordenar del más reciente al más viejo
                 logs.sort((a, b) => b.ts - a.ts); 
-                // Limitar a los ultimos 100
+                // Limitar a los ultimos 100 resultados de esa fecha (o globales)
                 logs = logs.slice(0, 100);
                 
                 tb.innerHTML = '';
                 if(logs.length === 0) {
-                    tb.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-slate-400">No hay registros de acceso aún.</td></tr>';
+                    tb.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-slate-400">No hay registros de acceso en esta fecha.</td></tr>';
                     return;
                 }
                 
@@ -547,6 +568,25 @@
                 });
             } catch(error) {
                 tb.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-red-400">Error al cargar el historial.</td></tr>';
+            }
+        };
+
+        window.borrarLogs = async () => {
+            if(!confirm("¿Estás seguro de que deseas ELIMINAR TODOS los registros de acceso (Logs)?\n\nEsta acción dejará el historial en blanco y no se puede deshacer.")) return;
+            
+            try {
+                const snap = await getDocs(collection(db, "registro_accesos"));
+                let promesas = [];
+                
+                snap.forEach(d => promesas.push(deleteDoc(doc(db, "registro_accesos", d.id))));
+                
+                await Promise.all(promesas);
+                alert(`¡Limpieza exitosa! Se eliminaron ${promesas.length} registros de acceso.`);
+                
+                document.getElementById('log-date-filter').value = ''; // Limpiamos el filtro
+                window.cargarLogs(); // Recargamos la tabla (quedará vacía)
+            } catch(e) {
+                alert("Ocurrió un error al intentar borrar los logs.");
             }
         };
 
