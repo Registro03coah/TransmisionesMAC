@@ -44,6 +44,12 @@
                     <h2 class="text-xl font-bold text-white"><i class="fa-solid fa-video text-cyan-400"></i> Mi Catálogo</h2>
                     <input type="text" onkeyup="buscarTabla(this, 'tabla-videos-body')" placeholder="&#xf002; Buscar..." class="font-[FontAwesome] bg-slate-900 border border-slate-700 px-3 py-1.5 rounded text-white text-sm outline-none focus:border-cyan-500">
                 </div>
+                
+                <!-- NUEVO: Contador centrado en el Módulo Operativo -->
+                <div class="flex items-center justify-center font-bold text-lg text-cyan-400">
+                    Videos Vigentes: <span id="contadorVideosMod" class="ml-2 text-white bg-cyan-600 px-3 py-1 rounded-full shadow-lg">0</span>
+                </div>
+                
                 <div class="flex flex-wrap gap-2">
                     <input type="file" id="csv-file-colab" accept=".csv" class="hidden" onchange="importarCSV(event)">
                     <button onclick="exportarCSV()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded font-bold text-sm shadow"><i class="fa-solid fa-download"></i> Bajar Excel</button>
@@ -64,7 +70,8 @@
                             <th class="p-2 text-center hover:text-cyan-400" onclick="ordenarTabla(this, 6, true)" title="Días Transcurridos">Transcurridos <i class="fa-solid fa-sort text-slate-600"></i></th>
                             <th class="p-2 text-center hover:text-cyan-400" onclick="ordenarTabla(this, 7, false)">Estado <i class="fa-solid fa-sort text-slate-600"></i></th>
                             <th class="p-2 text-right hover:text-cyan-400" onclick="ordenarTabla(this, 8, true)">Impactos <i class="fa-solid fa-sort text-slate-600"></i></th>
-                            <th class="p-2 text-center cursor-default">Borrar</th>
+                            <!-- NUEVO: Título Editar / Borrar en Módulo -->
+                            <th class="p-2 text-center cursor-default">Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="tabla-videos-body" class="divide-y divide-slate-700"></tbody>
@@ -171,10 +178,12 @@
         </div>
     </div>
 
+    <!-- NUEVO: Modal de Video Modificado (incluye ID Doc para saber si edita o es nuevo) -->
     <div id="modal-video" class="fixed inset-0 bg-slate-950/80 hidden z-[60] flex items-center justify-center p-4">
         <div class="bg-slate-800 p-6 rounded-xl max-w-md w-full border border-slate-700 shadow-2xl">
-            <h3 class="font-bold mb-4 text-white">Nuevo Video en Módulo</h3>
+            <h3 id="titulo-modal-video" class="font-bold mb-4 text-white">Nuevo Video en Módulo</h3>
             <form onsubmit="guardarVideo(event)" class="space-y-3">
+                <input type="hidden" id="v-doc"> <!-- NUEVO: ID del documento en Firebase (vacío = nuevo) -->
                 <input type="hidden" id="v-id">
                 <input type="text" id="v-ver" placeholder="Versión / Nombre" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white font-bold">
                 <input type="text" id="v-tema" placeholder="Temática (ej. Promoción, Informativo)" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white">
@@ -392,8 +401,16 @@
 
         window.renderVideos = () => {
             const tb = document.getElementById('tabla-videos-body'); tb.innerHTML='';
+            let vigentesCount = 0; // NUEVO: Contador
+            
             window.videos.forEach(v => {
+                if(v.est === 'Vigente') vigentesCount++; // NUEVO: Sumar si es vigente
+                
                 let estBd = v.est === 'Vigente' ? '<span class="text-green-400 font-bold">Vigente</span>' : (v.est==='Finalizado'?'<span class="text-slate-500 font-bold">Finalizado</span>':'<span class="text-amber-400 font-bold">Próximo</span>');
+                
+                // NUEVO: Agregado el botón de Editar junto al de Borrar
+                let acc = `<button onclick="editarVideoColab('${v.idDoc}')" title="Editar" class="bg-indigo-600/80 hover:bg-indigo-500 text-white px-2 py-1.5 rounded mr-1"><i class="fa-solid fa-pen"></i></button>
+                           <button onclick="borrarVid('${v.idDoc}')" title="Eliminar" class="bg-rose-600/80 hover:bg-rose-500 text-white px-2 py-1.5 rounded"><i class="fa-solid fa-trash"></i></button>`;
                 
                 tb.innerHTML += `<tr class="hover:bg-slate-700/50">
                     <td class="p-2 font-medium">${v.version}</td>
@@ -405,9 +422,11 @@
                     <td class="p-2 text-center text-cyan-400 font-bold">${v.trans_cal}</td>
                     <td class="p-2 text-center">${estBd}</td>
                     <td class="p-2 text-right font-bold text-amber-400 text-base">${v.imp.toLocaleString()}</td>
-                    <td class="p-2 text-center"><button onclick="borrarVid('${v.idDoc}')" class="text-rose-400"><i class="fa-solid fa-trash"></i></button></td>
+                    <td class="p-2 text-center">${acc}</td>
                 </tr>`;
             });
+            // NUEVO: Actualizar contador en pantalla
+            document.getElementById('contadorVideosMod').innerText = vigentesCount;
         };
 
         window.renderReporte = () => {
@@ -456,24 +475,55 @@
             a.download = `ReporteImpactos_${DB_SUFFIX}_${ini}_al_${fin}.csv`; a.click();
         };
 
+        // NUEVO: Función para abrir modal de registro Limpio (Nuevo)
         window.abrirModalVideo = () => { 
+            document.getElementById('titulo-modal-video').innerText = "Nuevo Video en Módulo";
+            document.getElementById('v-doc').value = ''; // Borramos el ID del documento
             document.getElementById('v-id').value = 'VID-' + Math.floor(Date.now()/1000); 
             document.getElementById('v-ver').value=''; 
             document.getElementById('v-tema').value=''; 
             document.getElementById('v-dur').value=''; 
+            document.getElementById('v-ini').value=''; 
+            document.getElementById('v-fin').value=''; 
             document.getElementById('modal-video').classList.remove('hidden'); 
         };
         
+        // NUEVO: Función para Editar en el módulo del Colaborador
+        window.editarVideoColab = (id) => {
+            let v = window.videos.find(x => x.idDoc === id); 
+            if(!v) return;
+            document.getElementById('titulo-modal-video').innerText = "Editar Video";
+            document.getElementById('v-doc').value = v.idDoc; 
+            document.getElementById('v-id').value = v.id_video || 'VID-' + Math.floor(Date.now()/1000); 
+            document.getElementById('v-ver').value = v.version; 
+            document.getElementById('v-tema').value = v._tema;
+            document.getElementById('v-dur').value = v.duracion; 
+            document.getElementById('v-ini').value = v._ini; 
+            document.getElementById('v-fin').value = v._fin;
+            document.getElementById('modal-video').classList.remove('hidden');
+        };
+        
+        // NUEVO: Lógica combinada para Guardar/Actualizar
         window.guardarVideo = async (e) => { 
             e.preventDefault(); 
-            await addDoc(collection(db, COLL_VID), {
+            let docId = document.getElementById('v-doc').value;
+            let data = {
                 id_video: document.getElementById('v-id').value, 
                 version: document.getElementById('v-ver').value, 
                 tematica: document.getElementById('v-tema').value,
                 duracion: document.getElementById('v-dur').value, 
                 inicio_transmision: document.getElementById('v-ini').value, 
                 cierre_transmision: document.getElementById('v-fin').value
-            }); 
+            };
+            
+            if(docId) {
+                // Actualizar existente
+                await updateDoc(doc(db, COLL_VID, docId), data);
+            } else {
+                // Crear nuevo
+                await addDoc(collection(db, COLL_VID), data); 
+            }
+            
             document.getElementById('modal-video').classList.add('hidden'); 
             await cargarData(); 
         };
