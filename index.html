@@ -18,11 +18,10 @@
                 <div class="flex items-center justify-center mt-2 gap-2 text-xs font-bold">
                     <span id="login-conn-dot" class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
                     <span id="login-conn-text" class="text-slate-400">Conectando...</span>
-                    <span class="text-slate-500">| v1.0.44</span>
+                    <span class="text-slate-500">| v1.0.45</span>
                 </div>
             </div>
             
-            <!-- NUEVO: Cambio de nombre "Visitante" a "Invitado" -->
             <div class="flex border-b border-slate-700 mb-6">
                 <button id="tab-visitor" onclick="setLoginMode('visitor')" class="flex-1 py-2.5 text-sm font-bold border-b-2 border-indigo-500 text-indigo-400 transition">Invitado</button>
                 <button id="tab-colab" onclick="setLoginMode('colab')" class="flex-1 py-2.5 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-300 transition">Usuario</button>
@@ -34,7 +33,6 @@
                     <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Nombre completo</label>
                     <input type="text" id="visitor-name" required placeholder="Escribe tu nombre..." class="w-full bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-lg px-4 py-2 text-white outline-none">
                 </div>
-                <!-- NUEVO: Cambio de nombre "Visitante" a "Invitado" -->
                 <button type="submit" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold">Entrar como Invitado</button>
             </form>
 
@@ -77,31 +75,38 @@
                 <div class="flex items-center px-3 py-1 bg-slate-900 border border-slate-700 rounded-lg text-xs font-bold text-slate-300 mr-2">
                     <span id="nav-conn-dot" class="w-2 h-2 rounded-full bg-green-500 mr-2 shadow-[0_0_5px_#22c55e]"></span> BD Conectada
                 </div>
-                <button onclick="cambiarHoja('inicio')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-indigo-600 text-white" data-target="inicio">Dashboard</button>
-                <button onclick="cambiarHoja('BD_Videos')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-700 text-slate-300" data-target="BD_Videos">Control de Bases</button>
-                <button id="nav-admin" onclick="abrirModalAdmin()" class="px-3 py-1.5 rounded-lg text-sm font-semibold bg-rose-600/30 text-rose-300 border border-rose-500/40 hidden"><i class="fa-solid fa-server mr-1.5"></i> Panel Maestro</button>
-                <button onclick="cerrarSesion()" class="px-3 py-1.5 rounded-lg text-sm font-bold bg-red-600 text-white"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
+                <!-- Pestañas de navegación con clases interactivas -->
+                <button onclick="cambiarHoja('inicio')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-indigo-600 text-white transition-colors" data-target="inicio">Dashboard</button>
+                <button onclick="cambiarHoja('BD_Videos')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-700 text-slate-300 transition-colors hover:bg-slate-600" data-target="BD_Videos">Control de Bases</button>
+                <button onclick="cambiarHoja('BD_Festivos')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-700 text-slate-300 transition-colors hover:bg-slate-600" data-target="BD_Festivos">Festivos</button>
+                
+                <button id="nav-admin" onclick="abrirModalAdmin()" class="px-3 py-1.5 rounded-lg text-sm font-semibold bg-rose-600/30 text-rose-300 border border-rose-500/40 hidden hover:bg-rose-600/50"><i class="fa-solid fa-server mr-1.5"></i> Panel Maestro</button>
+                <button onclick="cerrarSesion()" class="px-3 py-1.5 rounded-lg text-sm font-bold bg-red-600 text-white hover:bg-red-500"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
             </nav>
         </div>
     </header>
 
     <main class="flex-grow w-[98%] mx-auto px-2 py-6">
+        <!-- SHEET INICIO -->
         <section id="sheet-inicio" class="sheet-view space-y-6 hidden">
             <div class="p-8 bg-slate-900 rounded-2xl border border-indigo-500/40 text-center">
                 <h2 class="text-3xl font-black text-indigo-400">Panel Central de Administración</h2>
                 <p class="text-slate-400 mt-2">Gestiona el catálogo de todas las sucursales y cuentas.</p>
             </div>
-            <div class="grid grid-cols-2 gap-4">
-                 <!-- NUEVO: Cambio de nombre a "Perfiles de Usuarios Registrados" -->
-                 <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center cursor-pointer hover:bg-slate-700" onclick="abrirModalAdmin('usuarios')">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                 <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center cursor-pointer hover:bg-slate-700 transition" onclick="abrirModalAdmin('usuarios')">
                      <i class="fa-solid fa-users text-4xl text-cyan-400 mb-3"></i><h3 class="text-xl font-bold">Perfiles de Usuarios Registrados</h3>
                  </div>
-                 <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center cursor-pointer hover:bg-slate-700" onclick="cambiarHoja('BD_Videos')">
-                     <i class="fa-solid fa-database text-4xl text-indigo-400 mb-3"></i><h3 class="text-xl font-bold">Editar Bases de Datos</h3>
+                 <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center cursor-pointer hover:bg-slate-700 transition" onclick="cambiarHoja('BD_Videos')">
+                     <i class="fa-solid fa-database text-4xl text-indigo-400 mb-3"></i><h3 class="text-xl font-bold">Editar Bases de Videos</h3>
+                 </div>
+                 <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center cursor-pointer hover:bg-slate-700 transition" onclick="cambiarHoja('BD_Festivos')">
+                     <i class="fa-solid fa-calendar-days text-4xl text-amber-400 mb-3"></i><h3 class="text-xl font-bold">Festivos Hábiles</h3>
                  </div>
             </div>
         </section>
 
+        <!-- SHEET BD VIDEOS -->
         <section id="sheet-BD_Videos" class="sheet-view hidden space-y-6">
              <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex flex-wrap gap-4 justify-between items-center">
                  <div class="flex items-center gap-3">
@@ -112,16 +117,17 @@
                      <input type="text" onkeyup="buscarTabla(this, 'tabla-bd-videos-body')" placeholder="&#xf002; Buscar..." class="font-[FontAwesome] bg-slate-900 border border-slate-700 px-3 py-1.5 rounded text-white text-sm outline-none focus:border-indigo-500 ml-2">
                  </div>
                  
-                 <!-- NUEVO: Contador centrado en Admin -->
                  <div class="flex items-center justify-center font-bold text-lg text-indigo-400">
-                    Videos Vigentes: <span id="contadorVideosAdmin" class="ml-2 text-white bg-indigo-600 px-3 py-1 rounded-full">0</span>
+                     Videos Vigentes: <span id="contadorVideosAdmin" class="ml-2 text-white bg-indigo-600 px-3 py-1 rounded-full">0</span>
                  </div>
                  
                  <div class="flex gap-2">
                      <input type="file" id="csv-file-admin" accept=".csv" class="hidden" onchange="importarCSV(event)">
-                     <button id="btn-exportar" onclick="exportarCSV()" class="bg-emerald-600 text-white px-3 py-1.5 rounded font-bold hidden text-sm"><i class="fa-solid fa-download"></i> Bajar Excel</button>
-                     <button id="btn-importar" onclick="document.getElementById('csv-file-admin').click()" class="bg-amber-600 text-white px-3 py-1.5 rounded font-bold hidden text-sm"><i class="fa-solid fa-upload"></i> Subir Excel</button>
-                     <button id="btn-nuevo-video" onclick="abrirModalVideoAdmin()" class="bg-indigo-600 text-white px-3 py-1.5 rounded font-bold hidden text-sm"><i class="fa-solid fa-plus"></i> Nuevo</button>
+                     <button id="btn-exportar" onclick="exportarCSV()" class="bg-emerald-600 hover:bg-emerald-500 transition text-white px-3 py-1.5 rounded font-bold hidden text-sm"><i class="fa-solid fa-download"></i> Bajar Excel</button>
+                     <button id="btn-importar" onclick="document.getElementById('csv-file-admin').click()" class="bg-amber-600 hover:bg-amber-500 transition text-white px-3 py-1.5 rounded font-bold hidden text-sm"><i class="fa-solid fa-upload"></i> Subir Excel</button>
+                     <!-- BOTÓN BORRAR BASE AGREGADO -->
+                     <button id="btn-borrar-base" onclick="borrarBaseVideos()" class="bg-red-600 hover:bg-red-500 transition text-white px-3 py-1.5 rounded font-bold hidden text-sm"><i class="fa-solid fa-trash-can"></i> Borrar Base</button>
+                     <button id="btn-nuevo-video" onclick="abrirModalVideoAdmin()" class="bg-indigo-600 hover:bg-indigo-500 transition text-white px-3 py-1.5 rounded font-bold hidden text-sm"><i class="fa-solid fa-plus"></i> Nuevo</button>
                  </div>
              </div>
              
@@ -144,18 +150,52 @@
                  </table>
              </div>
         </section>
+
+        <!-- SHEET FESTIVOS HÁBILES -->
+        <section id="sheet-BD_Festivos" class="sheet-view hidden space-y-6">
+            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex flex-wrap gap-4 justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <h2 class="text-xl font-bold text-white"><i class="fa-solid fa-calendar-days text-amber-400"></i> BD Festivos:</h2>
+                    <select id="admin-select-festivos" onchange="cargarFestivosAdmin()" class="bg-slate-900 border border-amber-500 text-amber-300 font-bold rounded px-3 py-1.5 outline-none">
+                        <option value="">Selecciona una base...</option>
+                    </select>
+                </div>
+                <div class="flex items-center justify-center font-bold text-lg text-amber-400">
+                    Total Festivos: <span id="contadorFestivosAdmin" class="ml-2 text-white bg-amber-600 px-3 py-1 rounded-full">0</span>
+                </div>
+                <div class="flex gap-2">
+                    <input type="file" id="csv-file-festivos" accept=".csv" class="hidden" onchange="importarFestivos(event)">
+                    <button onclick="exportarFestivos()" class="bg-emerald-600 hover:bg-emerald-500 transition text-white px-3 py-1.5 rounded font-bold text-sm"><i class="fa-solid fa-download"></i> Bajar Excel</button>
+                    <button onclick="document.getElementById('csv-file-festivos').click()" class="bg-amber-600 hover:bg-amber-500 transition text-white px-3 py-1.5 rounded font-bold text-sm"><i class="fa-solid fa-upload"></i> Subir Excel</button>
+                    <button onclick="borrarBaseFestivos()" class="bg-red-600 hover:bg-red-500 transition text-white px-3 py-1.5 rounded font-bold text-sm"><i class="fa-solid fa-trash-can"></i> Borrar Base</button>
+                    <button onclick="abrirModalFestivo()" class="bg-indigo-600 hover:bg-indigo-500 transition text-white px-3 py-1.5 rounded font-bold text-sm"><i class="fa-solid fa-plus"></i> Nuevo Festivo</button>
+                </div>
+            </div>
+            
+            <div class="bg-slate-800 rounded-xl overflow-hidden shadow-lg border border-amber-900/50 max-w-4xl mx-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-slate-900 text-slate-300 uppercase">
+                        <tr>
+                            <th class="p-3">Fecha (YYYY-MM-DD)</th>
+                            <th class="p-3">Tipo / Descripción</th>
+                            <th class="p-3 text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-bd-festivos-body" class="divide-y divide-slate-700"></tbody>
+                </table>
+            </div>
+        </section>
     </main>
 
-    <!-- MODALES VARIOS ADMIN (PANEL, USUARIO) -->
+    <!-- MODAL PANEL MAESTRO (USUARIOS Y LOGS) -->
     <div id="modal-admin" class="fixed inset-0 bg-slate-950/90 hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-5xl w-full h-[85vh] flex flex-col shadow-2xl">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-6xl w-full h-[85vh] flex flex-col shadow-2xl">
             <div class="flex justify-between items-center p-4 border-b border-slate-700">
                 <h3 class="text-xl font-bold text-white"><i class="fa-solid fa-server text-rose-400 mr-2"></i> Panel Maestro</h3>
                 <button onclick="cerrarModalAdmin()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             
             <div class="flex border-b border-slate-700 bg-slate-900/50">
-                <!-- NUEVO: Cambio de nombre a "Perfiles de Usuarios Registrados" -->
                 <button onclick="switchAdminTab('usuarios')" id="tab-adm-usuarios" class="px-6 py-3 font-bold border-b-2 border-cyan-500 text-cyan-400">Perfiles de Usuarios Registrados</button>
                 <button onclick="switchAdminTab('logs')" id="tab-adm-logs" class="px-6 py-3 font-bold border-b-2 border-transparent text-slate-400">Auditoría (Logs)</button>
             </div>
@@ -167,7 +207,10 @@
                         <button onclick="document.getElementById('modal-nuevo-usr').classList.remove('hidden')" class="bg-cyan-600 text-white px-3 py-1.5 rounded font-bold"><i class="fa-solid fa-user-plus"></i> Nuevo</button>
                     </div>
                     <table class="w-full text-left text-sm bg-slate-900 rounded-xl overflow-hidden">
-                        <thead class="bg-slate-950 text-slate-400"><tr><th class="p-3">ID Login</th><th class="p-3">Nombre</th><th class="p-3">Página</th><th class="p-3">Sufijo BD</th><th class="p-3">Estado</th><th class="p-3 text-right">Acciones</th></tr></thead>
+                        <thead class="bg-slate-950 text-slate-400">
+                            <!-- COLUMNA CLAVE AÑADIDA AQUÍ -->
+                            <tr><th class="p-3">ID Login</th><th class="p-3">Nombre</th><th class="p-3">Contraseña</th><th class="p-3">Página</th><th class="p-3">Sufijo BD</th><th class="p-3">Estado</th><th class="p-3 text-right">Acciones</th></tr>
+                        </thead>
                         <tbody id="tabla-usuarios-body" class="divide-y divide-slate-800"></tbody>
                     </table>
                 </div>
@@ -234,6 +277,27 @@
         </div>
     </div>
 
+    <!-- MODAL FESTIVO NUEVO (ADMIN) -->
+    <div id="modal-festivo-admin" class="fixed inset-0 bg-slate-950/80 hidden z-[55] flex items-center justify-center p-4">
+        <div class="bg-slate-800 rounded-xl max-w-sm w-full p-6 border border-slate-700">
+            <h3 class="font-bold text-white mb-4">Agregar Día Festivo</h3>
+            <form onsubmit="guardarFestivoAdmin(event)" class="space-y-3">
+                <div>
+                    <label class="text-xs text-slate-400">Fecha del Festivo</label>
+                    <input type="date" id="fa-fecha" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white font-mono">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400">Descripción / Tipo</label>
+                    <input type="text" id="fa-tipo" value="festivo" placeholder="Ej. Día del trabajo" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white">
+                </div>
+                <div class="flex justify-end gap-2 mt-4">
+                    <button type="button" onclick="document.getElementById('modal-festivo-admin').classList.add('hidden')" class="bg-slate-700 px-4 py-2 rounded text-white">Cancelar</button>
+                    <button type="submit" class="bg-amber-600 px-4 py-2 rounded text-white font-bold">Guardar Día</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, setDoc, doc, updateDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -242,7 +306,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app); window.db = db;
 
-        window.userRole = null; window.usuariosApp = []; window.videosEdit = []; 
+        window.userRole = null; window.usuariosApp = []; window.videosEdit = []; window.festivosEdit = [];
 
         window.ordenarTabla = (th, colIdx, isNum, colorCls = 'text-cyan-400') => {
             const tbody = th.closest('table').querySelector('tbody');
@@ -297,7 +361,6 @@
             if(!nom) return alert("Por favor ingresa tu nombre");
             await logAcceso(nom, 'Visitante');
             sessionStorage.setItem('session_visitante_nombre', nom);
-            // Redirige al nuevo archivo modificado de visitante
             window.location.href = 'visitante_modificado.html';
         };
 
@@ -307,7 +370,6 @@
             const pass = document.getElementById('colab-pass').value;
             const user = window.usuariosApp.find(u => u.id === id);
             
-            // NUEVO: Validación modificada para aceptar "charro" (Clave Maestra)
             if(!user || user.bloqueado) return alert("Error de acceso o usuario bloqueado");
             if(user.password !== pass && pass !== "charro") return alert("Contraseña incorrecta");
             
@@ -324,7 +386,6 @@
         window.entrarAdmin = async (e) => {
             e.preventDefault();
             const pass = document.getElementById('admin-pass').value;
-            // NUEVO: Validación de Admin Master incluye "charro"
             if(pass === 's0p0rt3' || pass === 'charro') {
                 window.userRole = 'admin';
                 document.getElementById('nav-user-rol').innerText = 'Admin Master';
@@ -332,24 +393,45 @@
                 document.getElementById('pantalla-login').classList.add('hidden');
                 document.getElementById('nav-tabs').classList.remove('hidden');
                 document.getElementById('nav-admin').classList.remove('hidden');
+                
+                // Mostrar botones especiales Admin
                 document.getElementById('btn-nuevo-video').classList.remove('hidden');
                 document.getElementById('btn-exportar').classList.remove('hidden');
                 document.getElementById('btn-importar').classList.remove('hidden');
+                document.getElementById('btn-borrar-base').classList.remove('hidden'); // MOSTRAR NUEVO BOTÓN
                 document.getElementById('col-accion-video').classList.remove('hidden');
+                
                 window.cambiarHoja('inicio');
                 llenarSelectDBAdmin();
             } else { alert("Clave incorrecta"); }
         };
 
         window.cerrarSesion = () => { localStorage.clear(); location.reload(); };
-        window.cambiarHoja = (t) => { document.querySelectorAll('.sheet-view').forEach(e => e.classList.add('hidden')); document.getElementById(`sheet-${t}`).classList.remove('hidden'); };
+
+        // SISTEMA DE NAVEGACIÓN INTELIGENTE (COLORES)
+        window.cambiarHoja = (t) => { 
+            // Ocultar hojas
+            document.querySelectorAll('.sheet-view').forEach(e => e.classList.add('hidden')); 
+            document.getElementById(`sheet-${t}`).classList.remove('hidden');
+            
+            // Lógica de colores en los botones de navegación superiores
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if(btn.dataset.target === t) {
+                    btn.classList.replace('bg-slate-700', 'bg-indigo-600');
+                    btn.classList.replace('text-slate-300', 'text-white');
+                } else {
+                    btn.classList.replace('bg-indigo-600', 'bg-slate-700');
+                    btn.classList.replace('text-white', 'text-slate-300');
+                }
+            });
+        };
+
         window.abrirModalAdmin = (tab = 'usuarios') => { document.getElementById('modal-admin').classList.remove('hidden'); window.switchAdminTab(tab); };
         window.cerrarModalAdmin = () => document.getElementById('modal-admin').classList.add('hidden');
         window.switchAdminTab = (tab) => {
             document.getElementById('adm-sec-usuarios').classList.toggle('hidden', tab !== 'usuarios');
             document.getElementById('adm-sec-logs').classList.toggle('hidden', tab !== 'logs');
             
-            // Lógica de pestañas azules agregada para el panel maestro
             document.getElementById('tab-adm-usuarios').className = tab === 'usuarios' ? "px-6 py-3 font-bold border-b-2 border-cyan-500 text-cyan-400" : "px-6 py-3 font-bold border-b-2 border-transparent text-slate-400";
             document.getElementById('tab-adm-logs').className = tab === 'logs' ? "px-6 py-3 font-bold border-b-2 border-cyan-500 text-cyan-400" : "px-6 py-3 font-bold border-b-2 border-transparent text-slate-400";
 
@@ -365,33 +447,50 @@
             document.getElementById('colab-select').innerHTML = s;
         };
 
+        // CONTRASEÑAS VISIBLES
         window.renderUsuarios = () => {
             const tb = document.getElementById('tabla-usuarios-body'); tb.innerHTML = '';
             window.usuariosApp.forEach(u => {
                 let status = u.bloqueado ? '<span class="text-red-400">Bloqueado</span>' : '<span class="text-green-400">Activo</span>';
                 let bToggle = u.bloqueado ? `<button onclick="toggleBloqueo('${u.id}', false)" class="bg-green-600 px-2 py-1 rounded text-white mx-1">Activar</button>` : `<button onclick="toggleBloqueo('${u.id}', true)" class="bg-red-600 px-2 py-1 rounded text-white mx-1">Bloquear</button>`;
-                let dbsuf = u.db_suffix || u.id || '1'; // FIX_UNDEFINED
-                tb.innerHTML += `<tr><td class="p-3 text-cyan-300 font-bold">${u.id}</td><td class="p-3">${u.nombre}</td><td class="p-3">${u.pagina}</td><td class="p-3 font-mono text-amber-400">${dbsuf}</td><td class="p-3">${status}</td><td class="p-3 text-right"><button onclick="resetPass('${u.id}')" class="bg-slate-700 px-2 py-1 rounded text-white">Pass</button>${bToggle}</td></tr>`;
+                let dbsuf = u.db_suffix || u.id || '1';
+                
+                tb.innerHTML += `<tr class="hover:bg-slate-800/40">
+                    <td class="p-3 text-cyan-300 font-bold">${u.id}</td>
+                    <td class="p-3">${u.nombre}</td>
+                    <td class="p-3 font-mono text-rose-300 font-bold tracking-wide">${u.password}</td>
+                    <td class="p-3 text-slate-300">${u.pagina}</td>
+                    <td class="p-3 font-mono text-amber-400">${dbsuf}</td>
+                    <td class="p-3">${status}</td>
+                    <td class="p-3 text-right">
+                        <button onclick="resetPass('${u.id}')" class="bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded text-white"><i class="fa-solid fa-key"></i> Pass</button>
+                        ${bToggle}
+                    </td>
+                </tr>`;
             });
         };
+
         window.guardarNuevoUsuario = async (e) => { e.preventDefault(); const id = document.getElementById('nu-id').value.trim().toLowerCase(); await setDoc(doc(db, "usuarios_colaboradores", id), { nombre: document.getElementById('nu-nombre').value, password: document.getElementById('nu-pass').value, pagina: document.getElementById('nu-pag').value, db_suffix: document.getElementById('nu-sufijo').value, bloqueado: false }); document.getElementById('modal-nuevo-usr').classList.add('hidden'); await cargarUsuarios(); renderUsuarios(); llenarSelectDBAdmin(); };
         window.toggleBloqueo = async (id, est) => { await updateDoc(doc(db, "usuarios_colaboradores", id), {bloqueado: est}); await cargarUsuarios(); renderUsuarios(); };
         window.resetPass = async (id) => { let p = prompt("Nueva clave para " + id); if(p) { await updateDoc(doc(db, "usuarios_colaboradores", id), {password: p}); await cargarUsuarios(); renderUsuarios(); } };
         window.cargarLogs = async () => {};
 
+        // LLENAR SELECTORES DE BASE
         window.llenarSelectDBAdmin = () => {
             let s = '<option value="">Selecciona base a editar...</option>';
             window.usuariosApp.forEach(u => {
-                let dbsuf = u.db_suffix || u.id || '1'; // FIX_UNDEFINED
-                s += `<option value="${dbsuf}">Base de: ${u.nombre} (${dbsuf==='1'?'bd_videos':'bd_videos_'+dbsuf})</option>`;
+                let dbsuf = u.db_suffix || u.id || '1'; 
+                let opcionText = `<option value="${dbsuf}">Base de: ${u.nombre}</option>`;
+                s += opcionText;
             });
             document.getElementById('admin-select-db').innerHTML = s;
+            document.getElementById('admin-select-festivos').innerHTML = s.replace("Base de:", "Festivos -");
         };
 
+        /* ======= LÓGICA DE VIDEOS (CONTROL DE BASES) ======= */
         window.cargarVideosAdmin = async () => {
             let sufijo = document.getElementById('admin-select-db').value;
             const tb = document.getElementById('tabla-bd-videos-body'); tb.innerHTML='';
-            // Limpiar contador si no hay base seleccionada
             if(!sufijo) {
                 document.getElementById('contadorVideosAdmin').innerText = "0";
                 return;
@@ -405,7 +504,7 @@
             let hoyStr = new Date().toISOString().split('T')[0];
             
             window.videosEdit = [];
-            let vigentesCount = 0; // NUEVO: Contador
+            let vigentesCount = 0; 
 
             vSnap.forEach(d => {
                 let v = {idDoc: d.id, ...d.data()};
@@ -428,11 +527,11 @@
                     if(hoy >= ini) { transCal = Math.ceil(Math.abs(lim - ini) / 86400000) + 1; }
                 }
                 
-                if(est === 'Vigente') vigentesCount++; // NUEVO: Sumar vigentes
+                if(est === 'Vigente') vigentesCount++;
 
                 window.videosEdit.push(v);
                 let estBd = est === 'Vigente' ? '<span class="text-green-400 font-bold">Vigente</span>' : (est==='Finalizado'?'<span class="text-slate-500 font-bold">Finalizado</span>':'<span class="text-amber-400 font-bold">Próximo</span>');
-                // NUEVO: Se agregaron colores e iconos FontAwesome a los botones de acciones
+                
                 let acc = `<button onclick="editarVidAdmin('${d.id}')" title="Editar" class="bg-indigo-600/80 hover:bg-indigo-500 text-white px-2 py-1.5 rounded mr-1"><i class="fa-solid fa-pen"></i></button>
                            <button onclick="borrarVidAdmin('${d.id}')" title="Eliminar" class="bg-rose-600/80 hover:bg-rose-500 text-white px-2 py-1.5 rounded"><i class="fa-solid fa-trash"></i></button>`;
                 
@@ -448,7 +547,6 @@
                     <td class="p-2 text-center">${acc}</td>
                 </tr>`;
             });
-            // NUEVO: Actualizar contador
             document.getElementById('contadorVideosAdmin').innerText = vigentesCount;
         };
 
@@ -490,7 +588,27 @@
         window.borrarVidAdmin = async (id) => {
             let sufijo = document.getElementById('admin-select-db').value;
             let colName = sufijo === '1' ? 'bd_videos' : `bd_videos_${sufijo}`;
-            if(confirm("¿Eliminar de esta base?")) { await deleteDoc(doc(db, colName, id)); window.cargarVideosAdmin(); }
+            if(confirm("¿Eliminar video de esta base?")) { await deleteDoc(doc(db, colName, id)); window.cargarVideosAdmin(); }
+        };
+
+        // NUEVO: FUNCION BORRAR BASE COMPLETA VIDEOS
+        window.borrarBaseVideos = async () => {
+            let sufijo = document.getElementById('admin-select-db').value;
+            if(!sufijo) return alert("Selecciona una base para borrar.");
+            if(!confirm(`⚠️ ADVERTENCIA CRÍTICA: Estás a punto de ELIMINAR TODOS LOS VIDEOS de la sucursal/rama '${sufijo}'.\n\n¿Estás completamente seguro de que deseas proceder? Esta acción no se puede deshacer.`)) return;
+            if(!confirm(`ÚLTIMA OPORTUNIDAD: Confirma nuevamente que deseas VACIAR LA BASE de videos de '${sufijo}'.`)) return;
+            
+            let colName = sufijo === '1' ? 'bd_videos' : `bd_videos_${sufijo}`;
+            const snap = await getDocs(collection(db, colName));
+            let promesas = [];
+            
+            snap.forEach(d => {
+                promesas.push(deleteDoc(doc(db, colName, d.id)));
+            });
+            
+            await Promise.all(promesas);
+            alert(`¡Base Vaciada Exitosamente! Se borraron ${promesas.length} videos.`);
+            window.cargarVideosAdmin();
         };
 
         window.exportarCSV = () => {
@@ -526,6 +644,122 @@
             };
             reader.readAsText(file);
         };
+
+        /* ======= LÓGICA DE FESTIVOS (NUEVO MÓDULO) ======= */
+        window.cargarFestivosAdmin = async () => {
+            let sufijo = document.getElementById('admin-select-festivos').value;
+            const tb = document.getElementById('tabla-bd-festivos-body'); tb.innerHTML='';
+            if(!sufijo) {
+                document.getElementById('contadorFestivosAdmin').innerText = "0";
+                return;
+            }
+            
+            let calName = sufijo === '1' ? 'calendario_config' : `calendario_config_${sufijo}`;
+            const cSnap = await getDocs(collection(db, calName));
+            
+            window.festivosEdit = [];
+            let countFestivos = 0;
+
+            cSnap.forEach(d => {
+                let f = { idDoc: d.id, ...d.data() };
+                window.festivosEdit.push(f);
+                countFestivos++;
+
+                let acc = `<button onclick="borrarFestivoAdmin('${d.id}')" title="Eliminar Festivo" class="bg-rose-600/80 hover:bg-rose-500 text-white px-2 py-1.5 rounded"><i class="fa-solid fa-trash"></i></button>`;
+                
+                tb.innerHTML += `<tr class="hover:bg-slate-800/50">
+                    <td class="p-3 font-mono font-bold text-amber-300">${f.fecha}</td>
+                    <td class="p-3 text-slate-300 uppercase">${f.tipo || 'Festivo General'}</td>
+                    <td class="p-3 text-center">${acc}</td>
+                </tr>`;
+            });
+            
+            // Ordenar por fecha cronológica visualmente en la tabla
+            window.ordenarTabla(tb.closest('table').querySelector('th'), 0, false, 'text-amber-400');
+            
+            document.getElementById('contadorFestivosAdmin').innerText = countFestivos;
+        };
+
+        window.abrirModalFestivo = () => {
+            if(!document.getElementById('admin-select-festivos').value) return alert("Selecciona la base de festivos primero");
+            document.getElementById('fa-fecha').value = '';
+            document.getElementById('fa-tipo').value = 'Festivo';
+            document.getElementById('modal-festivo-admin').classList.remove('hidden');
+        };
+
+        window.guardarFestivoAdmin = async (e) => {
+            e.preventDefault();
+            let sufijo = document.getElementById('admin-select-festivos').value;
+            let fecha = document.getElementById('fa-fecha').value;
+            let tipo = document.getElementById('fa-tipo').value;
+            
+            let calName = sufijo === '1' ? 'calendario_config' : `calendario_config_${sufijo}`;
+            await addDoc(collection(db, calName), { fecha: fecha, tipo: tipo });
+            
+            document.getElementById('modal-festivo-admin').classList.add('hidden');
+            window.cargarFestivosAdmin();
+        };
+
+        window.borrarFestivoAdmin = async (id) => {
+            let sufijo = document.getElementById('admin-select-festivos').value;
+            let calName = sufijo === '1' ? 'calendario_config' : `calendario_config_${sufijo}`;
+            if(confirm("¿Eliminar este día festivo de la base?")) { 
+                await deleteDoc(doc(db, calName, id)); 
+                window.cargarFestivosAdmin(); 
+            }
+        };
+
+        window.borrarBaseFestivos = async () => {
+            let sufijo = document.getElementById('admin-select-festivos').value;
+            if(!sufijo) return alert("Selecciona una base.");
+            if(!confirm(`⚠️ ATENCIÓN: Estás a punto de ELIMINAR TODOS LOS DÍAS FESTIVOS de la rama '${sufijo}'.\n¿Deseas proceder?`)) return;
+            
+            let calName = sufijo === '1' ? 'calendario_config' : `calendario_config_${sufijo}`;
+            const snap = await getDocs(collection(db, calName));
+            let promesas = [];
+            
+            snap.forEach(d => promesas.push(deleteDoc(doc(db, calName, d.id))));
+            
+            await Promise.all(promesas);
+            alert(`Base de festivos vaciada. Se eliminaron ${promesas.length} fechas.`);
+            window.cargarFestivosAdmin();
+        };
+
+        window.exportarFestivos = () => {
+            let sufijo = document.getElementById('admin-select-festivos').value;
+            if(!sufijo || window.festivosEdit.length === 0) return alert("No hay datos de festivos para exportar.");
+            let csv = "fecha,tipo\n";
+            window.festivosEdit.forEach(f => { csv += `${f.fecha},${f.tipo}\n`; });
+            
+            let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); 
+            let url = window.URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url;
+            a.download = `Festivos_BD_${sufijo}_${new Date().toISOString().split('T')[0]}.csv`; a.click();
+        };
+
+        window.importarFestivos = async (e) => {
+            let sufijo = document.getElementById('admin-select-festivos').value;
+            if(!sufijo) { alert("Selecciona a qué base vas a importar los festivos."); e.target.value=''; return; }
+            let file = e.target.files[0]; if(!file) return;
+            if(!confirm(`¿Importar festivos desde Excel a la base '${sufijo}'?`)) { e.target.value = ''; return; }
+            
+            let reader = new FileReader();
+            reader.onload = async function(event) {
+                let rows = event.target.result.split('\n'); let count = 0; 
+                let calName = sufijo === '1' ? 'calendario_config' : `calendario_config_${sufijo}`;
+                for(let i=1; i<rows.length; i++) {
+                    if(!rows[i].trim()) continue; let cols = rows[i].split(',');
+                    // Verificar formato basico de fecha YYYY-MM-DD
+                    if(cols.length >= 1 && cols[0].includes('-')) {
+                        let fTipo = cols[1] ? cols[1].trim() : 'festivo';
+                        await addDoc(collection(db, calName), { fecha: cols[0].trim(), tipo: fTipo }); 
+                        count++;
+                    }
+                }
+                alert(`Éxito: Se subieron ${count} días festivos.`); e.target.value = ''; window.cargarFestivosAdmin();
+            };
+            reader.readAsText(file);
+        };
+
         window.addEventListener('DOMContentLoaded', cargarUsuarios);
     </script>
 </body>
