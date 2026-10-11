@@ -38,6 +38,7 @@
 
     <main class="flex-grow w-[98%] mx-auto px-2 py-6">
         
+        <!-- SECCIÓN VIDEOS -->
         <section id="sheet-BD_Videos" class="sheet-view space-y-6">
             <div class="flex flex-wrap justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700 shadow gap-4">
                 <div class="flex items-center gap-3">
@@ -77,6 +78,7 @@
             </div>
         </section>
 
+        <!-- SECCIÓN REPORTES -->
         <section id="sheet-Reporte" class="sheet-view hidden space-y-6">
             <div class="bg-slate-800 p-6 rounded-xl border border-orange-500 shadow-xl">
                 <h2 class="text-xl font-bold text-white mb-4 flex justify-between items-center flex-wrap gap-3">
@@ -130,7 +132,7 @@
             </div>
         </section>
         
-        <!-- NUEVA ESTRUCTURA DE FESTIVOS -->
+        <!-- SECCIÓN CALENDARIO -->
         <section id="sheet-Calendario" class="sheet-view hidden space-y-6">
             <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-xl">
                 <div class="flex justify-between items-center mb-4 flex-wrap gap-4">
@@ -221,7 +223,7 @@
         </div>
     </div>
     
-    <!-- NUEVO: Modal de Calendario Completo -->
+    <!-- Modal de Calendario -->
     <div id="modal-cal" class="fixed inset-0 bg-slate-950/80 hidden z-[60] flex items-center justify-center p-4">
         <div class="bg-slate-800 p-6 rounded-xl max-w-sm w-full border border-slate-700 shadow-2xl">
             <h3 id="titulo-modal-cal" class="font-bold mb-4 text-white text-lg">Agregar Fecha al Calendario</h3>
@@ -561,7 +563,7 @@
         window.borrarVid = async (id) => { if(confirm("¿Estás seguro de eliminar este video?")){ await deleteDoc(doc(db, COLL_VID, id)); await cargarData();} };
 
         /* ========================================= */
-        /* == NUEVA LOGICA DE CALENDARIO / FESTIVOS == */
+        /* == LOGICA DE CALENDARIO / FESTIVOS == */
         /* ========================================= */
 
         window.verificarTipoHoras = () => {
