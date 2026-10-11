@@ -6,6 +6,8 @@
     <title>Módulo Visitante - Consulta</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- NUEVO: Agregado SweetAlert2 para la ventana flotante -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
     
@@ -14,7 +16,8 @@
             <div class="flex items-center space-x-3">
                 <img src="logo1_mario.jpg" onerror="this.src='https://via.placeholder.com/40?text=MAC'" class="w-10 h-10 rounded-xl object-cover border border-indigo-500/40">
                 <div>
-                    <h1 class="text-lg font-bold text-white">Consulta (Solo Lectura)</h1>
+                    <!-- NUEVO: Cambio de nombre solicitado -->
+                    <h1 class="text-lg font-bold text-white">Catálogo de Videos</h1>
                     <p class="text-xs text-slate-400">Visitante: <span id="hdr-nombre" class="font-bold text-indigo-400">...</span></p>
                 </div>
             </div>
@@ -29,7 +32,8 @@
                 <div class="w-px h-6 bg-slate-700 mx-1"></div>
                 
                 <button onclick="abrirConfig()" class="px-3 py-1.5 rounded-lg text-sm font-semibold bg-amber-600/20 text-amber-400 border border-amber-500/30"><i class="fa-solid fa-sliders"></i> Ajustes Temporales</button>
-                <button onclick="salir()" class="ml-2 px-3 py-1.5 rounded-lg text-sm font-bold bg-red-600 hover:bg-red-500 text-white"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
+                <!-- NUEVO: Botón Salir modificado para usar SweetAlert -->
+                <button onclick="salirVisitante()" class="ml-2 px-3 py-1.5 rounded-lg text-sm font-bold bg-red-600 hover:bg-red-500 text-white"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
             </nav>
         </div>
     </header>
@@ -39,8 +43,13 @@
         <section id="sheet-BD_Videos" class="sheet-view space-y-6">
             <div class="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700 shadow gap-4 flex-wrap">
                 <div class="flex items-center gap-3">
-                    <h2 class="text-xl font-bold text-white"><i class="fa-solid fa-eye text-indigo-400 mr-2"></i> Base de Datos (Solo Lectura)</h2>
+                    <!-- NUEVO: Cambio de nombre solicitado -->
+                    <h2 class="text-xl font-bold text-white"><i class="fa-solid fa-eye text-indigo-400 mr-2"></i> Catálogo de Videos</h2>
                     <input type="text" onkeyup="buscarTabla(this, 'tabla-videos-body')" placeholder="&#xf002; Buscar video..." class="font-[FontAwesome] bg-slate-900 border border-slate-700 px-3 py-1.5 rounded text-white text-sm outline-none focus:border-indigo-500">
+                </div>
+                <!-- NUEVO: Contador centrado -->
+                <div class="flex items-center justify-center font-bold text-lg text-indigo-400">
+                    Videos Vigentes: <span id="contadorVideosVisitante" class="ml-2 text-white bg-indigo-600 px-3 py-1 rounded-full">0</span>
                 </div>
             </div>
             <div class="bg-slate-800 rounded-xl overflow-hidden shadow-lg border border-indigo-900/50">
@@ -142,6 +151,29 @@
         </div>
     </div>
 
+    <!-- NUEVO: Script para el SweetAlert (Mensaje Whatsapp) -->
+    <script>
+        window.salirVisitante = () => {
+            Swal.fire({
+                title: '¡Qué gusto tenerte por aquí! ✨🚀',
+                html: `
+                    <p style="font-size: 16px;">¿Quieres llevar tu experiencia al siguiente nivel?</p>
+                    <p style="font-size: 14px; margin-bottom: 20px;">Para disfrutar de acceso permanente y todas las herramientas avanzadas como usuario registrado, solo necesitas activar tu membresía preferencial.</p>
+                    <a href="https://wa.me/5218661155107" target="_blank" 
+                       style="background-color: #25D366; color: white; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;">
+                       <i class="fab fa-whatsapp"></i> Contactar a Mario Cárdenas
+                    </a>
+                `,
+                showConfirmButton: false,
+                showCloseButton: true,
+                willClose: () => {
+                    sessionStorage.clear(); 
+                    window.location.href = 'index.html';
+                }
+            });
+        };
+    </script>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -185,8 +217,6 @@
                 tr.style.display = tr.innerText.toLowerCase().includes(q) ? '' : 'none';
             });
         };
-
-        window.salir = () => { sessionStorage.clear(); window.location.href='index.html'; };
 
         window.cambiarHoja = (t) => {
             document.querySelectorAll('.sheet-view').forEach(e=>e.classList.add('hidden'));
@@ -278,7 +308,11 @@
 
         window.renderVideos = () => {
             const tb = document.getElementById('tabla-videos-body'); tb.innerHTML='';
+            let vigentesCount = 0; // NUEVO: Contador de vigentes
+
             window.videos.forEach(v => {
+                if(v.est === 'Vigente') vigentesCount++; // NUEVO: Sumar si es vigente
+
                 let estBd = v.est === 'Vigente' ? '<span class="text-green-400 font-bold">Vigente</span>' : (v.est==='Finalizado'?'<span class="text-slate-500 font-bold">Finalizado</span>':'<span class="text-amber-400 font-bold">Próximo</span>');
                 tb.innerHTML += `<tr class="hover:bg-slate-700/50">
                     <td class="p-2 font-medium">${v.version}</td>
@@ -292,6 +326,8 @@
                     <td class="p-2 text-right font-bold text-amber-400 text-base">${v.imp.toLocaleString()}</td>
                 </tr>`;
             });
+            // NUEVO: Actualizar el contador en la pantalla
+            document.getElementById('contadorVideosVisitante').innerText = vigentesCount;
         };
 
         window.renderReporte = () => {
