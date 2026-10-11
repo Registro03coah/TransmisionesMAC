@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo Colaborador - SDCI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
+    
+    <header class="bg-slate-800 border-b border-cyan-700 sticky top-0 z-40 shadow-md">
+        <div class="w-[98%] mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <img src="logo1_mario.jpg" onerror="this.src='https://via.placeholder.com/40?text=MAC'" class="w-10 h-10 rounded-xl object-cover border border-cyan-500/40">
+                <div>
+                    <h1 class="text-lg font-bold text-white">Módulo Operativo</h1>
+                    <p class="text-xs text-slate-400">Usuario: <span id="hdr-nombre" class="font-bold text-cyan-400">...</span></p>
+                </div>
+            </div>
+            <nav id="nav-tabs" class="flex flex-wrap gap-2 items-center">
+                <div class="flex items-center px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs font-bold text-slate-300 mr-2">
+                    <span id="nav-conn-dot" class="w-2.5 h-2.5 rounded-full bg-red-500 mr-2 shadow-[0_0_5px_#ef4444]"></span> BD <span id="hdr-sufijo" class="ml-1 text-cyan-400">...</span>
+                </div>
+                
+                <button onclick="cambiarHoja('BD_Videos')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-cyan-600 text-white" data-target="BD_Videos">Mis Videos</button>
+                <button onclick="cambiarHoja('Reporte')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-700 text-slate-300" data-target="Reporte">Generador de Reportes</button>
+                <button onclick="cambiarHoja('Calendario')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-700 text-slate-300" data-target="Calendario">Festivos e Hábiles</button>
+                
+                <div class="w-px h-6 bg-slate-700 mx-1"></div>
+                
+                <button onclick="cambiarMiPassword()" class="px-3 py-1.5 rounded-lg text-sm font-semibold bg-slate-700 text-slate-300 border border-slate-600 hover:text-white"><i class="fa-solid fa-key"></i> Clave</button>
+                <button onclick="abrirConfig()" class="px-3 py-1.5 rounded-lg text-sm font-semibold bg-amber-600/20 text-amber-400 border border-amber-500/30"><i class="fa-solid fa-sliders"></i> Ajustes</button>
+                <button onclick="salir()" class="ml-2 px-3 py-1.5 rounded-lg text-sm font-bold bg-red-600 hover:bg-red-500 text-white"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow w-[98%] mx-auto px-2 py-6">
+        
+        <section id="sheet-BD_Videos" class="sheet-view space-y-6">
+            <div class="flex flex-wrap justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700 shadow gap-4">
+                <div class="flex items-center gap-3">
+                    <h2 class="text-xl font-bold text-white"><i class="fa-solid fa-video text-cyan-400"></i> Mi Catálogo</h2>
+                    <input type="text" onkeyup="buscarTabla(this, 'tabla-videos-body')" placeholder="&#xf002; Buscar..." class="font-[FontAwesome] bg-slate-900 border border-slate-700 px-3 py-1.5 rounded text-white text-sm outline-none focus:border-cyan-500">
+                </div>
+                
+                <div class="flex items-center justify-center font-bold text-lg text-cyan-400">
+                    Videos Vigentes: <span id="contadorVideosMod" class="ml-2 text-white bg-cyan-600 px-3 py-1 rounded-full shadow-lg">0</span>
+                </div>
+                
+                <div class="flex flex-wrap gap-2">
+                    <input type="file" id="csv-file-colab" accept=".csv" class="hidden" onchange="importarCSV(event)">
+                    <button onclick="exportarCSV()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded font-bold text-sm shadow"><i class="fa-solid fa-download"></i> Bajar Excel</button>
+                    <button onclick="document.getElementById('csv-file-colab').click()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-2 rounded font-bold text-sm shadow"><i class="fa-solid fa-upload"></i> Subir Excel</button>
+                    <button onclick="abrirModalVideo()" class="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded font-bold text-sm shadow"><i class="fa-solid fa-plus"></i> Registrar Nuevo</button>
+                </div>
+            </div>
+            <div class="bg-slate-800 rounded-xl overflow-hidden shadow-lg border border-cyan-900/50">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-900 text-slate-300 uppercase cursor-pointer select-none">
+                        <tr>
+                            <th class="p-2 hover:text-cyan-400" onclick="ordenarTabla(this, 0, false)">Versión <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 hover:text-cyan-400" onclick="ordenarTabla(this, 1, false)">Temática <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 hover:text-cyan-400" onclick="ordenarTabla(this, 2, false)">Duración <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 hover:text-cyan-400" onclick="ordenarTabla(this, 3, false)">Inicio <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 hover:text-cyan-400" onclick="ordenarTabla(this, 4, false)">Cierre <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 text-center hover:text-cyan-400" onclick="ordenarTabla(this, 5, true)" title="Festivos en Rango">Festivos <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 text-center hover:text-cyan-400" onclick="ordenarTabla(this, 6, true)" title="Días Transcurridos">Transcurridos <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 text-center hover:text-cyan-400" onclick="ordenarTabla(this, 7, false)">Estado <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 text-right hover:text-cyan-400" onclick="ordenarTabla(this, 8, true)">Impactos <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 text-center cursor-default">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-videos-body" class="divide-y divide-slate-700"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="sheet-Reporte" class="sheet-view hidden space-y-6">
+            <div class="bg-slate-800 p-6 rounded-xl border border-orange-500 shadow-xl">
+                <h2 class="text-xl font-bold text-white mb-4 flex justify-between items-center flex-wrap gap-3">
+                    <span><i class="fa-solid fa-chart-pie text-orange-400"></i> Generador de Reportes</span>
+                    <input type="text" onkeyup="buscarTabla(this, 'tabla-reporte-body')" placeholder="&#xf002; Buscar en reporte..." class="font-[FontAwesome] bg-slate-900 border border-slate-700 px-3 py-1.5 rounded text-white text-sm font-normal outline-none focus:border-orange-500">
+                </h2>
+                
+                <div class="flex gap-4 mb-4 bg-slate-900 p-4 rounded-xl border border-slate-700 items-center justify-between">
+                    <div class="flex gap-4">
+                        <div>
+                            <label class="text-xs text-slate-400 font-bold block mb-1">Día de Inicio</label>
+                            <input type="date" id="rep-inicio" class="bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white font-bold outline-none focus:border-orange-500" onchange="renderReporte()">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400 font-bold block mb-1">Día de Cierre</label>
+                            <input type="date" id="rep-fin" class="bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white font-bold outline-none focus:border-orange-500" onchange="renderReporte()">
+                        </div>
+                    </div>
+                    <div>
+                        <button onclick="exportarReporte()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg font-bold shadow-lg flex items-center gap-2 transition"><i class="fa-solid fa-file-excel"></i> Exportar Reporte</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 flex justify-between items-center">
+                        <span class="text-slate-400 font-bold uppercase text-xs tracking-wider">Suma de Videos en Periodo:</span>
+                        <span id="rep-total-videos" class="text-3xl font-black text-white">0</span>
+                    </div>
+                    <div class="bg-slate-900 p-4 rounded-xl border border-amber-500/50 flex justify-between items-center shadow-[0_0_15px_rgba(245,158,11,0.1)]">
+                        <span class="text-amber-400 font-bold uppercase text-xs tracking-wider">Total Impactos Sumados:</span>
+                        <span id="rep-total-impactos" class="text-3xl font-black text-amber-400">0</span>
+                    </div>
+                </div>
+
+                <table class="w-full text-left text-xs bg-slate-900 rounded-xl overflow-hidden shadow">
+                    <thead class="bg-slate-950 text-slate-400 uppercase cursor-pointer select-none">
+                        <tr>
+                            <th class="p-2 hover:text-orange-400" onclick="ordenarTabla(this, 0, false, 'text-orange-400')">Versión <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 hover:text-orange-400" onclick="ordenarTabla(this, 1, false, 'text-orange-400')">Temática <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 hover:text-orange-400" onclick="ordenarTabla(this, 2, false, 'text-orange-400')">Duración <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 hover:text-orange-400" onclick="ordenarTabla(this, 3, false, 'text-orange-400')">Inicio <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 hover:text-orange-400" onclick="ordenarTabla(this, 4, false, 'text-orange-400')">Cierre <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 text-center hover:text-orange-400" onclick="ordenarTabla(this, 5, true, 'text-orange-400')">Festivos <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 text-center hover:text-orange-400" onclick="ordenarTabla(this, 6, true, 'text-orange-400')">Transcurridos <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 text-center hover:text-orange-400" onclick="ordenarTabla(this, 7, false, 'text-orange-400')">Estado <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 text-right hover:text-orange-400" onclick="ordenarTabla(this, 8, true, 'text-orange-400')">Impactos <i class="fa-solid fa-sort text-slate-600"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-reporte-body" class="divide-y divide-slate-800"></tbody>
+                </table>
+            </div>
+        </section>
+        
+        <!-- NUEVA ESTRUCTURA DE FESTIVOS -->
+        <section id="sheet-Calendario" class="sheet-view hidden space-y-6">
+            <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-xl">
+                <div class="flex justify-between items-center mb-4 flex-wrap gap-4">
+                    <div class="flex items-center gap-3">
+                        <h2 class="text-xl font-bold text-white"><i class="fa-solid fa-calendar-xmark text-amber-400"></i> Configuración de Calendario</h2>
+                        <input type="text" onkeyup="buscarTabla(this, 'tabla-cal-body')" placeholder="&#xf002; Buscar fecha..." class="font-[FontAwesome] bg-slate-900 border border-slate-700 px-3 py-1.5 rounded text-white text-sm font-normal outline-none focus:border-amber-500">
+                    </div>
+
+                    <div class="flex items-center justify-center font-bold text-lg text-amber-400">
+                        Fechas Registradas: <span id="contadorFestivosMod" class="ml-2 text-white bg-amber-600 px-3 py-1 rounded-full shadow-lg">0</span>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-2">
+                        <input type="file" id="csv-file-cal" accept=".csv" class="hidden" onchange="importarCalCSV(event)">
+                        <button onclick="exportarCalCSV()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded font-bold shadow text-sm transition"><i class="fa-solid fa-download"></i> Bajar Calendario</button>
+                        <button onclick="document.getElementById('csv-file-cal').click()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded font-bold shadow text-sm transition"><i class="fa-solid fa-upload"></i> Subir Calendario</button>
+                        <button onclick="borrarBaseCalendario()" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded font-bold shadow text-sm transition"><i class="fa-solid fa-trash-can"></i> Borrar Todo</button>
+                        <button onclick="abrirModalCal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded font-bold shadow text-sm transition"><i class="fa-solid fa-plus"></i> Añadir Fecha</button>
+                    </div>
+                </div>
+                
+                <div class="bg-slate-900 rounded-xl overflow-hidden border border-amber-900/50 shadow-lg">
+                    <table class="w-full text-left text-sm cursor-pointer select-none">
+                        <thead class="bg-slate-950 text-slate-400 uppercase text-xs">
+                            <tr>
+                                <th class="p-3 hover:text-amber-400" onclick="ordenarTabla(this, 0, false, 'text-amber-400')">Tipo <i class="fa-solid fa-sort text-slate-600"></i></th>
+                                <th class="p-3 hover:text-amber-400" onclick="ordenarTabla(this, 1, false, 'text-amber-400')">Fecha <i class="fa-solid fa-sort text-slate-600"></i></th>
+                                <th class="p-3 hover:text-amber-400" onclick="ordenarTabla(this, 2, false, 'text-amber-400')">Descripción <i class="fa-solid fa-sort text-slate-600"></i></th>
+                                <th class="p-3 hover:text-amber-400" onclick="ordenarTabla(this, 3, true, 'text-amber-400')">Horas <i class="fa-solid fa-sort text-slate-600"></i></th>
+                                <th class="p-3 text-center cursor-default">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-cal-body" class="divide-y divide-slate-800"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODALES -->
+    <div id="modal-config" class="fixed inset-0 bg-slate-950/95 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-800 border-2 border-amber-500 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative">
+            <button id="btn-cerrar-config" onclick="cerrarConfig()" class="absolute top-4 right-4 text-slate-400 hover:text-white hidden"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h3 class="text-xl font-black text-amber-400 mb-2 text-center"><i class="fa-solid fa-sliders"></i> Ajustes Generales de Módulo</h3>
+            <p class="text-xs text-slate-300 text-center mb-6">Esta configuración calculará los impactos automáticos (puedes sobrescribir las horas por día en el calendario).</p>
+            
+            <form onsubmit="guardarConfig(event)" class="space-y-5">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Horas de transmisión estándar al día</label>
+                    <select id="cfg-horas" class="w-full bg-slate-900 border border-slate-600 rounded px-4 py-3 text-white font-bold">
+                        <option value="5">5 Horas</option><option value="6">6 Horas</option><option value="7">7 Horas</option>
+                        <option value="8">8 Horas</option><option value="9">9 Horas</option><option value="10">10 Horas</option>
+                        <option value="11">11 Horas</option><option value="12">12 Horas</option><option value="24">24 Horas</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Cantidad de pantallas operando</label>
+                    <input type="number" id="cfg-pantallas" min="1" max="20" required value="1" class="w-full bg-slate-900 border border-slate-600 rounded px-4 py-3 text-white font-bold text-center text-lg">
+                </div>
+                <button type="submit" class="w-full py-3 bg-amber-600 hover:bg-amber-500 text-white rounded-lg font-bold shadow-lg">Guardar Configuración</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Video -->
+    <div id="modal-video" class="fixed inset-0 bg-slate-950/80 hidden z-[60] flex items-center justify-center p-4">
+        <div class="bg-slate-800 p-6 rounded-xl max-w-md w-full border border-slate-700 shadow-2xl">
+            <h3 id="titulo-modal-video" class="font-bold mb-4 text-white">Nuevo Video en Módulo</h3>
+            <form onsubmit="guardarVideo(event)" class="space-y-3">
+                <input type="hidden" id="v-doc"> 
+                <input type="hidden" id="v-id">
+                <input type="text" id="v-ver" placeholder="Versión / Nombre" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white font-bold">
+                <input type="text" id="v-tema" placeholder="Temática (ej. Promoción, Informativo)" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white">
+                <input type="text" id="v-dur" placeholder="Duración (MM:SS)" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white font-mono">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-xs text-slate-400">Inicio</label>
+                        <input type="date" id="v-ini" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400">Cierre</label>
+                        <input type="date" id="v-fin" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white">
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 mt-4"><button type="button" onclick="document.getElementById('modal-video').classList.add('hidden')" class="bg-slate-700 px-4 py-2 rounded text-white">Cancelar</button><button type="submit" class="bg-cyan-600 px-4 py-2 rounded text-white font-bold shadow">Guardar</button></div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- NUEVO: Modal de Calendario Completo -->
+    <div id="modal-cal" class="fixed inset-0 bg-slate-950/80 hidden z-[60] flex items-center justify-center p-4">
+        <div class="bg-slate-800 p-6 rounded-xl max-w-sm w-full border border-slate-700 shadow-2xl">
+            <h3 id="titulo-modal-cal" class="font-bold mb-4 text-white text-lg">Agregar Fecha al Calendario</h3>
+            <form onsubmit="guardarCal(event)" class="space-y-4">
+                <input type="hidden" id="c-doc">
+                
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Tipo de Evento</label>
+                    <select id="c-tipo" class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white focus:border-amber-500 outline-none" onchange="verificarTipoHoras()">
+                        <option value="festivo">Día Inhábil (Descanso General)</option>
+                        <option value="adicional">Día Laboral Adicional (Ej. Domingo)</option>
+                        <option value="especial">Horario Especial (Ajuste de Horas)</option>
+                    </select>
+                </div>
+                
+                <div id="div-c-horas" class="hidden">
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Horas laborables para este día</label>
+                    <input type="number" id="c-horas" min="1" max="24" value="5" class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white font-bold outline-none focus:border-amber-500">
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Fecha</label>
+                    <input type="date" id="c-fec" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white outline-none focus:border-amber-500">
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Descripción / Motivo</label>
+                    <input type="text" id="c-desc" placeholder="Ej. Navidad, Mantenimiento..." required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white outline-none focus:border-amber-500">
+                </div>
+                
+                <div class="flex justify-end gap-2 mt-4 pt-2 border-t border-slate-700">
+                    <button type="button" onclick="document.getElementById('modal-cal').classList.add('hidden')" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded text-white transition">Cancelar</button>
+                    <button type="submit" class="bg-amber-600 hover:bg-amber-500 px-4 py-2 rounded text-white font-bold shadow transition">Guardar Fecha</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- LOGICA FIREBASE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, setDoc, getDoc, addDoc, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyA6jvnsXZwF2anOJo3VadfNvn7Fl6Z5efY", projectId: "sistema-mac-reportes" };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app); window.db = db;
+
+        const COLAB_ID = localStorage.getItem('session_colab_id');
+        const COLAB_NOM = localStorage.getItem('session_colab_nombre');
+        const DB_SUFFIX = localStorage.getItem('session_colab_db');
+        
+        if(!COLAB_ID || !DB_SUFFIX) { window.location.href = 'index.html'; }
+        
+        document.getElementById('hdr-nombre').innerText = COLAB_NOM;
+        document.getElementById('hdr-sufijo').innerText = DB_SUFFIX === '1' ? '(Base Antigua MAC)' : `(_${DB_SUFFIX})`;
+
+        const COLL_VID = DB_SUFFIX === '1' ? 'bd_videos' : `bd_videos_${DB_SUFFIX}`;
+        const COLL_CAL = DB_SUFFIX === '1' ? 'calendario_config' : `calendario_config_${DB_SUFFIX}`;
+        
+        window.cfg = { horas: 7, pantallas: 1 };
+        window.videos = [];
+        window.calendario = [];
+
+        window.ordenarTabla = (th, colIdx, isNum, colorCls = 'text-cyan-400') => {
+            const tbody = th.closest('table').querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const asc = th.dataset.asc !== 'true';
+            th.dataset.asc = asc;
+            
+            th.closest('tr').querySelectorAll('th i.fa-sort, th i.fa-sort-up, th i.fa-sort-down').forEach(i => {
+                i.className = 'fa-solid fa-sort text-slate-600';
+            });
+            const icon = th.querySelector('i');
+            if(icon) icon.className = asc ? `fa-solid fa-sort-up ${colorCls}` : `fa-solid fa-sort-down ${colorCls}`;
+
+            rows.sort((a, b) => {
+                let vA = a.cells[colIdx].innerText.replace(/,/g, '').trim();
+                let vB = b.cells[colIdx].innerText.replace(/,/g, '').trim();
+                if(isNum) return asc ? Number(vA) - Number(vB) : Number(vB) - Number(vA);
+                return asc ? vA.localeCompare(vB) : vB.localeCompare(vA);
+            });
+            tbody.append(...rows);
+        };
+
+        window.buscarTabla = (inp, tbId) => {
+            const q = inp.value.toLowerCase();
+            document.getElementById(tbId).querySelectorAll('tr').forEach(tr => {
+                tr.style.display = tr.innerText.toLowerCase().includes(q) ? '' : 'none';
+            });
+        };
+
+        window.cambiarMiPassword = async () => {
+            let p = prompt("Ingresa tu nueva contraseña para acceder al módulo:");
+            if(p && p.trim() !== "") {
+                try {
+                    await updateDoc(doc(db, "usuarios_colaboradores", COLAB_ID), {password: p.trim()});
+                    alert("¡Tu contraseña ha sido actualizada con éxito!");
+                } catch(e) {
+                    alert("Hubo un error al actualizar la contraseña.");
+                }
+            }
+        };
+
+        window.salir = () => { localStorage.clear(); window.location.href='index.html'; };
+
+        window.cambiarHoja = (t) => {
+            document.querySelectorAll('.sheet-view').forEach(e=>e.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(e=>{ e.classList.remove('bg-cyan-600','text-white'); e.classList.add('bg-slate-700','text-slate-300'); });
+            document.getElementById(`sheet-${t}`).classList.remove('hidden');
+            document.querySelector(`[data-target="${t}"]`).classList.add('bg-cyan-600','text-white');
+            if(t==='Reporte') renderReporte();
+        };
+
+        async function init() {
+            getDocs(collection(db, "test_conn")).then(()=>{
+                document.getElementById('nav-conn-dot').classList.replace('bg-red-500','bg-green-500');
+                document.getElementById('nav-conn-dot').classList.replace('shadow-[0_0_5px_#ef4444]','shadow-[0_0_5px_#22c55e]');
+            });
+
+            const docCfg = await getDoc(doc(db, "config_modulos", COLAB_ID));
+            if(docCfg.exists()) {
+                window.cfg = docCfg.data();
+                document.getElementById('cfg-horas').value = window.cfg.horas; document.getElementById('cfg-pantallas').value = window.cfg.pantallas;
+                document.getElementById('btn-cerrar-config').classList.remove('hidden');
+            } else {
+                document.getElementById('modal-config').classList.remove('hidden');
+            }
+            await cargarData();
+        }
+
+        window.guardarConfig = async (e) => {
+            e.preventDefault();
+            window.cfg = { horas: parseInt(document.getElementById('cfg-horas').value), pantallas: parseInt(document.getElementById('cfg-pantallas').value) };
+            await setDoc(doc(db, "config_modulos", COLAB_ID), window.cfg);
+            document.getElementById('modal-config').classList.add('hidden'); document.getElementById('btn-cerrar-config').classList.remove('hidden');
+            procesarMate(); renderVideos();
+        };
+
+        window.abrirConfig = () => document.getElementById('modal-config').classList.remove('hidden');
+        window.cerrarConfig = () => document.getElementById('modal-config').classList.add('hidden');
+
+        async function cargarData() {
+            const vSnap = await getDocs(collection(db, COLL_VID)); window.videos = []; vSnap.forEach(d => window.videos.push({idDoc:d.id, ...d.data()}));
+            const cSnap = await getDocs(collection(db, COLL_CAL)); window.calendario = []; cSnap.forEach(d => window.calendario.push({idDoc:d.id, ...d.data()}));
+            procesarMate(); renderVideos(); renderCal();
+        }
+
+        window.duracionSeg = d => { const p = String(d).split(':'); return p.length===3?p[0]*3600+p[1]*60+Number(p[2]):p[0]*60+Number(p[1]); };
+        
+        function procesarMate() {
+            let fest = new Set(window.calendario.filter(c=>c.tipo==='festivo').map(c=>c.fecha));
+            let adic = new Set(window.calendario.filter(c=>c.tipo==='adicional').map(c=>c.fecha));
+            let horasEsp = {}; 
+            window.calendario.filter(c=>c.tipo==='especial').forEach(c => horasEsp[c.fecha] = c.horas);
+
+            let hoyStr = new Date().toISOString().split('T')[0];
+
+            window.videos.forEach(v => {
+                let vIni = v.inicio_transmision || v.inicio;
+                let vFin = v.cierre_transmision || v.cierre;
+                
+                v._ini = vIni;
+                v._fin = vFin;
+                v._tema = v.tematica || 'General';
+
+                if(!vIni || !vFin) { v.dias = 0; v.imp = 0; v.est='Error'; v.fest_rango=0; v.trans_cal=0; return; }
+
+                let ini = new Date(vIni+"T00:00:00"), fin = new Date(vFin+"T00:00:00"), hoy = new Date(hoyStr+"T00:00:00");
+                if (hoy > fin) v.est = 'Finalizado'; else if (hoy < ini) v.est = 'Próximo'; else v.est = 'Vigente';
+
+                let festRango = 0;
+                let iter = new Date(ini);
+                while(iter <= fin) {
+                    if(fest.has(iter.toISOString().split('T')[0])) festRango++;
+                    iter.setDate(iter.getDate()+1);
+                }
+                v.fest_rango = festRango;
+
+                let lim = (fin < hoy) ? fin : hoy; 
+                let transCal = 0;
+                if (hoy >= ini) { transCal = Math.ceil(Math.abs(lim - ini) / 86400000) + 1; }
+                v.trans_cal = transCal;
+
+                let dias = 0, rep = 0; let c = new Date(ini);
+                while(c <= lim) {
+                    let f = c.toISOString().split('T')[0];
+                    let esNormal = c.getDay() !== 0; 
+                    
+                    let labora = false;
+                    if (fest.has(f)) labora = false; 
+                    else if (horasEsp[f] !== undefined) labora = true; 
+                    else if (adic.has(f)) labora = true; 
+                    else if (esNormal) labora = true; 
+                    
+                    if(labora) {
+                        dias++;
+                        let actHoy = window.videos.filter(vid => {
+                            let i = vid.inicio_transmision || vid.inicio;
+                            let fn = vid.cierre_transmision || vid.cierre;
+                            return f >= i && f <= fn;
+                        });
+                        let sumS = actHoy.reduce((a,b)=>a+window.duracionSeg(b.duracion), 0);
+                        
+                        let hrHoy = horasEsp[f] !== undefined ? horasEsp[f] : (window.tempCfg ? window.tempCfg.horas : window.cfg.horas);
+                        let ptHoy = window.tempCfg ? window.tempCfg.pantallas : window.cfg.pantallas;
+                        
+                        if(sumS>0) rep += (3600 / sumS) * hrHoy * ptHoy * (window.duracionSeg(v.duracion)/60);
+                    }
+                    c.setDate(c.getDate()+1);
+                }
+                v.dias = dias; v.imp = Math.round(rep);
+            });
+        }
+
+        window.renderVideos = () => {
+            const tb = document.getElementById('tabla-videos-body'); tb.innerHTML='';
+            let vigentesCount = 0;
+            
+            window.videos.forEach(v => {
+                if(v.est === 'Vigente') vigentesCount++;
+                
+                let estBd = v.est === 'Vigente' ? '<span class="text-green-400 font-bold">Vigente</span>' : (v.est==='Finalizado'?'<span class="text-slate-500 font-bold">Finalizado</span>':'<span class="text-amber-400 font-bold">Próximo</span>');
+                
+                let acc = `<button onclick="editarVideoColab('${v.idDoc}')" title="Editar" class="bg-indigo-600/80 hover:bg-indigo-500 text-white px-2 py-1.5 rounded mr-1"><i class="fa-solid fa-pen"></i></button>
+                           <button onclick="borrarVid('${v.idDoc}')" title="Eliminar" class="bg-rose-600/80 hover:bg-rose-500 text-white px-2 py-1.5 rounded"><i class="fa-solid fa-trash"></i></button>`;
+                
+                tb.innerHTML += `<tr class="hover:bg-slate-700/50">
+                    <td class="p-2 font-medium">${v.version}</td>
+                    <td class="p-2 text-indigo-300 text-xs">${v._tema}</td>
+                    <td class="p-2 font-mono text-slate-400">${v.duracion}</td>
+                    <td class="p-2 font-mono">${v._ini || '-'}</td>
+                    <td class="p-2 font-mono">${v._fin || '-'}</td>
+                    <td class="p-2 text-center text-rose-400 font-bold">${v.fest_rango}</td>
+                    <td class="p-2 text-center text-cyan-400 font-bold">${v.trans_cal}</td>
+                    <td class="p-2 text-center">${estBd}</td>
+                    <td class="p-2 text-right font-bold text-amber-400 text-base">${v.imp.toLocaleString()}</td>
+                    <td class="p-2 text-center">${acc}</td>
+                </tr>`;
+            });
+            document.getElementById('contadorVideosMod').innerText = vigentesCount;
+        };
+
+        window.renderReporte = () => {
+            const tb = document.getElementById('tabla-reporte-body'); tb.innerHTML='';
+            let ini = document.getElementById('rep-inicio').value; let fin = document.getElementById('rep-fin').value;
+            if(!ini || !fin) {
+                document.getElementById('rep-total-videos').innerText = '0';
+                document.getElementById('rep-total-impactos').innerText = '0';
+                return;
+            }
+            
+            let tVid = 0; let tImp = 0;
+            window.videos.forEach(v => {
+                if(v._ini <= fin && v._fin >= ini) {
+                    tVid++; tImp += v.imp;
+                    let estBd = v.est === 'Vigente' ? '<span class="text-green-400 font-bold">Vigente</span>' : (v.est==='Finalizado'?'<span class="text-slate-500 font-bold">Finalizado</span>':'<span class="text-amber-400 font-bold">Próximo</span>');
+                    
+                    tb.innerHTML += `<tr class="hover:bg-slate-700/50">
+                        <td class="p-2 font-medium">${v.version}</td>
+                        <td class="p-2 text-indigo-300 text-xs">${v._tema}</td>
+                        <td class="p-2 font-mono text-slate-400">${v.duracion}</td>
+                        <td class="p-2 font-mono">${v._ini}</td>
+                        <td class="p-2 font-mono">${v._fin}</td>
+                        <td class="p-2 text-center text-rose-400">${v.fest_rango}</td>
+                        <td class="p-2 text-center text-cyan-400">${v.trans_cal}</td>
+                        <td class="p-2 text-center">${estBd}</td>
+                        <td class="p-2 text-right text-amber-400 font-bold text-base">${v.imp.toLocaleString()}</td>
+                    </tr>`;
+                }
+            });
+            document.getElementById('rep-total-videos').innerText = tVid;
+            document.getElementById('rep-total-impactos').innerText = tImp.toLocaleString();
+        };
+
+        window.exportarReporte = () => {
+            let ini = document.getElementById('rep-inicio').value; let fin = document.getElementById('rep-fin').value;
+            if(!ini || !fin) return alert("Selecciona un rango de fechas para el reporte.");
+            let csv = "Version,Tematica,Duracion,Inicio,Cierre,Festivos_Rango,Transcurridos,Estado,Impactos\n";
+            window.videos.forEach(v => {
+                if(v._ini <= fin && v._fin >= ini) {
+                    let id_vid = (v.version||"").replace(/,/g, ' '); let tema = (v._tema||"").replace(/,/g, ' ');
+                    csv += `${id_vid},${tema},${v.duracion},${v._ini},${v._fin},${v.fest_rango},${v.trans_cal},${v.est},${v.imp}\n`;
+                }
+            });
+            let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); let url = window.URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url;
+            a.download = `ReporteImpactos_${DB_SUFFIX}_${ini}_al_${fin}.csv`; a.click();
+        };
+
+        window.abrirModalVideo = () => { 
+            document.getElementById('titulo-modal-video').innerText = "Nuevo Video en Módulo";
+            document.getElementById('v-doc').value = ''; 
+            document.getElementById('v-id').value = 'VID-' + Math.floor(Date.now()/1000); 
+            document.getElementById('v-ver').value=''; 
+            document.getElementById('v-tema').value=''; 
+            document.getElementById('v-dur').value=''; 
+            document.getElementById('v-ini').value=''; 
+            document.getElementById('v-fin').value=''; 
+            document.getElementById('modal-video').classList.remove('hidden'); 
+        };
+        
+        window.editarVideoColab = (id) => {
+            let v = window.videos.find(x => x.idDoc === id); 
+            if(!v) return;
+            document.getElementById('titulo-modal-video').innerText = "Editar Video";
+            document.getElementById('v-doc').value = v.idDoc; 
+            document.getElementById('v-id').value = v.id_video || 'VID-' + Math.floor(Date.now()/1000); 
+            document.getElementById('v-ver').value = v.version; 
+            document.getElementById('v-tema').value = v._tema;
+            document.getElementById('v-dur').value = v.duracion; 
+            document.getElementById('v-ini').value = v._ini; 
+            document.getElementById('v-fin').value = v._fin;
+            document.getElementById('modal-video').classList.remove('hidden');
+        };
+        
+        window.guardarVideo = async (e) => { 
+            e.preventDefault(); 
+            let docId = document.getElementById('v-doc').value;
+            let data = {
+                id_video: document.getElementById('v-id').value, 
+                version: document.getElementById('v-ver').value, 
+                tematica: document.getElementById('v-tema').value,
+                duracion: document.getElementById('v-dur').value, 
+                inicio_transmision: document.getElementById('v-ini').value, 
+                cierre_transmision: document.getElementById('v-fin').value
+            };
+            
+            if(docId) {
+                await updateDoc(doc(db, COLL_VID, docId), data);
+            } else {
+                await addDoc(collection(db, COLL_VID), data); 
+            }
+            
+            document.getElementById('modal-video').classList.add('hidden'); 
+            await cargarData(); 
+        };
+        
+        window.borrarVid = async (id) => { if(confirm("¿Estás seguro de eliminar este video?")){ await deleteDoc(doc(db, COLL_VID, id)); await cargarData();} };
+
+        /* ========================================= */
+        /* == NUEVA LOGICA DE CALENDARIO / FESTIVOS == */
+        /* ========================================= */
+
+        window.verificarTipoHoras = () => {
+            const val = document.getElementById('c-tipo').value;
+            document.getElementById('div-c-horas').classList.toggle('hidden', val !== 'especial');
+        };
+
+        window.renderCal = () => {
+            const tb = document.getElementById('tabla-cal-body'); tb.innerHTML='';
+            let countCal = 0;
+            
+            // Ordenar por fecha antes de renderizar para que se vea cronológico
+            window.calendario.sort((a,b) => a.fecha.localeCompare(b.fecha));
+
+            window.calendario.forEach(c => {
+                countCal++;
+                let badge = '';
+                if(c.tipo==='festivo') badge = '<span class="bg-rose-900/50 text-rose-400 px-3 py-1 rounded text-xs font-bold uppercase">Inhábil</span>';
+                else if(c.tipo==='especial') badge = `<span class="bg-cyan-900/50 text-cyan-400 px-3 py-1 rounded text-xs font-bold uppercase">Especial</span>`;
+                else badge = '<span class="bg-emerald-900/50 text-emerald-400 px-3 py-1 rounded text-xs font-bold uppercase">Día Extra</span>';
+                
+                let horasText = c.tipo === 'especial' ? `<span class="font-bold text-amber-300">${c.horas} h</span>` : '<span class="text-slate-500">-</span>';
+
+                let acc = `<button onclick="editarCalColab('${c.idDoc}')" title="Editar Fecha" class="bg-indigo-600/80 hover:bg-indigo-500 text-white px-2 py-1.5 rounded mr-1 transition"><i class="fa-solid fa-pen"></i></button>
+                           <button onclick="borrarCal('${c.idDoc}')" title="Borrar Fecha" class="bg-rose-600/80 hover:bg-rose-500 text-white px-2 py-1.5 rounded transition"><i class="fa-solid fa-trash"></i></button>`;
+
+                tb.innerHTML += `<tr class="hover:bg-slate-700/50 transition-colors">
+                    <td class="p-3">${badge}</td>
+                    <td class="p-3 font-mono font-bold text-white">${c.fecha}</td>
+                    <td class="p-3 text-slate-300 font-medium">${c.descripcion || '-'}</td>
+                    <td class="p-3">${horasText}</td>
+                    <td class="p-3 text-center whitespace-nowrap">${acc}</td>
+                </tr>`;
+            });
+            document.getElementById('contadorFestivosMod').innerText = countCal;
+        };
+
+        window.abrirModalCal = () => {
+            document.getElementById('titulo-modal-cal').innerText = "Agregar Fecha al Calendario";
+            document.getElementById('c-doc').value = '';
+            document.getElementById('c-tipo').value = 'festivo';
+            document.getElementById('c-fec').value = '';
+            document.getElementById('c-desc').value = '';
+            document.getElementById('c-horas').value = window.cfg.horas || 5;
+            window.verificarTipoHoras();
+            document.getElementById('modal-cal').classList.remove('hidden');
+        };
+
+        window.editarCalColab = (id) => {
+            let c = window.calendario.find(x => x.idDoc === id); 
+            if(!c) return;
+            document.getElementById('titulo-modal-cal').innerText = "Editar Fecha Especial";
+            document.getElementById('c-doc').value = c.idDoc;
+            document.getElementById('c-tipo').value = c.tipo || 'festivo';
+            document.getElementById('c-fec').value = c.fecha;
+            document.getElementById('c-desc').value = c.descripcion || '';
+            document.getElementById('c-horas').value = c.horas || window.cfg.horas;
+            window.verificarTipoHoras();
+            document.getElementById('modal-cal').classList.remove('hidden');
+        };
+        
+        window.guardarCal = async (e) => { 
+            e.preventDefault(); 
+            let docId = document.getElementById('c-doc').value;
+            let tipo = document.getElementById('c-tipo').value;
+            
+            let data = { 
+                tipo: tipo, 
+                fecha: document.getElementById('c-fec').value, 
+                descripcion: document.getElementById('c-desc').value 
+            };
+            if (tipo === 'especial') data.horas = Number(document.getElementById('c-horas').value);
+            
+            if(docId) {
+                await updateDoc(doc(db, COLL_CAL, docId), data);
+            } else {
+                await addDoc(collection(db, COLL_CAL), data); 
+            }
+            document.getElementById('modal-cal').classList.add('hidden'); 
+            await cargarData(); 
+        };
+
+        window.borrarCal = async (id) => { if(confirm("¿Eliminar esta fecha del calendario?")){ await deleteDoc(doc(db, COLL_CAL, id)); await cargarData();} };
+
+        window.borrarBaseCalendario = async () => {
+            if(!confirm(`⚠️ ADVERTENCIA: Estás a punto de ELIMINAR TODO TU CALENDARIO (${window.calendario.length} fechas registradas).\n\n¿Estás completamente seguro? Esta acción no se puede deshacer.`)) return;
+            if(!confirm(`ÚLTIMA OPORTUNIDAD: Confirma que deseas VACIAR TODO EL CALENDARIO.`)) return;
+            
+            const snap = await getDocs(collection(db, COLL_CAL));
+            let promesas = [];
+            snap.forEach(d => promesas.push(deleteDoc(doc(db, COLL_CAL, d.id))));
+            
+            await Promise.all(promesas);
+            alert(`Calendario vaciado. Se eliminaron ${promesas.length} fechas.`);
+            await cargarData();
+        };
+
+        window.exportarCalCSV = () => {
+            if(window.calendario.length === 0) return alert("No hay fechas para exportar.");
+            let csv = "tipo,fecha,descripcion,horas\n";
+            window.calendario.forEach(c => { csv += `${c.tipo},${c.fecha},${c.descripcion||''},${c.horas||''}\n`; });
+            let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); let url = window.URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url;
+            a.download = `Calendario_${DB_SUFFIX}_${new Date().toISOString().split('T')[0]}.csv`; a.click();
+        };
+
+        window.importarCalCSV = async (e) => {
+            let file = e.target.files[0]; if(!file) return;
+            if(!confirm(`¿Importar calendario desde Excel a tu base de datos?`)) { e.target.value = ''; return; }
+            let reader = new FileReader();
+            reader.onload = async function(event) {
+                let rows = event.target.result.split('\n'); let count = 0;
+                for(let i=1; i<rows.length; i++) {
+                    if(!rows[i].trim()) continue; let cols = rows[i].split(',');
+                    if(cols.length >= 3) {
+                        let obj = { tipo: cols[0].trim(), fecha: cols[1].trim(), descripcion: cols[2].trim() };
+                        if(cols[3] && !isNaN(cols[3].trim())) obj.horas = Number(cols[3].trim());
+                        await addDoc(collection(db, COLL_CAL), obj); count++;
+                    }
+                }
+                alert(`Éxito: Se subieron ${count} fechas de calendario.`); e.target.value = ''; await cargarData();
+            };
+            reader.readAsText(file);
+        };
+
+        /* ========================================= */
+
+        window.exportarCSV = () => {
+            if(window.videos.length === 0) return alert("No hay videos para exportar.");
+            let csv = "id_video,version,tematica,duracion,inicio_transmision,cierre_transmision\n";
+            window.videos.forEach(v => {
+                let i = v.inicio_transmision || v.inicio || ""; let f = v.cierre_transmision || v.cierre || "";
+                let id_vid = (v.id_video||"").replace(/,/g, ''); let ver = (v.version||"").replace(/,/g, ' '); let tema = (v.tematica||"General").replace(/,/g, ' '); let dur = (v.duracion||"").replace(/,/g, '');
+                csv += `${id_vid},${ver},${tema},${dur},${i},${f}\n`;
+            });
+            let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); let url = window.URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url;
+            a.download = `MisVideos_${DB_SUFFIX}_${new Date().toISOString().split('T')[0]}.csv`; a.click();
+        };
+
+        window.importarCSV = async (e) => {
+            let file = e.target.files[0]; if(!file) return;
+            if(!confirm(`¿Importar datos desde Excel a tu base?`)) { e.target.value = ''; return; }
+            let reader = new FileReader();
+            reader.onload = async function(event) {
+                let rows = event.target.result.split('\n'); let count = 0;
+                for(let i=1; i<rows.length; i++) {
+                    if(!rows[i].trim()) continue; let cols = rows[i].split(',');
+                    if(cols.length >= 6 && cols[3].includes(':')) {
+                        await addDoc(collection(db, COLL_VID), { id_video: cols[0].trim(), version: cols[1].trim(), tematica: cols[2].trim(), duracion: cols[3].trim(), inicio_transmision: cols[4].trim(), cierre_transmision: cols[5].trim() }); count++;
+                    } else if(cols.length >= 5) {
+                        await addDoc(collection(db, COLL_VID), { id_video: cols[0].trim(), version: cols[1].trim(), tematica: 'General', duracion: cols[2].trim(), inicio_transmision: cols[3].trim(), cierre_transmision: cols[4].trim() }); count++;
+                    }
+                }
+                alert(`Éxito: Se subieron ${count} videos nuevos desde Excel.`); e.target.value = ''; await cargarData();
+            };
+            reader.readAsText(file);
+        };
+
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
