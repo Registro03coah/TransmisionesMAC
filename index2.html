@@ -45,7 +45,6 @@
                     <input type="text" onkeyup="buscarTabla(this, 'tabla-videos-body')" placeholder="&#xf002; Buscar..." class="font-[FontAwesome] bg-slate-900 border border-slate-700 px-3 py-1.5 rounded text-white text-sm outline-none focus:border-cyan-500">
                 </div>
                 
-                <!-- NUEVO: Contador centrado en el Módulo Operativo -->
                 <div class="flex items-center justify-center font-bold text-lg text-cyan-400">
                     Videos Vigentes: <span id="contadorVideosMod" class="ml-2 text-white bg-cyan-600 px-3 py-1 rounded-full shadow-lg">0</span>
                 </div>
@@ -70,7 +69,6 @@
                             <th class="p-2 text-center hover:text-cyan-400" onclick="ordenarTabla(this, 6, true)" title="Días Transcurridos">Transcurridos <i class="fa-solid fa-sort text-slate-600"></i></th>
                             <th class="p-2 text-center hover:text-cyan-400" onclick="ordenarTabla(this, 7, false)">Estado <i class="fa-solid fa-sort text-slate-600"></i></th>
                             <th class="p-2 text-right hover:text-cyan-400" onclick="ordenarTabla(this, 8, true)">Impactos <i class="fa-solid fa-sort text-slate-600"></i></th>
-                            <!-- NUEVO: Título Editar / Borrar en Módulo -->
                             <th class="p-2 text-center cursor-default">Acciones</th>
                         </tr>
                     </thead>
@@ -102,7 +100,6 @@
                     </div>
                 </div>
 
-                <!-- Resumen Total -->
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 flex justify-between items-center">
                         <span class="text-slate-400 font-bold uppercase text-xs tracking-wider">Suma de Videos en Periodo:</span>
@@ -133,21 +130,42 @@
             </div>
         </section>
         
+        <!-- NUEVA ESTRUCTURA DE FESTIVOS -->
         <section id="sheet-Calendario" class="sheet-view hidden space-y-6">
-            <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
-                <div class="flex justify-between items-center mb-4 flex-wrap gap-3">
-                    <h2 class="text-xl font-bold text-white"><i class="fa-solid fa-calendar-xmark text-amber-400"></i> Días Festivos y Ajuste de Horarios</h2>
-                    <div class="flex gap-2">
+            <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-xl">
+                <div class="flex justify-between items-center mb-4 flex-wrap gap-4">
+                    <div class="flex items-center gap-3">
+                        <h2 class="text-xl font-bold text-white"><i class="fa-solid fa-calendar-xmark text-amber-400"></i> Configuración de Calendario</h2>
+                        <input type="text" onkeyup="buscarTabla(this, 'tabla-cal-body')" placeholder="&#xf002; Buscar fecha..." class="font-[FontAwesome] bg-slate-900 border border-slate-700 px-3 py-1.5 rounded text-white text-sm font-normal outline-none focus:border-amber-500">
+                    </div>
+
+                    <div class="flex items-center justify-center font-bold text-lg text-amber-400">
+                        Fechas Registradas: <span id="contadorFestivosMod" class="ml-2 text-white bg-amber-600 px-3 py-1 rounded-full shadow-lg">0</span>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-2">
                         <input type="file" id="csv-file-cal" accept=".csv" class="hidden" onchange="importarCalCSV(event)">
                         <button onclick="exportarCalCSV()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded font-bold shadow text-sm transition"><i class="fa-solid fa-download"></i> Bajar Calendario</button>
                         <button onclick="document.getElementById('csv-file-cal').click()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded font-bold shadow text-sm transition"><i class="fa-solid fa-upload"></i> Subir Calendario</button>
-                        <button onclick="document.getElementById('modal-cal').classList.remove('hidden')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded font-bold shadow text-sm transition"><i class="fa-solid fa-plus"></i> Añadir Fecha</button>
+                        <button onclick="borrarBaseCalendario()" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded font-bold shadow text-sm transition"><i class="fa-solid fa-trash-can"></i> Borrar Todo</button>
+                        <button onclick="abrirModalCal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded font-bold shadow text-sm transition"><i class="fa-solid fa-plus"></i> Añadir Fecha</button>
                     </div>
                 </div>
-                <table class="w-full text-left text-sm bg-slate-900 rounded-xl overflow-hidden">
-                    <thead class="bg-slate-950 text-slate-400"><tr><th class="p-3">Tipo</th><th class="p-3">Fecha</th><th class="p-3">Descripción</th><th class="p-3">Eliminar</th></tr></thead>
-                    <tbody id="tabla-cal-body" class="divide-y divide-slate-800"></tbody>
-                </table>
+                
+                <div class="bg-slate-900 rounded-xl overflow-hidden border border-amber-900/50 shadow-lg">
+                    <table class="w-full text-left text-sm cursor-pointer select-none">
+                        <thead class="bg-slate-950 text-slate-400 uppercase text-xs">
+                            <tr>
+                                <th class="p-3 hover:text-amber-400" onclick="ordenarTabla(this, 0, false, 'text-amber-400')">Tipo <i class="fa-solid fa-sort text-slate-600"></i></th>
+                                <th class="p-3 hover:text-amber-400" onclick="ordenarTabla(this, 1, false, 'text-amber-400')">Fecha <i class="fa-solid fa-sort text-slate-600"></i></th>
+                                <th class="p-3 hover:text-amber-400" onclick="ordenarTabla(this, 2, false, 'text-amber-400')">Descripción <i class="fa-solid fa-sort text-slate-600"></i></th>
+                                <th class="p-3 hover:text-amber-400" onclick="ordenarTabla(this, 3, true, 'text-amber-400')">Horas <i class="fa-solid fa-sort text-slate-600"></i></th>
+                                <th class="p-3 text-center cursor-default">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-cal-body" class="divide-y divide-slate-800"></tbody>
+                    </table>
+                </div>
             </div>
         </section>
 
@@ -178,12 +196,12 @@
         </div>
     </div>
 
-    <!-- NUEVO: Modal de Video Modificado (incluye ID Doc para saber si edita o es nuevo) -->
+    <!-- Modal de Video -->
     <div id="modal-video" class="fixed inset-0 bg-slate-950/80 hidden z-[60] flex items-center justify-center p-4">
         <div class="bg-slate-800 p-6 rounded-xl max-w-md w-full border border-slate-700 shadow-2xl">
             <h3 id="titulo-modal-video" class="font-bold mb-4 text-white">Nuevo Video en Módulo</h3>
             <form onsubmit="guardarVideo(event)" class="space-y-3">
-                <input type="hidden" id="v-doc"> <!-- NUEVO: ID del documento en Firebase (vacío = nuevo) -->
+                <input type="hidden" id="v-doc"> 
                 <input type="hidden" id="v-id">
                 <input type="text" id="v-ver" placeholder="Versión / Nombre" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white font-bold">
                 <input type="text" id="v-tema" placeholder="Temática (ej. Promoción, Informativo)" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white">
@@ -203,22 +221,41 @@
         </div>
     </div>
     
+    <!-- NUEVO: Modal de Calendario Completo -->
     <div id="modal-cal" class="fixed inset-0 bg-slate-950/80 hidden z-[60] flex items-center justify-center p-4">
         <div class="bg-slate-800 p-6 rounded-xl max-w-sm w-full border border-slate-700 shadow-2xl">
-            <h3 class="font-bold mb-4 text-white">Agregar Fecha Especial</h3>
-            <form onsubmit="guardarCal(event)" class="space-y-3">
-                <select id="c-tipo" class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white" onchange="document.getElementById('div-c-horas').classList.toggle('hidden', this.value !== 'especial')">
-                    <option value="festivo">Día Inhábil (Descanso General)</option>
-                    <option value="adicional">Día Laboral Adicional (Ej. Domingo)</option>
-                    <option value="especial">Horario Especial (Ajuste de Horas)</option>
-                </select>
-                <div id="div-c-horas" class="hidden mt-3">
-                    <label class="text-xs text-slate-400">Horas laborables para este día específico</label>
-                    <input type="number" id="c-horas" min="1" max="24" value="5" class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white mt-1 font-bold">
+            <h3 id="titulo-modal-cal" class="font-bold mb-4 text-white text-lg">Agregar Fecha al Calendario</h3>
+            <form onsubmit="guardarCal(event)" class="space-y-4">
+                <input type="hidden" id="c-doc">
+                
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Tipo de Evento</label>
+                    <select id="c-tipo" class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white focus:border-amber-500 outline-none" onchange="verificarTipoHoras()">
+                        <option value="festivo">Día Inhábil (Descanso General)</option>
+                        <option value="adicional">Día Laboral Adicional (Ej. Domingo)</option>
+                        <option value="especial">Horario Especial (Ajuste de Horas)</option>
+                    </select>
                 </div>
-                <input type="date" id="c-fec" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white">
-                <input type="text" id="c-desc" placeholder="Motivo (ej. Navidad o Día Corto)" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white">
-                <div class="flex justify-end gap-2 mt-4"><button type="button" onclick="document.getElementById('modal-cal').classList.add('hidden')" class="bg-slate-700 px-4 py-2 rounded text-white">Cancelar</button><button type="submit" class="bg-amber-600 px-4 py-2 rounded text-white font-bold shadow">Guardar Fecha</button></div>
+                
+                <div id="div-c-horas" class="hidden">
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Horas laborables para este día</label>
+                    <input type="number" id="c-horas" min="1" max="24" value="5" class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white font-bold outline-none focus:border-amber-500">
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Fecha</label>
+                    <input type="date" id="c-fec" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white outline-none focus:border-amber-500">
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Descripción / Motivo</label>
+                    <input type="text" id="c-desc" placeholder="Ej. Navidad, Mantenimiento..." required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white outline-none focus:border-amber-500">
+                </div>
+                
+                <div class="flex justify-end gap-2 mt-4 pt-2 border-t border-slate-700">
+                    <button type="button" onclick="document.getElementById('modal-cal').classList.add('hidden')" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded text-white transition">Cancelar</button>
+                    <button type="submit" class="bg-amber-600 hover:bg-amber-500 px-4 py-2 rounded text-white font-bold shadow transition">Guardar Fecha</button>
+                </div>
             </form>
         </div>
     </div>
@@ -371,13 +408,13 @@
                 let dias = 0, rep = 0; let c = new Date(ini);
                 while(c <= lim) {
                     let f = c.toISOString().split('T')[0];
-                    let esNormal = c.getDay() !== 0; // Lunes a Sabado
+                    let esNormal = c.getDay() !== 0; 
                     
                     let labora = false;
-                    if (fest.has(f)) labora = false; // Inhabil estricto
-                    else if (horasEsp[f] !== undefined) labora = true; // Dia con horario especial
-                    else if (adic.has(f)) labora = true; // Domingo u otro extra
-                    else if (esNormal) labora = true; // Dia normal
+                    if (fest.has(f)) labora = false; 
+                    else if (horasEsp[f] !== undefined) labora = true; 
+                    else if (adic.has(f)) labora = true; 
+                    else if (esNormal) labora = true; 
                     
                     if(labora) {
                         dias++;
@@ -401,14 +438,13 @@
 
         window.renderVideos = () => {
             const tb = document.getElementById('tabla-videos-body'); tb.innerHTML='';
-            let vigentesCount = 0; // NUEVO: Contador
+            let vigentesCount = 0;
             
             window.videos.forEach(v => {
-                if(v.est === 'Vigente') vigentesCount++; // NUEVO: Sumar si es vigente
+                if(v.est === 'Vigente') vigentesCount++;
                 
                 let estBd = v.est === 'Vigente' ? '<span class="text-green-400 font-bold">Vigente</span>' : (v.est==='Finalizado'?'<span class="text-slate-500 font-bold">Finalizado</span>':'<span class="text-amber-400 font-bold">Próximo</span>');
                 
-                // NUEVO: Agregado el botón de Editar junto al de Borrar
                 let acc = `<button onclick="editarVideoColab('${v.idDoc}')" title="Editar" class="bg-indigo-600/80 hover:bg-indigo-500 text-white px-2 py-1.5 rounded mr-1"><i class="fa-solid fa-pen"></i></button>
                            <button onclick="borrarVid('${v.idDoc}')" title="Eliminar" class="bg-rose-600/80 hover:bg-rose-500 text-white px-2 py-1.5 rounded"><i class="fa-solid fa-trash"></i></button>`;
                 
@@ -425,7 +461,6 @@
                     <td class="p-2 text-center">${acc}</td>
                 </tr>`;
             });
-            // NUEVO: Actualizar contador en pantalla
             document.getElementById('contadorVideosMod').innerText = vigentesCount;
         };
 
@@ -464,21 +499,20 @@
         window.exportarReporte = () => {
             let ini = document.getElementById('rep-inicio').value; let fin = document.getElementById('rep-fin').value;
             if(!ini || !fin) return alert("Selecciona un rango de fechas para el reporte.");
-            let csv = "Version,Tematica,Duracion,Inicio,Cierre,Festivos_Rango,Transcurridos,Estado,Impactos\\n";
+            let csv = "Version,Tematica,Duracion,Inicio,Cierre,Festivos_Rango,Transcurridos,Estado,Impactos\n";
             window.videos.forEach(v => {
                 if(v._ini <= fin && v._fin >= ini) {
                     let id_vid = (v.version||"").replace(/,/g, ' '); let tema = (v._tema||"").replace(/,/g, ' ');
-                    csv += `${id_vid},${tema},${v.duracion},${v._ini},${v._fin},${v.fest_rango},${v.trans_cal},${v.est},${v.imp}\\n`;
+                    csv += `${id_vid},${tema},${v.duracion},${v._ini},${v._fin},${v.fest_rango},${v.trans_cal},${v.est},${v.imp}\n`;
                 }
             });
             let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); let url = window.URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url;
             a.download = `ReporteImpactos_${DB_SUFFIX}_${ini}_al_${fin}.csv`; a.click();
         };
 
-        // NUEVO: Función para abrir modal de registro Limpio (Nuevo)
         window.abrirModalVideo = () => { 
             document.getElementById('titulo-modal-video').innerText = "Nuevo Video en Módulo";
-            document.getElementById('v-doc').value = ''; // Borramos el ID del documento
+            document.getElementById('v-doc').value = ''; 
             document.getElementById('v-id').value = 'VID-' + Math.floor(Date.now()/1000); 
             document.getElementById('v-ver').value=''; 
             document.getElementById('v-tema').value=''; 
@@ -488,7 +522,6 @@
             document.getElementById('modal-video').classList.remove('hidden'); 
         };
         
-        // NUEVO: Función para Editar en el módulo del Colaborador
         window.editarVideoColab = (id) => {
             let v = window.videos.find(x => x.idDoc === id); 
             if(!v) return;
@@ -503,7 +536,6 @@
             document.getElementById('modal-video').classList.remove('hidden');
         };
         
-        // NUEVO: Lógica combinada para Guardar/Actualizar
         window.guardarVideo = async (e) => { 
             e.preventDefault(); 
             let docId = document.getElementById('v-doc').value;
@@ -517,10 +549,8 @@
             };
             
             if(docId) {
-                // Actualizar existente
                 await updateDoc(doc(db, COLL_VID, docId), data);
             } else {
-                // Crear nuevo
                 await addDoc(collection(db, COLL_VID), data); 
             }
             
@@ -528,45 +558,121 @@
             await cargarData(); 
         };
         
-        window.borrarVid = async (id) => { if(confirm("¿Eliminar video?")){ await deleteDoc(doc(db, COLL_VID, id)); await cargarData();} };
+        window.borrarVid = async (id) => { if(confirm("¿Estás seguro de eliminar este video?")){ await deleteDoc(doc(db, COLL_VID, id)); await cargarData();} };
+
+        /* ========================================= */
+        /* == NUEVA LOGICA DE CALENDARIO / FESTIVOS == */
+        /* ========================================= */
+
+        window.verificarTipoHoras = () => {
+            const val = document.getElementById('c-tipo').value;
+            document.getElementById('div-c-horas').classList.toggle('hidden', val !== 'especial');
+        };
 
         window.renderCal = () => {
             const tb = document.getElementById('tabla-cal-body'); tb.innerHTML='';
+            let countCal = 0;
+            
+            // Ordenar por fecha antes de renderizar para que se vea cronológico
+            window.calendario.sort((a,b) => a.fecha.localeCompare(b.fecha));
+
             window.calendario.forEach(c => {
+                countCal++;
                 let badge = '';
-                if(c.tipo==='festivo') badge = '<span class="bg-red-900/50 text-red-400 px-2 py-1 rounded text-xs font-bold">Inhábil</span>';
-                else if(c.tipo==='especial') badge = `<span class="bg-cyan-900/50 text-cyan-400 px-2 py-1 rounded text-xs font-bold">Especial (${c.horas}h)</span>`;
-                else badge = '<span class="bg-green-900/50 text-green-400 px-2 py-1 rounded text-xs font-bold">Laboral Extra</span>';
+                if(c.tipo==='festivo') badge = '<span class="bg-rose-900/50 text-rose-400 px-3 py-1 rounded text-xs font-bold uppercase">Inhábil</span>';
+                else if(c.tipo==='especial') badge = `<span class="bg-cyan-900/50 text-cyan-400 px-3 py-1 rounded text-xs font-bold uppercase">Especial</span>`;
+                else badge = '<span class="bg-emerald-900/50 text-emerald-400 px-3 py-1 rounded text-xs font-bold uppercase">Día Extra</span>';
                 
-                tb.innerHTML += `<tr class="hover:bg-slate-700/50"><td class="p-3">${badge}</td><td class="p-3 font-mono text-amber-300">${c.fecha}</td><td class="p-3">${c.descripcion}</td><td class="p-3"><button onclick="borrarCal('${c.idDoc}')" class="text-rose-400"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                let horasText = c.tipo === 'especial' ? `<span class="font-bold text-amber-300">${c.horas} h</span>` : '<span class="text-slate-500">-</span>';
+
+                let acc = `<button onclick="editarCalColab('${c.idDoc}')" title="Editar Fecha" class="bg-indigo-600/80 hover:bg-indigo-500 text-white px-2 py-1.5 rounded mr-1 transition"><i class="fa-solid fa-pen"></i></button>
+                           <button onclick="borrarCal('${c.idDoc}')" title="Borrar Fecha" class="bg-rose-600/80 hover:bg-rose-500 text-white px-2 py-1.5 rounded transition"><i class="fa-solid fa-trash"></i></button>`;
+
+                tb.innerHTML += `<tr class="hover:bg-slate-700/50 transition-colors">
+                    <td class="p-3">${badge}</td>
+                    <td class="p-3 font-mono font-bold text-white">${c.fecha}</td>
+                    <td class="p-3 text-slate-300 font-medium">${c.descripcion || '-'}</td>
+                    <td class="p-3">${horasText}</td>
+                    <td class="p-3 text-center whitespace-nowrap">${acc}</td>
+                </tr>`;
             });
+            document.getElementById('contadorFestivosMod').innerText = countCal;
+        };
+
+        window.abrirModalCal = () => {
+            document.getElementById('titulo-modal-cal').innerText = "Agregar Fecha al Calendario";
+            document.getElementById('c-doc').value = '';
+            document.getElementById('c-tipo').value = 'festivo';
+            document.getElementById('c-fec').value = '';
+            document.getElementById('c-desc').value = '';
+            document.getElementById('c-horas').value = window.cfg.horas || 5;
+            window.verificarTipoHoras();
+            document.getElementById('modal-cal').classList.remove('hidden');
+        };
+
+        window.editarCalColab = (id) => {
+            let c = window.calendario.find(x => x.idDoc === id); 
+            if(!c) return;
+            document.getElementById('titulo-modal-cal').innerText = "Editar Fecha Especial";
+            document.getElementById('c-doc').value = c.idDoc;
+            document.getElementById('c-tipo').value = c.tipo || 'festivo';
+            document.getElementById('c-fec').value = c.fecha;
+            document.getElementById('c-desc').value = c.descripcion || '';
+            document.getElementById('c-horas').value = c.horas || window.cfg.horas;
+            window.verificarTipoHoras();
+            document.getElementById('modal-cal').classList.remove('hidden');
         };
         
         window.guardarCal = async (e) => { 
             e.preventDefault(); 
+            let docId = document.getElementById('c-doc').value;
             let tipo = document.getElementById('c-tipo').value;
-            let obj = { tipo: tipo, fecha: document.getElementById('c-fec').value, descripcion: document.getElementById('c-desc').value };
-            if (tipo === 'especial') obj.horas = Number(document.getElementById('c-horas').value);
-            await addDoc(collection(db, COLL_CAL), obj); 
+            
+            let data = { 
+                tipo: tipo, 
+                fecha: document.getElementById('c-fec').value, 
+                descripcion: document.getElementById('c-desc').value 
+            };
+            if (tipo === 'especial') data.horas = Number(document.getElementById('c-horas').value);
+            
+            if(docId) {
+                await updateDoc(doc(db, COLL_CAL, docId), data);
+            } else {
+                await addDoc(collection(db, COLL_CAL), data); 
+            }
             document.getElementById('modal-cal').classList.add('hidden'); 
             await cargarData(); 
         };
-        window.borrarCal = async (id) => { if(confirm("¿Eliminar fecha?")){ await deleteDoc(doc(db, COLL_CAL, id)); await cargarData();} };
+
+        window.borrarCal = async (id) => { if(confirm("¿Eliminar esta fecha del calendario?")){ await deleteDoc(doc(db, COLL_CAL, id)); await cargarData();} };
+
+        window.borrarBaseCalendario = async () => {
+            if(!confirm(`⚠️ ADVERTENCIA: Estás a punto de ELIMINAR TODO TU CALENDARIO (${window.calendario.length} fechas registradas).\n\n¿Estás completamente seguro? Esta acción no se puede deshacer.`)) return;
+            if(!confirm(`ÚLTIMA OPORTUNIDAD: Confirma que deseas VACIAR TODO EL CALENDARIO.`)) return;
+            
+            const snap = await getDocs(collection(db, COLL_CAL));
+            let promesas = [];
+            snap.forEach(d => promesas.push(deleteDoc(doc(db, COLL_CAL, d.id))));
+            
+            await Promise.all(promesas);
+            alert(`Calendario vaciado. Se eliminaron ${promesas.length} fechas.`);
+            await cargarData();
+        };
 
         window.exportarCalCSV = () => {
             if(window.calendario.length === 0) return alert("No hay fechas para exportar.");
-            let csv = "tipo,fecha,descripcion,horas\\n";
-            window.calendario.forEach(c => { csv += `${c.tipo},${c.fecha},${c.descripcion||''},${c.horas||''}\\n`; });
+            let csv = "tipo,fecha,descripcion,horas\n";
+            window.calendario.forEach(c => { csv += `${c.tipo},${c.fecha},${c.descripcion||''},${c.horas||''}\n`; });
             let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); let url = window.URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url;
             a.download = `Calendario_${DB_SUFFIX}_${new Date().toISOString().split('T')[0]}.csv`; a.click();
         };
 
         window.importarCalCSV = async (e) => {
             let file = e.target.files[0]; if(!file) return;
-            if(!confirm(`¿Importar calendario desde Excel?`)) { e.target.value = ''; return; }
+            if(!confirm(`¿Importar calendario desde Excel a tu base de datos?`)) { e.target.value = ''; return; }
             let reader = new FileReader();
             reader.onload = async function(event) {
-                let rows = event.target.result.split('\\n'); let count = 0;
+                let rows = event.target.result.split('\n'); let count = 0;
                 for(let i=1; i<rows.length; i++) {
                     if(!rows[i].trim()) continue; let cols = rows[i].split(',');
                     if(cols.length >= 3) {
@@ -580,13 +686,15 @@
             reader.readAsText(file);
         };
 
+        /* ========================================= */
+
         window.exportarCSV = () => {
             if(window.videos.length === 0) return alert("No hay videos para exportar.");
-            let csv = "id_video,version,tematica,duracion,inicio_transmision,cierre_transmision\\n";
+            let csv = "id_video,version,tematica,duracion,inicio_transmision,cierre_transmision\n";
             window.videos.forEach(v => {
                 let i = v.inicio_transmision || v.inicio || ""; let f = v.cierre_transmision || v.cierre || "";
                 let id_vid = (v.id_video||"").replace(/,/g, ''); let ver = (v.version||"").replace(/,/g, ' '); let tema = (v.tematica||"General").replace(/,/g, ' '); let dur = (v.duracion||"").replace(/,/g, '');
-                csv += `${id_vid},${ver},${tema},${dur},${i},${f}\\n`;
+                csv += `${id_vid},${ver},${tema},${dur},${i},${f}\n`;
             });
             let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); let url = window.URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url;
             a.download = `MisVideos_${DB_SUFFIX}_${new Date().toISOString().split('T')[0]}.csv`; a.click();
@@ -597,7 +705,7 @@
             if(!confirm(`¿Importar datos desde Excel a tu base?`)) { e.target.value = ''; return; }
             let reader = new FileReader();
             reader.onload = async function(event) {
-                let rows = event.target.result.split('\\n'); let count = 0;
+                let rows = event.target.result.split('\n'); let count = 0;
                 for(let i=1; i<rows.length; i++) {
                     if(!rows[i].trim()) continue; let cols = rows[i].split(',');
                     if(cols.length >= 6 && cols[3].includes(':')) {
