@@ -18,7 +18,7 @@
                 <div class="flex items-center justify-center mt-2 gap-2 text-xs font-bold">
                     <span id="login-conn-dot" class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
                     <span id="login-conn-text" class="text-slate-400">Conectando...</span>
-                    <span class="text-slate-500">| v1.0.41</span>
+                    <span class="text-slate-500">| v1.0.43</span>
                 </div>
             </div>
             
@@ -106,6 +106,7 @@
                      <select id="admin-select-db" onchange="cargarVideosAdmin()" class="bg-slate-900 border border-indigo-500 text-indigo-300 font-bold rounded px-3 py-1.5 outline-none">
                          <option value="">Selecciona una base...</option>
                      </select>
+                     <input type="text" onkeyup="buscarTabla(this, 'tabla-bd-videos-body')" placeholder="&#xf002; Buscar..." class="font-[FontAwesome] bg-slate-900 border border-slate-700 px-3 py-1.5 rounded text-white text-sm outline-none focus:border-indigo-500 ml-2">
                  </div>
                  <div class="flex gap-2">
                      <input type="file" id="csv-file-admin" accept=".csv" class="hidden" onchange="importarCSV(event)">
@@ -117,17 +118,17 @@
              
              <div class="bg-slate-800 rounded-xl overflow-hidden shadow-lg border border-indigo-900/50">
                  <table class="w-full text-left text-xs">
-                     <thead class="bg-slate-900 text-slate-300 uppercase">
+                     <thead class="bg-slate-900 text-slate-300 uppercase cursor-pointer select-none">
                          <tr>
-                             <th class="p-2">Versión</th>
-                             <th class="p-2">Temática</th>
-                             <th class="p-2">Duración</th>
-                             <th class="p-2">Inicio</th>
-                             <th class="p-2">Cierre</th>
-                             <th class="p-2 text-center" title="Días Festivos en el rango">Festivos</th>
-                             <th class="p-2 text-center" title="Días Transcurridos">Transcurridos</th>
-                             <th class="p-2 text-center">Estado</th>
-                             <th id="col-accion-video" class="p-2 text-center hidden">Acciones</th>
+                             <th class="p-2 hover:text-indigo-400" onclick="ordenarTabla(this, 0, false, 'text-indigo-400')">Versión <i class="fa-solid fa-sort text-slate-600"></i></th>
+                             <th class="p-2 hover:text-indigo-400" onclick="ordenarTabla(this, 1, false, 'text-indigo-400')">Temática <i class="fa-solid fa-sort text-slate-600"></i></th>
+                             <th class="p-2 hover:text-indigo-400" onclick="ordenarTabla(this, 2, false, 'text-indigo-400')">Duración <i class="fa-solid fa-sort text-slate-600"></i></th>
+                             <th class="p-2 hover:text-indigo-400" onclick="ordenarTabla(this, 3, false, 'text-indigo-400')">Inicio <i class="fa-solid fa-sort text-slate-600"></i></th>
+                             <th class="p-2 hover:text-indigo-400" onclick="ordenarTabla(this, 4, false, 'text-indigo-400')">Cierre <i class="fa-solid fa-sort text-slate-600"></i></th>
+                             <th class="p-2 text-center hover:text-indigo-400" onclick="ordenarTabla(this, 5, true, 'text-indigo-400')" title="Días Festivos en el rango">Festivos <i class="fa-solid fa-sort text-slate-600"></i></th>
+                             <th class="p-2 text-center hover:text-indigo-400" onclick="ordenarTabla(this, 6, true, 'text-indigo-400')" title="Días Transcurridos">Transcurridos <i class="fa-solid fa-sort text-slate-600"></i></th>
+                             <th class="p-2 text-center hover:text-indigo-400" onclick="ordenarTabla(this, 7, false, 'text-indigo-400')">Estado <i class="fa-solid fa-sort text-slate-600"></i></th>
+                             <th id="col-accion-video" class="p-2 text-center hidden cursor-default">Acciones</th>
                          </tr>
                      </thead>
                      <tbody id="tabla-bd-videos-body" class="divide-y divide-slate-700"></tbody>
@@ -186,6 +187,8 @@
                 <select id="nu-pag" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white">
                     <option value="index2.html">Página 2 (index2.html)</option>
                     <option value="index3.html">Página 3 (index3.html)</option>
+                    <option value="index4.html">Página 4 (index4.html)</option>
+                    <option value="index5.html">Página 5 (index5.html)</option>
                 </select>
                 <div>
                     <label class="text-xs text-slate-400 mb-1 block">Sufijo BD (Usa '1' para conectar a BD antigua)</label>
@@ -231,6 +234,34 @@
 
         window.userRole = null; window.usuariosApp = []; window.videosEdit = []; 
 
+        window.ordenarTabla = (th, colIdx, isNum, colorCls = 'text-cyan-400') => {
+            const tbody = th.closest('table').querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const asc = th.dataset.asc !== 'true';
+            th.dataset.asc = asc;
+            
+            th.closest('tr').querySelectorAll('th i.fa-sort, th i.fa-sort-up, th i.fa-sort-down').forEach(i => {
+                i.className = 'fa-solid fa-sort text-slate-600';
+            });
+            const icon = th.querySelector('i');
+            if(icon) icon.className = asc ? `fa-solid fa-sort-up ${colorCls}` : `fa-solid fa-sort-down ${colorCls}`;
+
+            rows.sort((a, b) => {
+                let vA = a.cells[colIdx].innerText.replace(/,/g, '').trim();
+                let vB = b.cells[colIdx].innerText.replace(/,/g, '').trim();
+                if(isNum) return asc ? Number(vA) - Number(vB) : Number(vB) - Number(vA);
+                return asc ? vA.localeCompare(vB) : vB.localeCompare(vA);
+            });
+            tbody.append(...rows);
+        };
+
+        window.buscarTabla = (inp, tbId) => {
+            const q = inp.value.toLowerCase();
+            document.getElementById(tbId).querySelectorAll('tr').forEach(tr => {
+                tr.style.display = tr.innerText.toLowerCase().includes(q) ? '' : 'none';
+            });
+        };
+
         getDocs(collection(db, "test_conn")).then(()=>{
             document.getElementById('login-conn-dot').classList.replace('bg-red-500','bg-green-500');
             document.getElementById('login-conn-text').innerText = 'Conectado a Firebase';
@@ -268,7 +299,11 @@
             await logAcceso(user.nombre, 'Colaborador');
             localStorage.setItem('session_colab_id', user.id);
             localStorage.setItem('session_colab_nombre', user.nombre);
-            localStorage.setItem('session_colab_db', user.db_suffix); 
+            
+            // FIX_UNDEFINED: si falta el sufijo, toma el id por defecto o '1'
+            let dbsuf = user.db_suffix || user.id || '1';
+            localStorage.setItem('session_colab_db', dbsuf); 
+            
             window.location.href = user.pagina; 
         };
 
@@ -315,7 +350,8 @@
             window.usuariosApp.forEach(u => {
                 let status = u.bloqueado ? '<span class="text-red-400">Bloqueado</span>' : '<span class="text-green-400">Activo</span>';
                 let bToggle = u.bloqueado ? `<button onclick="toggleBloqueo('${u.id}', false)" class="bg-green-600 px-2 py-1 rounded text-white mx-1">Activar</button>` : `<button onclick="toggleBloqueo('${u.id}', true)" class="bg-red-600 px-2 py-1 rounded text-white mx-1">Bloquear</button>`;
-                tb.innerHTML += `<tr><td class="p-3 text-cyan-300 font-bold">${u.id}</td><td class="p-3">${u.nombre}</td><td class="p-3">${u.pagina}</td><td class="p-3 font-mono text-amber-400">${u.db_suffix}</td><td class="p-3">${status}</td><td class="p-3 text-right"><button onclick="resetPass('${u.id}')" class="bg-slate-700 px-2 py-1 rounded text-white">Pass</button>${bToggle}</td></tr>`;
+                let dbsuf = u.db_suffix || u.id || '1'; // FIX_UNDEFINED
+                tb.innerHTML += `<tr><td class="p-3 text-cyan-300 font-bold">${u.id}</td><td class="p-3">${u.nombre}</td><td class="p-3">${u.pagina}</td><td class="p-3 font-mono text-amber-400">${dbsuf}</td><td class="p-3">${status}</td><td class="p-3 text-right"><button onclick="resetPass('${u.id}')" class="bg-slate-700 px-2 py-1 rounded text-white">Pass</button>${bToggle}</td></tr>`;
             });
         };
         window.guardarNuevoUsuario = async (e) => { e.preventDefault(); const id = document.getElementById('nu-id').value.trim().toLowerCase(); await setDoc(doc(db, "usuarios_colaboradores", id), { nombre: document.getElementById('nu-nombre').value, password: document.getElementById('nu-pass').value, pagina: document.getElementById('nu-pag').value, db_suffix: document.getElementById('nu-sufijo').value, bloqueado: false }); document.getElementById('modal-nuevo-usr').classList.add('hidden'); await cargarUsuarios(); renderUsuarios(); llenarSelectDBAdmin(); };
@@ -325,7 +361,10 @@
 
         window.llenarSelectDBAdmin = () => {
             let s = '<option value="">Selecciona base a editar...</option>';
-            window.usuariosApp.forEach(u => s += `<option value="${u.db_suffix}">Base de: ${u.nombre} (${u.db_suffix==='1'?'bd_videos':'bd_videos_'+u.db_suffix})</option>`);
+            window.usuariosApp.forEach(u => {
+                let dbsuf = u.db_suffix || u.id || '1'; // FIX_UNDEFINED
+                s += `<option value="${dbsuf}">Base de: ${u.nombre} (${dbsuf==='1'?'bd_videos':'bd_videos_'+dbsuf})</option>`;
+            });
             document.getElementById('admin-select-db').innerHTML = s;
         };
 

@@ -25,10 +25,11 @@
                 
                 <button onclick="cambiarHoja('BD_Videos')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-cyan-600 text-white" data-target="BD_Videos">Mis Videos</button>
                 <button onclick="cambiarHoja('Reporte')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-700 text-slate-300" data-target="Reporte">Generador de Reportes</button>
-                <button onclick="cambiarHoja('Calendario')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-700 text-slate-300" data-target="Calendario">Festivos</button>
+                <button onclick="cambiarHoja('Calendario')" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-700 text-slate-300" data-target="Calendario">Festivos e Hábiles</button>
                 
                 <div class="w-px h-6 bg-slate-700 mx-1"></div>
                 
+                <button onclick="cambiarMiPassword()" class="px-3 py-1.5 rounded-lg text-sm font-semibold bg-slate-700 text-slate-300 border border-slate-600 hover:text-white"><i class="fa-solid fa-key"></i> Clave</button>
                 <button onclick="abrirConfig()" class="px-3 py-1.5 rounded-lg text-sm font-semibold bg-amber-600/20 text-amber-400 border border-amber-500/30"><i class="fa-solid fa-sliders"></i> Ajustes</button>
                 <button onclick="salir()" class="ml-2 px-3 py-1.5 rounded-lg text-sm font-bold bg-red-600 hover:bg-red-500 text-white"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
             </nav>
@@ -39,7 +40,10 @@
         
         <section id="sheet-BD_Videos" class="sheet-view space-y-6">
             <div class="flex flex-wrap justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700 shadow gap-4">
-                <h2 class="text-xl font-bold text-white"><i class="fa-solid fa-video text-cyan-400"></i> Mi Catálogo de Videos</h2>
+                <div class="flex items-center gap-3">
+                    <h2 class="text-xl font-bold text-white"><i class="fa-solid fa-video text-cyan-400"></i> Mi Catálogo</h2>
+                    <input type="text" onkeyup="buscarTabla(this, 'tabla-videos-body')" placeholder="&#xf002; Buscar..." class="font-[FontAwesome] bg-slate-900 border border-slate-700 px-3 py-1.5 rounded text-white text-sm outline-none focus:border-cyan-500">
+                </div>
                 <div class="flex flex-wrap gap-2">
                     <input type="file" id="csv-file-colab" accept=".csv" class="hidden" onchange="importarCSV(event)">
                     <button onclick="exportarCSV()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded font-bold text-sm shadow"><i class="fa-solid fa-download"></i> Bajar Excel</button>
@@ -49,18 +53,18 @@
             </div>
             <div class="bg-slate-800 rounded-xl overflow-hidden shadow-lg border border-cyan-900/50">
                 <table class="w-full text-left text-xs">
-                    <thead class="bg-slate-900 text-slate-300 uppercase">
+                    <thead class="bg-slate-900 text-slate-300 uppercase cursor-pointer select-none">
                         <tr>
-                            <th class="p-2">Versión</th>
-                            <th class="p-2">Temática</th>
-                            <th class="p-2">Duración</th>
-                            <th class="p-2">Inicio</th>
-                            <th class="p-2">Cierre</th>
-                            <th class="p-2 text-center" title="Festivos en Rango">Festivos</th>
-                            <th class="p-2 text-center" title="Días Transcurridos">Transcurridos</th>
-                            <th class="p-2 text-center">Estado</th>
-                            <th class="p-2 text-right">Impactos</th>
-                            <th class="p-2 text-center">Borrar</th>
+                            <th class="p-2 hover:text-cyan-400" onclick="ordenarTabla(this, 0, false)">Versión <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 hover:text-cyan-400" onclick="ordenarTabla(this, 1, false)">Temática <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 hover:text-cyan-400" onclick="ordenarTabla(this, 2, false)">Duración <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 hover:text-cyan-400" onclick="ordenarTabla(this, 3, false)">Inicio <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 hover:text-cyan-400" onclick="ordenarTabla(this, 4, false)">Cierre <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 text-center hover:text-cyan-400" onclick="ordenarTabla(this, 5, true)" title="Festivos en Rango">Festivos <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 text-center hover:text-cyan-400" onclick="ordenarTabla(this, 6, true)" title="Días Transcurridos">Transcurridos <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 text-center hover:text-cyan-400" onclick="ordenarTabla(this, 7, false)">Estado <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 text-right hover:text-cyan-400" onclick="ordenarTabla(this, 8, true)">Impactos <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 text-center cursor-default">Borrar</th>
                         </tr>
                     </thead>
                     <tbody id="tabla-videos-body" class="divide-y divide-slate-700"></tbody>
@@ -70,16 +74,24 @@
 
         <section id="sheet-Reporte" class="sheet-view hidden space-y-6">
             <div class="bg-slate-800 p-6 rounded-xl border border-orange-500 shadow-xl">
-                <h2 class="text-xl font-bold text-white mb-4"><i class="fa-solid fa-chart-pie text-orange-400"></i> Generador de Reportes</h2>
+                <h2 class="text-xl font-bold text-white mb-4 flex justify-between items-center flex-wrap gap-3">
+                    <span><i class="fa-solid fa-chart-pie text-orange-400"></i> Generador de Reportes</span>
+                    <input type="text" onkeyup="buscarTabla(this, 'tabla-reporte-body')" placeholder="&#xf002; Buscar en reporte..." class="font-[FontAwesome] bg-slate-900 border border-slate-700 px-3 py-1.5 rounded text-white text-sm font-normal outline-none focus:border-orange-500">
+                </h2>
                 
-                <div class="flex gap-4 mb-4 bg-slate-900 p-4 rounded-xl border border-slate-700 items-center">
-                    <div>
-                        <label class="text-xs text-slate-400 font-bold block mb-1">Día de Inicio</label>
-                        <input type="date" id="rep-inicio" class="bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white font-bold outline-none focus:border-orange-500" onchange="renderReporte()">
+                <div class="flex gap-4 mb-4 bg-slate-900 p-4 rounded-xl border border-slate-700 items-center justify-between">
+                    <div class="flex gap-4">
+                        <div>
+                            <label class="text-xs text-slate-400 font-bold block mb-1">Día de Inicio</label>
+                            <input type="date" id="rep-inicio" class="bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white font-bold outline-none focus:border-orange-500" onchange="renderReporte()">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400 font-bold block mb-1">Día de Cierre</label>
+                            <input type="date" id="rep-fin" class="bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white font-bold outline-none focus:border-orange-500" onchange="renderReporte()">
+                        </div>
                     </div>
                     <div>
-                        <label class="text-xs text-slate-400 font-bold block mb-1">Día de Cierre</label>
-                        <input type="date" id="rep-fin" class="bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white font-bold outline-none focus:border-orange-500" onchange="renderReporte()">
+                        <button onclick="exportarReporte()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg font-bold shadow-lg flex items-center gap-2 transition"><i class="fa-solid fa-file-excel"></i> Exportar Reporte</button>
                     </div>
                 </div>
 
@@ -96,17 +108,17 @@
                 </div>
 
                 <table class="w-full text-left text-xs bg-slate-900 rounded-xl overflow-hidden shadow">
-                    <thead class="bg-slate-950 text-slate-400 uppercase">
+                    <thead class="bg-slate-950 text-slate-400 uppercase cursor-pointer select-none">
                         <tr>
-                            <th class="p-2">Versión</th>
-                            <th class="p-2">Temática</th>
-                            <th class="p-2">Duración</th>
-                            <th class="p-2">Inicio</th>
-                            <th class="p-2">Cierre</th>
-                            <th class="p-2 text-center">Festivos</th>
-                            <th class="p-2 text-center">Transcurridos</th>
-                            <th class="p-2 text-center">Estado</th>
-                            <th class="p-2 text-right text-amber-400 font-bold">Impactos</th>
+                            <th class="p-2 hover:text-orange-400" onclick="ordenarTabla(this, 0, false, 'text-orange-400')">Versión <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 hover:text-orange-400" onclick="ordenarTabla(this, 1, false, 'text-orange-400')">Temática <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 hover:text-orange-400" onclick="ordenarTabla(this, 2, false, 'text-orange-400')">Duración <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 hover:text-orange-400" onclick="ordenarTabla(this, 3, false, 'text-orange-400')">Inicio <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 hover:text-orange-400" onclick="ordenarTabla(this, 4, false, 'text-orange-400')">Cierre <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 text-center hover:text-orange-400" onclick="ordenarTabla(this, 5, true, 'text-orange-400')">Festivos <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 text-center hover:text-orange-400" onclick="ordenarTabla(this, 6, true, 'text-orange-400')">Transcurridos <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 text-center hover:text-orange-400" onclick="ordenarTabla(this, 7, false, 'text-orange-400')">Estado <i class="fa-solid fa-sort text-slate-600"></i></th>
+                            <th class="p-2 text-right hover:text-orange-400" onclick="ordenarTabla(this, 8, true, 'text-orange-400')">Impactos <i class="fa-solid fa-sort text-slate-600"></i></th>
                         </tr>
                     </thead>
                     <tbody id="tabla-reporte-body" class="divide-y divide-slate-800"></tbody>
@@ -116,8 +128,15 @@
         
         <section id="sheet-Calendario" class="sheet-view hidden space-y-6">
             <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
-                <h2 class="text-xl font-bold text-white mb-4"><i class="fa-solid fa-calendar-xmark text-amber-400"></i> Días Festivos / Inhábiles</h2>
-                <button onclick="document.getElementById('modal-cal').classList.remove('hidden')" class="bg-amber-600 text-white px-4 py-2 rounded font-bold mb-4 shadow"><i class="fa-solid fa-plus"></i> Agregar Fecha</button>
+                <div class="flex justify-between items-center mb-4 flex-wrap gap-3">
+                    <h2 class="text-xl font-bold text-white"><i class="fa-solid fa-calendar-xmark text-amber-400"></i> Días Festivos y Ajuste de Horarios</h2>
+                    <div class="flex gap-2">
+                        <input type="file" id="csv-file-cal" accept=".csv" class="hidden" onchange="importarCalCSV(event)">
+                        <button onclick="exportarCalCSV()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded font-bold shadow text-sm transition"><i class="fa-solid fa-download"></i> Bajar Calendario</button>
+                        <button onclick="document.getElementById('csv-file-cal').click()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded font-bold shadow text-sm transition"><i class="fa-solid fa-upload"></i> Subir Calendario</button>
+                        <button onclick="document.getElementById('modal-cal').classList.remove('hidden')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded font-bold shadow text-sm transition"><i class="fa-solid fa-plus"></i> Añadir Fecha</button>
+                    </div>
+                </div>
                 <table class="w-full text-left text-sm bg-slate-900 rounded-xl overflow-hidden">
                     <thead class="bg-slate-950 text-slate-400"><tr><th class="p-3">Tipo</th><th class="p-3">Fecha</th><th class="p-3">Descripción</th><th class="p-3">Eliminar</th></tr></thead>
                     <tbody id="tabla-cal-body" class="divide-y divide-slate-800"></tbody>
@@ -131,15 +150,16 @@
     <div id="modal-config" class="fixed inset-0 bg-slate-950/95 z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-slate-800 border-2 border-amber-500 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative">
             <button id="btn-cerrar-config" onclick="cerrarConfig()" class="absolute top-4 right-4 text-slate-400 hover:text-white hidden"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <h3 class="text-xl font-black text-amber-400 mb-2 text-center"><i class="fa-solid fa-sliders"></i> Ajustes de Módulo</h3>
-            <p class="text-xs text-slate-300 text-center mb-6">Esta configuración calculará los impactos automáticos de tu sucursal.</p>
+            <h3 class="text-xl font-black text-amber-400 mb-2 text-center"><i class="fa-solid fa-sliders"></i> Ajustes Generales de Módulo</h3>
+            <p class="text-xs text-slate-300 text-center mb-6">Esta configuración calculará los impactos automáticos (puedes sobrescribir las horas por día en el calendario).</p>
             
             <form onsubmit="guardarConfig(event)" class="space-y-5">
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1">Horas de transmisión al día</label>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Horas de transmisión estándar al día</label>
                     <select id="cfg-horas" class="w-full bg-slate-900 border border-slate-600 rounded px-4 py-3 text-white font-bold">
-                        <option value="7">7 Horas</option><option value="8">8 Horas</option><option value="9">9 Horas</option>
-                        <option value="10">10 Horas</option><option value="11">11 Horas</option><option value="12">12 Horas</option>
+                        <option value="5">5 Horas</option><option value="6">6 Horas</option><option value="7">7 Horas</option>
+                        <option value="8">8 Horas</option><option value="9">9 Horas</option><option value="10">10 Horas</option>
+                        <option value="11">11 Horas</option><option value="12">12 Horas</option><option value="24">24 Horas</option>
                     </select>
                 </div>
                 <div>
@@ -176,12 +196,20 @@
     
     <div id="modal-cal" class="fixed inset-0 bg-slate-950/80 hidden z-[60] flex items-center justify-center p-4">
         <div class="bg-slate-800 p-6 rounded-xl max-w-sm w-full border border-slate-700 shadow-2xl">
-            <h3 class="font-bold mb-4 text-white">Agregar Fecha</h3>
+            <h3 class="font-bold mb-4 text-white">Agregar Fecha Especial</h3>
             <form onsubmit="guardarCal(event)" class="space-y-3">
-                <select id="c-tipo" class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white"><option value="festivo">Día Inhábil (Descanso)</option><option value="adicional">Día Laboral Adicional (Domingo)</option></select>
+                <select id="c-tipo" class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white" onchange="document.getElementById('div-c-horas').classList.toggle('hidden', this.value !== 'especial')">
+                    <option value="festivo">Día Inhábil (Descanso General)</option>
+                    <option value="adicional">Día Laboral Adicional (Ej. Domingo)</option>
+                    <option value="especial">Horario Especial (Ajuste de Horas)</option>
+                </select>
+                <div id="div-c-horas" class="hidden mt-3">
+                    <label class="text-xs text-slate-400">Horas laborables para este día específico</label>
+                    <input type="number" id="c-horas" min="1" max="24" value="5" class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white mt-1 font-bold">
+                </div>
                 <input type="date" id="c-fec" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white">
-                <input type="text" id="c-desc" placeholder="Motivo (ej. Navidad)" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white">
-                <div class="flex justify-end gap-2 mt-4"><button type="button" onclick="document.getElementById('modal-cal').classList.add('hidden')" class="bg-slate-700 px-4 py-2 rounded text-white">Cancelar</button><button type="submit" class="bg-amber-600 px-4 py-2 rounded text-white font-bold shadow">Guardar</button></div>
+                <input type="text" id="c-desc" placeholder="Motivo (ej. Navidad o Día Corto)" required class="w-full bg-slate-900 border-slate-700 p-2 rounded text-white">
+                <div class="flex justify-end gap-2 mt-4"><button type="button" onclick="document.getElementById('modal-cal').classList.add('hidden')" class="bg-slate-700 px-4 py-2 rounded text-white">Cancelar</button><button type="submit" class="bg-amber-600 px-4 py-2 rounded text-white font-bold shadow">Guardar Fecha</button></div>
             </form>
         </div>
     </div>
@@ -189,7 +217,7 @@
     <!-- LOGICA FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, setDoc, getDoc, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, setDoc, getDoc, addDoc, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyA6jvnsXZwF2anOJo3VadfNvn7Fl6Z5efY", projectId: "sistema-mac-reportes" };
         const app = initializeApp(firebaseConfig);
@@ -210,6 +238,46 @@
         window.cfg = { horas: 7, pantallas: 1 };
         window.videos = [];
         window.calendario = [];
+
+        window.ordenarTabla = (th, colIdx, isNum, colorCls = 'text-cyan-400') => {
+            const tbody = th.closest('table').querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const asc = th.dataset.asc !== 'true';
+            th.dataset.asc = asc;
+            
+            th.closest('tr').querySelectorAll('th i.fa-sort, th i.fa-sort-up, th i.fa-sort-down').forEach(i => {
+                i.className = 'fa-solid fa-sort text-slate-600';
+            });
+            const icon = th.querySelector('i');
+            if(icon) icon.className = asc ? `fa-solid fa-sort-up ${colorCls}` : `fa-solid fa-sort-down ${colorCls}`;
+
+            rows.sort((a, b) => {
+                let vA = a.cells[colIdx].innerText.replace(/,/g, '').trim();
+                let vB = b.cells[colIdx].innerText.replace(/,/g, '').trim();
+                if(isNum) return asc ? Number(vA) - Number(vB) : Number(vB) - Number(vA);
+                return asc ? vA.localeCompare(vB) : vB.localeCompare(vA);
+            });
+            tbody.append(...rows);
+        };
+
+        window.buscarTabla = (inp, tbId) => {
+            const q = inp.value.toLowerCase();
+            document.getElementById(tbId).querySelectorAll('tr').forEach(tr => {
+                tr.style.display = tr.innerText.toLowerCase().includes(q) ? '' : 'none';
+            });
+        };
+
+        window.cambiarMiPassword = async () => {
+            let p = prompt("Ingresa tu nueva contraseña para acceder al módulo:");
+            if(p && p.trim() !== "") {
+                try {
+                    await updateDoc(doc(db, "usuarios_colaboradores", COLAB_ID), {password: p.trim()});
+                    alert("¡Tu contraseña ha sido actualizada con éxito!");
+                } catch(e) {
+                    alert("Hubo un error al actualizar la contraseña.");
+                }
+            }
+        };
 
         window.salir = () => { localStorage.clear(); window.location.href='index.html'; };
 
@@ -260,6 +328,9 @@
         function procesarMate() {
             let fest = new Set(window.calendario.filter(c=>c.tipo==='festivo').map(c=>c.fecha));
             let adic = new Set(window.calendario.filter(c=>c.tipo==='adicional').map(c=>c.fecha));
+            let horasEsp = {}; 
+            window.calendario.filter(c=>c.tipo==='especial').forEach(c => horasEsp[c.fecha] = c.horas);
+
             let hoyStr = new Date().toISOString().split('T')[0];
 
             window.videos.forEach(v => {
@@ -273,13 +344,8 @@
                 if(!vIni || !vFin) { v.dias = 0; v.imp = 0; v.est='Error'; v.fest_rango=0; v.trans_cal=0; return; }
 
                 let ini = new Date(vIni+"T00:00:00"), fin = new Date(vFin+"T00:00:00"), hoy = new Date(hoyStr+"T00:00:00");
-                
-                // Estado
-                if (hoy > fin) v.est = 'Finalizado';
-                else if (hoy < ini) v.est = 'Próximo';
-                else v.est = 'Vigente';
+                if (hoy > fin) v.est = 'Finalizado'; else if (hoy < ini) v.est = 'Próximo'; else v.est = 'Vigente';
 
-                // Festivos en Rango & Transcurridos Calendario
                 let festRango = 0;
                 let iter = new Date(ini);
                 while(iter <= fin) {
@@ -290,16 +356,21 @@
 
                 let lim = (fin < hoy) ? fin : hoy; 
                 let transCal = 0;
-                if (hoy >= ini) {
-                    transCal = Math.ceil(Math.abs(lim - ini) / 86400000) + 1; 
-                }
+                if (hoy >= ini) { transCal = Math.ceil(Math.abs(lim - ini) / 86400000) + 1; }
                 v.trans_cal = transCal;
 
-                // Impactos
                 let dias = 0, rep = 0; let c = new Date(ini);
                 while(c <= lim) {
                     let f = c.toISOString().split('T')[0];
-                    if(!fest.has(f) && (c.getDay()!==0 || adic.has(f))) {
+                    let esNormal = c.getDay() !== 0; // Lunes a Sabado
+                    
+                    let labora = false;
+                    if (fest.has(f)) labora = false; // Inhabil estricto
+                    else if (horasEsp[f] !== undefined) labora = true; // Dia con horario especial
+                    else if (adic.has(f)) labora = true; // Domingo u otro extra
+                    else if (esNormal) labora = true; // Dia normal
+                    
+                    if(labora) {
                         dias++;
                         let actHoy = window.videos.filter(vid => {
                             let i = vid.inicio_transmision || vid.inicio;
@@ -307,7 +378,11 @@
                             return f >= i && f <= fn;
                         });
                         let sumS = actHoy.reduce((a,b)=>a+window.duracionSeg(b.duracion), 0);
-                        if(sumS>0) rep += (3600 / sumS) * window.cfg.horas * window.cfg.pantallas * (window.duracionSeg(v.duracion)/60);
+                        
+                        let hrHoy = horasEsp[f] !== undefined ? horasEsp[f] : (window.tempCfg ? window.tempCfg.horas : window.cfg.horas);
+                        let ptHoy = window.tempCfg ? window.tempCfg.pantallas : window.cfg.pantallas;
+                        
+                        if(sumS>0) rep += (3600 / sumS) * hrHoy * ptHoy * (window.duracionSeg(v.duracion)/60);
                     }
                     c.setDate(c.getDate()+1);
                 }
@@ -367,6 +442,20 @@
             document.getElementById('rep-total-impactos').innerText = tImp.toLocaleString();
         };
 
+        window.exportarReporte = () => {
+            let ini = document.getElementById('rep-inicio').value; let fin = document.getElementById('rep-fin').value;
+            if(!ini || !fin) return alert("Selecciona un rango de fechas para el reporte.");
+            let csv = "Version,Tematica,Duracion,Inicio,Cierre,Festivos_Rango,Transcurridos,Estado,Impactos\n";
+            window.videos.forEach(v => {
+                if(v._ini <= fin && v._fin >= ini) {
+                    let id_vid = (v.version||"").replace(/,/g, ' '); let tema = (v._tema||"").replace(/,/g, ' ');
+                    csv += `${id_vid},${tema},${v.duracion},${v._ini},${v._fin},${v.fest_rango},${v.trans_cal},${v.est},${v.imp}\n`;
+                }
+            });
+            let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); let url = window.URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url;
+            a.download = `ReporteImpactos_${DB_SUFFIX}_${ini}_al_${fin}.csv`; a.click();
+        };
+
         window.abrirModalVideo = () => { 
             document.getElementById('v-id').value = 'VID-' + Math.floor(Date.now()/1000); 
             document.getElementById('v-ver').value=''; 
@@ -394,14 +483,53 @@
         window.renderCal = () => {
             const tb = document.getElementById('tabla-cal-body'); tb.innerHTML='';
             window.calendario.forEach(c => {
-                let badge = c.tipo==='festivo' ? '<span class="bg-red-900/50 text-red-400 px-2 py-1 rounded text-xs font-bold">Inhábil</span>' : '<span class="bg-green-900/50 text-green-400 px-2 py-1 rounded text-xs font-bold">Laboral Extra</span>';
+                let badge = '';
+                if(c.tipo==='festivo') badge = '<span class="bg-red-900/50 text-red-400 px-2 py-1 rounded text-xs font-bold">Inhábil</span>';
+                else if(c.tipo==='especial') badge = `<span class="bg-cyan-900/50 text-cyan-400 px-2 py-1 rounded text-xs font-bold">Especial (${c.horas}h)</span>`;
+                else badge = '<span class="bg-green-900/50 text-green-400 px-2 py-1 rounded text-xs font-bold">Laboral Extra</span>';
+                
                 tb.innerHTML += `<tr class="hover:bg-slate-700/50"><td class="p-3">${badge}</td><td class="p-3 font-mono text-amber-300">${c.fecha}</td><td class="p-3">${c.descripcion}</td><td class="p-3"><button onclick="borrarCal('${c.idDoc}')" class="text-rose-400"><i class="fa-solid fa-trash"></i></button></td></tr>`;
             });
         };
-        window.guardarCal = async (e) => { e.preventDefault(); await addDoc(collection(db, COLL_CAL), {tipo: document.getElementById('c-tipo').value, fecha: document.getElementById('c-fec').value, descripcion: document.getElementById('c-desc').value}); document.getElementById('modal-cal').classList.add('hidden'); await cargarData(); };
+        
+        window.guardarCal = async (e) => { 
+            e.preventDefault(); 
+            let tipo = document.getElementById('c-tipo').value;
+            let obj = { tipo: tipo, fecha: document.getElementById('c-fec').value, descripcion: document.getElementById('c-desc').value };
+            if (tipo === 'especial') obj.horas = Number(document.getElementById('c-horas').value);
+            await addDoc(collection(db, COLL_CAL), obj); 
+            document.getElementById('modal-cal').classList.add('hidden'); 
+            await cargarData(); 
+        };
         window.borrarCal = async (id) => { if(confirm("¿Eliminar fecha?")){ await deleteDoc(doc(db, COLL_CAL, id)); await cargarData();} };
 
-        // EXPORTAR / IMPORTAR CSV EN COLABORADOR
+        window.exportarCalCSV = () => {
+            if(window.calendario.length === 0) return alert("No hay fechas para exportar.");
+            let csv = "tipo,fecha,descripcion,horas\n";
+            window.calendario.forEach(c => { csv += `${c.tipo},${c.fecha},${c.descripcion||''},${c.horas||''}\n`; });
+            let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); let url = window.URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url;
+            a.download = `Calendario_${DB_SUFFIX}_${new Date().toISOString().split('T')[0]}.csv`; a.click();
+        };
+
+        window.importarCalCSV = async (e) => {
+            let file = e.target.files[0]; if(!file) return;
+            if(!confirm(`¿Importar calendario desde Excel?`)) { e.target.value = ''; return; }
+            let reader = new FileReader();
+            reader.onload = async function(event) {
+                let rows = event.target.result.split('\n'); let count = 0;
+                for(let i=1; i<rows.length; i++) {
+                    if(!rows[i].trim()) continue; let cols = rows[i].split(',');
+                    if(cols.length >= 3) {
+                        let obj = { tipo: cols[0].trim(), fecha: cols[1].trim(), descripcion: cols[2].trim() };
+                        if(cols[3] && !isNaN(cols[3].trim())) obj.horas = Number(cols[3].trim());
+                        await addDoc(collection(db, COLL_CAL), obj); count++;
+                    }
+                }
+                alert(`Éxito: Se subieron ${count} fechas de calendario.`); e.target.value = ''; await cargarData();
+            };
+            reader.readAsText(file);
+        };
+
         window.exportarCSV = () => {
             if(window.videos.length === 0) return alert("No hay videos para exportar.");
             let csv = "id_video,version,tematica,duracion,inicio_transmision,cierre_transmision\n";
